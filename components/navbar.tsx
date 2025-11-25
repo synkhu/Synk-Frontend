@@ -8,7 +8,6 @@ export default function Navbar() {
     const [email, setEmail] = useState('')
     const [code, setCode] = useState('')
     
-    // Sample cart data - in a real app, this would come from your state management
     const [cartItems, setCartItems] = useState([
         {
             id: 1,
@@ -60,22 +59,17 @@ export default function Navbar() {
     }
 
     const handleGetCode = () => {
-        // Here you would typically send the code to the user's email
         console.log('Sending code to:', email)
-        // For demo purposes, we'll just switch to code entry
         setLoginStep('code')
     }
 
     const handleLogin = () => {
-        // Here you would verify the code
         console.log('Verifying code:', code, 'for email:', email)
-        // If successful:
         setShowPopup(false)
         alert('Sikeres bejelentkezés!')
     }
 
     const handleForgotPassword = () => {
-        // Handle forgot password logic here
         alert('Elfelejtett jelszó funkció')
     }
 
@@ -94,8 +88,7 @@ export default function Navbar() {
         setCartItems(cartItems.filter(item => item.id !== ticketId))
     }
 
-    const downloadTicket = (ticket) => {
-        // In a real app, this would generate/download the ticket PDF
+    const downloadTicket = (ticket: { eventName: string }) => {
         alert(`Letöltés: ${ticket.eventName} jegy`)
     }
 
@@ -103,14 +96,14 @@ export default function Navbar() {
         return cartItems.reduce((total, item) => total + item.price, 0)
     }
 
-    const formatPrice = (price) => {
+    const formatPrice = (price: number) => {
         return new Intl.NumberFormat('hu-HU', {
             style: 'currency',
             currency: 'HUF'
-        }).format(price)
+        }).format(price)    
     }
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('hu-HU', {
             year: 'numeric',
             month: 'long',

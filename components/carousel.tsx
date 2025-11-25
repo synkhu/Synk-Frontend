@@ -1,4 +1,4 @@
-import React from 'react'
+import Image from 'next/image'
 
 export default function Carousel() {
     return (
@@ -7,13 +7,13 @@ export default function Carousel() {
             <div id="carouselExampleAutoplaying" className="carousel slide" data-bs-ride="carousel">
                 <div className="carousel-inner">
                     <div className="carousel-item active">
-                        <img src="c:\Users\Admin\AppData\Local\Temp\premium_photo-1664474619075-644dd191935f.jpg" className="d-block w-100" alt="..."/>
+                        <Image src="..." className="d-block w-100" alt="..."/>
                     </div>
                     <div className="carousel-item">
-                        <img src="..." className="d-block w-100" alt="..."/>
+                        <Image src="..." className="d-block w-100" alt="..."/>
                     </div>
                     <div className="carousel-item">
-                        <img src="..." className="d-block w-100" alt="..."/>
+                        <Image src="..." className="d-block w-100" alt="..."/>
                     </div>
                 </div>
                 <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
