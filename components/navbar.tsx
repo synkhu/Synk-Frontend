@@ -90,7 +90,7 @@ export default function Navbar() {
         setShowCartPopup(false)
     }
 
-    const removeTicket = (ticketId: string) => {
+    const removeTicket = (ticketId: number) => {
         setCartItems(cartItems.filter(item => item.id !== ticketId))
     }
 
@@ -333,3 +333,4 @@ export default function Navbar() {
     )
 
 }
+
