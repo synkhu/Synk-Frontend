@@ -1,0 +1,309 @@
+.navbar {
+  width: 260px;
+  min-height: 100vh;
+  background: #0b1220;
+  color: #fff;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-logo-icon {
+  width: 40px;
+  height: 40px;
+  background: #1f2937;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.navbar-logo-text {
+  margin: 0;
+  font-size: 20px;
+}
+
+.navbar-search-label {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.navbar-search-input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #24303d;
+  background: #061023;
+  color: #fff;
+  outline: none;
+}
+
+.navbar-buttons {
+  margin-top: auto;
+}
+
+.navbar-button {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.navbar-button:last-child {
+  margin-bottom: 0;
+}
+
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-container {
+  background: #0b1220;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #24303d;
+  width: 90%;
+  max-width: 400px;
+  color: #fff;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.popup-title {
+  margin: 0;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.popup-input-group {
+  margin-bottom: 1rem;
+}
+
+.popup-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 14px;
+}
+
+.popup-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #24303d;
+  background: #061023;
+  color: #fff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.popup-primary-button {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.popup-primary-button:disabled {
+  background: #1f2937;
+  cursor: not-allowed;
+}
+
+.popup-secondary-button {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: transparent;
+  color: #9ca3af;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.popup-info-text {
+  font-size: 14px;
+  margin-bottom: 1rem;
+  color: #9ca3af;
+}
+
+/* Cart Popup Styles */
+.cart-popup-container {
+  background: #0b1220;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #24303d;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: #fff;
+}
+
+.cart-title {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+}
+
+.cart-empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem 0;
+}
+
+.ticket-item {
+  background: #1f2937;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #374151;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.ticket-event-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0;
+  color: #fff;
+}
+
+.ticket-price {
+  font-weight: 600;
+  color: #10b981;
+  font-size: 1.1rem;
+}
+
+.ticket-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.ticket-detail {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.ticket-detail strong {
+  color: #fff;
+}
+
+.ticket-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.ticket-action-button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ticket-action-remove {
+  background: #ef4444;
+  color: white;
+}
+
+.ticket-action-remove:hover {
+  background: #dc2626;
+}
+
+.ticket-action-download {
+  background: #2563eb;
+  color: white;
+}
+
+.ticket-action-download:hover {
+  background: #1d4ed8;
+}
+
+.cart-total {
+  border-top: 1px solid #374151;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.cart-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cart-checkout-button {
+  flex: 2;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: none;
+  background: #10b981;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cart-close-button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: transparent;
+  color: #9ca3af;
+  font-weight: 600;
+  cursor: pointer;
+}
