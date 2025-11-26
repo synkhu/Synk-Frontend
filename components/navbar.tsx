@@ -1,13 +1,17 @@
 import React, { useState } from 'react'
 import './navbar.css'
+import axios from 'axios'
+import RegisterPopup from './register'
 
 export default function Navbar() {
     const [showPopup, setShowPopup] = useState(false)
     const [showCartPopup, setShowCartPopup] = useState(false)
-    const [loginStep, setLoginStep] = useState('email') // 'email' or 'code'
+    const [showRegisterPopup, setShowRegisterPopup] = useState(false)
+
+    const [loginStep, setLoginStep] = useState<'email' | 'code'>('email')
     const [email, setEmail] = useState('')
     const [code, setCode] = useState('')
-    
+
     const [cartItems, setCartItems] = useState([
         {
             id: 1,
@@ -69,10 +73,6 @@ export default function Navbar() {
         alert('Sikeres bejelentkezés!')
     }
 
-    const handleForgotPassword = () => {
-        alert('Elfelejtett jelszó funkció')
-    }
-
     const closePopup = () => {
         setShowPopup(false)
         setLoginStep('email')
@@ -100,7 +100,7 @@ export default function Navbar() {
         return new Intl.NumberFormat('hu-HU', {
             style: 'currency',
             currency: 'HUF'
-        }).format(price)    
+        }).format(price)
     }
 
     const formatDate = (dateString: string) => {
@@ -154,25 +154,25 @@ export default function Navbar() {
                             <h2 className="popup-title">
                                 {loginStep === 'email' ? 'Bejelentkezés' : 'Írd be a kódot'}
                             </h2>
-                            <button
-                                onClick={closePopup}
-                                className="popup-close"
-                            >
-                                ×
-                            </button>
+                            <button onClick={closePopup} className="popup-close">×</button>
                         </div>
 
                         {loginStep === 'email' ? (
                             <div>
                                 <div className="popup-input-group">
-                                    <label className="popup-label">
-                                        Email cím
-                                    </label>
+                                    <label className="popup-label">Email cím</label>
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="Add meg az email címed"
+                                        className="popup-input"
+                                    />
+
+                                    <label className="popup-label">Jelszó</label>
+                                    <input
+                                        type="password"
+                                        placeholder="Add meg a jelszavad"
                                         className="popup-input"
                                     />
                                 </div>
@@ -185,12 +185,21 @@ export default function Navbar() {
                                     Kód küldése
                                 </button>
 
-                                <button
-                                    onClick={handleForgotPassword}
-                                    className="popup-secondary-button"
-                                >
+                                <button className="popup-secondary-button">
                                     Elfelejtettem a jelszavamat
                                 </button>
+
+                                <a
+                                    href="#"
+                                    className="popup-register-link"
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        setShowPopup(false)
+                                        setShowRegisterPopup(true)
+                                    }}
+                                >
+                                    Nincs még fiókod? Regisztrálj most!
+                                </a>
                             </div>
                         ) : (
                             <div>
@@ -198,9 +207,8 @@ export default function Navbar() {
                                     <p className="popup-info-text">
                                         Elküldtünk egy kódot a(z) <strong>{email}</strong> email címre
                                     </p>
-                                    <label className="popup-label">
-                                        Ellenőrző kód
-                                    </label>
+
+                                    <label className="popup-label">Ellenőrző kód</label>
                                     <input
                                         type="text"
                                         value={code}
@@ -230,18 +238,23 @@ export default function Navbar() {
                 </div>
             )}
 
-            {/* Kosár popup */}
+            {/* Register Popup */}
+            <RegisterPopup
+                visible={showRegisterPopup}
+                onClose={() => setShowRegisterPopup(false)}
+                onBackToLogin={() => {
+                    setShowRegisterPopup(false)
+                    setShowPopup(true)
+                }}
+            />
+
+            {/* Cart Popup */}
             {showCartPopup && (
                 <div className="popup-overlay">
                     <div className="cart-popup-container">
                         <div className="popup-header">
                             <h2 className="cart-title">Kosár</h2>
-                            <button
-                                onClick={closeCartPopup}
-                                className="popup-close"
-                            >
-                                ×
-                            </button>
+                            <button onClick={closeCartPopup} className="popup-close">×</button>
                         </div>
 
                         {cartItems.length === 0 ? (
@@ -256,35 +269,15 @@ export default function Navbar() {
                                             <h3 className="ticket-event-name">{ticket.eventName}</h3>
                                             <div className="ticket-price">{formatPrice(ticket.price)}</div>
                                         </div>
-                                        
+
                                         <div className="ticket-details">
-                                            <div className="ticket-detail">
-                                                <strong>Dátum:</strong> {formatDate(ticket.date)}
-                                            </div>
-                                            <div className="ticket-detail">
-                                                <strong>Idő:</strong> {ticket.time}
-                                            </div>
-                                            <div className="ticket-detail">
-                                                <strong>Helyszín:</strong> {ticket.venue}
-                                            </div>
-                                            <div className="ticket-detail">
-                                                <strong>Jegy típusa:</strong> {ticket.type}
-                                            </div>
-                                            {ticket.section && (
-                                                <div className="ticket-detail">
-                                                    <strong>Szektor:</strong> {ticket.section}
-                                                </div>
-                                            )}
-                                            {ticket.row && ticket.row !== '-' && (
-                                                <div className="ticket-detail">
-                                                    <strong>Sor:</strong> {ticket.row}
-                                                </div>
-                                            )}
-                                            {ticket.seat && (
-                                                <div className="ticket-detail">
-                                                    <strong>Hely:</strong> {ticket.seat}
-                                                </div>
-                                            )}
+                                            <div><strong>Dátum:</strong> {formatDate(ticket.date)}</div>
+                                            <div><strong>Idő:</strong> {ticket.time}</div>
+                                            <div><strong>Helyszín:</strong> {ticket.venue}</div>
+                                            <div><strong>Jegy típusa:</strong> {ticket.type}</div>
+                                            {ticket.section && <div><strong>Szektor:</strong> {ticket.section}</div>}
+                                            {ticket.row && ticket.row !== '-' && <div><strong>Sor:</strong> {ticket.row}</div>}
+                                            {ticket.seat && <div><strong>Hely:</strong> {ticket.seat}</div>}
                                         </div>
 
                                         <div className="ticket-actions">
@@ -324,6 +317,4 @@ export default function Navbar() {
             )}
         </div>
     )
-
 }
-
