@@ -13,7 +13,7 @@ interface LoginPopupProps {
     onCodeChange: (value: string) => void
     onGetCode: () => void
     onLogin: () => void
-    onLoginSuccess?: (sessionData: any) => void // Optional callback with session data
+    onLoginSuccess?: (sessionData: any) => void
     onOpenRegister: () => void
     onBackToEmail: () => void
 }
@@ -52,60 +52,33 @@ export default function LoginPopup({
         setError(null)
 
         try {
-            const credentials: LoginCredentials = { 
-                email, 
-                password 
-            }
-            
+            const credentials: LoginCredentials = { email, password }
             const sessionData = await authService.login(credentials)
             console.log('Login successful:', sessionData)
-            
-            // Update state
+
             setLoginSuccess(true)
             setSessionInfo(sessionData)
-            
-            // Call parent callbacks
-            onLogin()
-            
-            // Optional: Pass session data to parent
-            if (onLoginSuccess) {
-                onLoginSuccess(sessionData)
-            }
-            
-            // Show success for 2 seconds then close
+
+            if (onLoginSuccess) onLoginSuccess(sessionData)
+
             setTimeout(() => {
                 onClose()
-                // Reset form
                 setPassword('')
                 setLoginSuccess(false)
                 setSessionInfo(null)
             }, 2000)
-            
         } catch (error: any) {
             console.error('Login error:', error)
-            
-            // Handle different types of errors
-            if (error.response) {
-                if (error.response.status === 401) {
-                    setError('Hibás email cím vagy jelszó')
-                } else if (error.response.status === 400) {
-                    setError('Érvénytelen adatok')
-                } else if (error.response.status === 500) {
-                    setError('Szerverhiba. Kérjük, próbáld újra később.')
-                } else {
-                    setError(error.response.data?.message || 'Bejelentkezés sikertelen')
-                }
-            } else if (error.request) {
-                setError('Nem sikerült kapcsolódni a szerverhez. Ellenőrizd az internetkapcsolatot.')
+            if (error?.response && error.response.data) {
+                setError(error.response.data.errors?.Password?.[0] || 'Hibás email vagy jelszó')
             } else {
-                setError('Bejelentkezési hiba: ' + error.message)
+                setError('Hibás email vagy jelszó')
             }
         } finally {
             setIsLoading(false)
         }
     }
 
-    // Reset form when popup closes
     useEffect(() => {
         if (!visible) {
             setPassword('')
@@ -123,8 +96,8 @@ export default function LoginPopup({
                     <h2 className="popup-title">
                         {loginStep === 'email' ? 'Bejelentkezés' : 'Írd be a kódot'}
                     </h2>
-                    <button 
-                        onClick={onClose} 
+                    <button
+                        onClick={onClose}
                         className="popup-close"
                         disabled={isLoading}
                     >
@@ -132,11 +105,7 @@ export default function LoginPopup({
                     </button>
                 </div>
 
-                {error && (
-                    <div className="popup-error-message">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="popup-error-message">{error}</div>}
 
                 {loginSuccess && (
                     <div className="popup-success-message">
@@ -149,7 +118,6 @@ export default function LoginPopup({
                     </div>
                 )}
 
-                {/* Email step */}
                 {loginStep === 'email' ? (
                     <div>
                         <div className="popup-input-group">
@@ -171,11 +139,6 @@ export default function LoginPopup({
                                 placeholder="Add meg a jelszavad"
                                 className="popup-input"
                                 disabled={isLoading}
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter' && email && password && !isLoading) {
-                                        handleLoginWithAPI()
-                                    }
-                                }}
                             />
                         </div>
 
@@ -184,11 +147,10 @@ export default function LoginPopup({
                             disabled={!email || !password || isLoading || loginSuccess}
                             className="popup-primary-button"
                         >
-                            {isLoading ? 'Bejelentkezés folyamatban...' : 
-                             loginSuccess ? '✓ Sikeres' : 'Bejelentkezés'}
+                            {isLoading ? 'Bejelentkezés folyamatban...' : loginSuccess ? '✓ Sikeres' : 'Bejelentkezés'}
                         </button>
 
-                        <button 
+                        <button
                             className="popup-secondary-button"
                             disabled={isLoading || loginSuccess}
                         >
@@ -200,9 +162,7 @@ export default function LoginPopup({
                             className="popup-register-link"
                             onClick={(e) => {
                                 e.preventDefault()
-                                if (!isLoading && !loginSuccess) {
-                                    onOpenRegister()
-                                }
+                                if (!isLoading && !loginSuccess) onOpenRegister()
                             }}
                             style={{ pointerEvents: isLoading || loginSuccess ? 'none' : 'auto' }}
                         >
@@ -210,7 +170,6 @@ export default function LoginPopup({
                         </a>
                     </div>
                 ) : (
-                    /* Code verification step */
                     <div>
                         <div className="popup-input-group">
                             <p className="popup-info-text">
@@ -233,8 +192,7 @@ export default function LoginPopup({
                             disabled={!code || isLoading || loginSuccess}
                             className="popup-primary-button"
                         >
-                            {isLoading ? 'Ellenőrzés...' : 
-                             loginSuccess ? '✓ Sikeres' : 'Bejelentkezés'}
+                            {isLoading ? 'Ellenőrzés...' : loginSuccess ? '✓ Sikeres' : 'Bejelentkezés'}
                         </button>
 
                         <button

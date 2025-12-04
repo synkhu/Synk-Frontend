@@ -1,10 +1,17 @@
+"use client";
+
 import React, { useState } from 'react'
 import './navbar.css'
 import RegisterPopup from './register'
 import LoginPopup from './login'
 import Cart, { CartTicket } from './kosar'
 
-export default function Navbar() {
+type NavbarProps = {
+  loggedIn: boolean;
+  setLoggedIn: (value: boolean) => void;
+};
+
+export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
     const [showLoginPopup, setShowLoginPopup] = useState(false)
     const [showCartPopup, setShowCartPopup] = useState(false)
     const [showRegisterPopup, setShowRegisterPopup] = useState(false)
@@ -52,19 +59,46 @@ export default function Navbar() {
         }
     ])
 
+    // Open login popup
     const openLogin = () => {
+        if (loggedIn) return;
         setShowLoginPopup(true)
         setLoginStep('email')
         setEmail('')
         setCode('')
     }
 
-    const handleGetCode = () => setLoginStep('code')
+    const handleLogout = () => {
+        localStorage.removeItem("authToken");
+        setLoggedIn(false);
+    };
 
-    const handleLogin = () => {
-        alert('Sikeres bejelentkezés!')
-        setShowLoginPopup(false)
-    }
+    const handleLogin = async () => {
+        try {
+            const res = await fetch("https://api.synk.hu/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({ email, password: code }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data?.errors?.Password?.[0] || "Login failed");
+                return;
+            }
+
+            localStorage.setItem("authToken", data.token);
+            setLoggedIn(true);
+            setShowLoginPopup(false);
+        } catch (error) {
+            console.error(error);
+            alert("Something went wrong");
+        }
+    };
 
     const removeTicket = (ticketId: number) => {
         setCartItems(cartItems.filter(item => item.id !== ticketId))
@@ -106,6 +140,12 @@ export default function Navbar() {
                     <button type="button" className="navbar-button" onClick={openLogin}>
                         Jegyeim
                     </button>
+
+                    {loggedIn && (
+                        <button type="button" className="navbar-button" onClick={handleLogout}>
+                            Kijelentkezés
+                        </button>
+                    )}
                 </div>
             </nav>
 
@@ -118,8 +158,13 @@ export default function Navbar() {
                 onClose={() => setShowLoginPopup(false)}
                 onEmailChange={setEmail}
                 onCodeChange={setCode}
-                onGetCode={handleGetCode}
+                onGetCode={() => setLoginStep('code')}
                 onLogin={handleLogin}
+                onLoginSuccess={(sessionData: { token: string }) => {
+                    setLoggedIn(true);
+                    setShowLoginPopup(false);
+                    localStorage.setItem("authToken", sessionData.token);
+                }}
                 onOpenRegister={() => {
                     setShowLoginPopup(false)
                     setShowRegisterPopup(true)

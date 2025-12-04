@@ -6,3 +6,9 @@
     overflow: hidden;
     border-radius: 10px;
 }
+
+.login-status {
+    color: green;
+    font-weight: bold;
+    margin: 10px 0;
+}
