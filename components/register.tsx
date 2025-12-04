@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import './navbar.css'
 
+
 interface RegisterPopupProps {
     onClose: () => void
     onBackToLogin: () => void
