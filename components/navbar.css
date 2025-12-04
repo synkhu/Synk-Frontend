@@ -1,7 +1,7 @@
 .navbar {
   width: 260px;
   min-height: 100vh;
-  background: #0b1220;
+  background: #2d1b4e;
   color: #fff;
   padding: 1rem;
   box-sizing: border-box;
@@ -19,9 +19,9 @@
 .navbar-logo-icon {
   width: 40px;
   height: 40px;
-  background: #1f2937;
+  background: #4c3073;
   border-radius: 8px;
-  display: flex;
+  display: flex;  
   align-items: center;
   justify-content: center;
   font-weight: 700;
@@ -42,8 +42,8 @@
   width: 100%;
   padding: 0.5rem;
   border-radius: 6px;
-  border: 1px solid #24303d;
-  background: #061023;
+  border: 1px solid #5a3d8a;
+  background: #1a0f2e;
   color: #fff;
   outline: none;
 }
@@ -57,11 +57,17 @@
   padding: 0.75rem;
   border-radius: 6px;
   border: none;
-  background: #2563eb;
+  background: #7c3aed;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.navbar-button:hover {
+  background: #a78bfa;
+  transform: scale(1.05);
 }
 
 .navbar-button:last-child {
@@ -83,10 +89,10 @@
 }
 
 .popup-container {
-  background: #0b1220;
+  background: #2d1b4e;
   padding: 2rem;
   border-radius: 8px;
-  border: 1px solid #24303d;
+  border: 1px solid #5a3d8a;
   width: 90%;
   max-width: 400px;
   color: #fff;
@@ -125,8 +131,8 @@
   width: 100%;
   padding: 0.75rem;
   border-radius: 6px;
-  border: 1px solid #24303d;
-  background: #061023;
+  border: 1px solid #5a3d8a;
+  background: #1a0f2e;
   color: #fff;
   outline: none;
   box-sizing: border-box;
@@ -137,42 +143,56 @@
   padding: 0.75rem;
   border-radius: 6px;
   border: none;
-  background: #2563eb;
+  background: #7c3aed;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.popup-primary-button:hover {
+  background: #a78bfa;
+  transform: scale(1.02);
 }
 
 .popup-primary-button:disabled {
-  background: #1f2937;
+  background: #4c3073;
   cursor: not-allowed;
+  transform: scale(1);
 }
 
 .popup-secondary-button {
   width: 100%;
   padding: 0.75rem;
   border-radius: 6px;
-  border: 1px solid #374151;
+  border: 1px solid #6d4496;
   background: transparent;
-  color: #9ca3af;
+  color: #c4b5fd;
   font-weight: 600;
   cursor: pointer;
   font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.popup-secondary-button:hover {
+  background: #4c3073;
+  border-color: #7c3aed;
+  transform: scale(1.02);
 }
 
 .popup-info-text {
   font-size: 14px;
   margin-bottom: 1rem;
-  color: #9ca3af;
+  color: #c4b5fd;
 }
 
 /* Cart Popup Styles */
 .cart-popup-container {
-  background: #0b1220;
+  background: #2d1b4e;
   padding: 2rem;
   border-radius: 8px;
-  border: 1px solid #24303d;
+  border: 1px solid #5a3d8a;
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
@@ -187,16 +207,16 @@
 
 .cart-empty {
   text-align: center;
-  color: #9ca3af;
+  color: #c4b5fd;
   padding: 2rem 0;
 }
 
 .ticket-item {
-  background: #1f2937;
+  background: #4c3073;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
-  border: 1px solid #374151;
+  border: 1px solid #6d4496;
 }
 
 .ticket-header {
@@ -228,7 +248,7 @@
 
 .ticket-detail {
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: #c4b5fd;
 }
 
 .ticket-detail strong {
@@ -248,7 +268,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .ticket-action-remove {
@@ -258,19 +278,21 @@
 
 .ticket-action-remove:hover {
   background: #dc2626;
+  transform: scale(1.05);
 }
 
 .ticket-action-download {
-  background: #2563eb;
+  background: #7c3aed;
   color: white;
 }
 
 .ticket-action-download:hover {
-  background: #1d4ed8;
+  background: #a78bfa;
+  transform: scale(1.05);
 }
 
 .cart-total {
-  border-top: 1px solid #374151;
+  border-top: 1px solid #6d4496;
   padding-top: 1rem;
   margin-top: 1rem;
   display: flex;
@@ -295,15 +317,66 @@
   color: #fff;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cart-checkout-button:hover {
+  background: #059669;
+  transform: scale(1.02);
 }
 
 .cart-close-button {
   flex: 1;
   padding: 0.75rem;
   border-radius: 6px;
-  border: 1px solid #374151;
+  border: 1px solid #6d4496;
   background: transparent;
-  color: #9ca3af;
+  color: #c4b5fd;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cart-close-button:hover {
+  background: #4c3073;
+  border-color: #7c3aed;
+  transform: scale(1.02);
+}
+
+/* Animations */
+@keyframes flowIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes flowOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+}
+
+.popup-container {
+  animation: flowIn 0.3s ease-out;
+}
+
+.popup-container.closing {
+  animation: flowOut 0.3s ease-in forwards;
+}
+.cart-popup-container {
+  animation: flowIn 0.3s ease-out;
+}
+
+.cart-popup-container.closing {
+  animation: flowOut 0.3s ease-in forwards;
 }
