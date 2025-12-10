@@ -43,19 +43,47 @@ export default function RegisterPopup({ visible, onClose, onBackToLogin }: Regis
 
             console.log('Registration successful:', data)
             setRegisterSuccess(true)
-
+            setRegisterError('') 
             setRegisterData({ email: '', password: '', firstName: '', lastName: '' })
 
             setTimeout(() => {
                 onClose()
+                setRegisterSuccess(false)
             }, 2000)
 
         } catch (error: any) {
             console.error('Registration error:', error)
-            const msg = error.response?.data?.message 
-                || error.response?.data?.error 
-                || 'Sikertelen regisztráció. Kérjük, próbáld újra.'
+            
+            let msg = 'Sikertelen regisztráció. Kérjük, próbáld újra.'
+            
+            if (error.response?.data?.errors) {
+                const errors = error.response.data.errors
+                
+                for (const field in errors) {
+                    if (Array.isArray(errors[field]) && errors[field].length > 0) {
+                        msg = errors[field][0]
+                        break
+                    }
+                }
+            } 
+            else if (error.response?.data?.message) {
+                msg = error.response.data.message
+            }
+            else if (error.response?.data?.error) {
+                msg = error.response.data.error
+            }
+            else if (error.response) {
+                msg = `Hiba történt (${error.response.status})`
+            } 
+            else if (error.request) {
+                msg = 'Nincs kapcsolat a szerverrel. Ellenőrizd az internetkapcsolatot.'
+            } 
+            else {
+                msg = error.message || msg
+            }
+            
             setRegisterError(msg)
+            setRegisterSuccess(false)
         } finally {
             setRegisterLoading(false)
         }
@@ -77,7 +105,13 @@ export default function RegisterPopup({ visible, onClose, onBackToLogin }: Regis
                 )}
 
                 {registerError && (
-                    <div className="popup-error">{registerError}</div>
+                    <div className="popup-error">
+                        {registerError.split('\n').map((err, idx) => (
+                            <div key={idx} style={{ marginBottom: '4px' }}>
+                                • {err}
+                            </div>
+                        ))}
+                    </div>
                 )}
 
                 <form onSubmit={handleRegisterSubmit}>
