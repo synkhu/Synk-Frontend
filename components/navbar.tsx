@@ -155,6 +155,10 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                         <button type="button" className="navbar-button" onClick={() => window.location.href = '/venues'}>
                             Venues Admin
                         </button>
+
+                        <button type="button" className="navbar-button" onClick={() => window.location.href = '/events'}>
+                            Events Admin
+                        </button>
                 </div>
             </nav>
 

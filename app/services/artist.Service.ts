@@ -54,3 +54,16 @@ export const deleteArtist = async (id: number) => {
     },
   });
 };
+
+export const searchArtists = async (query: string) => {
+  if (!query.trim()) return [];
+
+  const res = await axios.get(`${API_URL}/artists`, {
+    params: {
+      Search: query,
+      pageSize: 10, // optional but recommended
+    },
+  });
+
+  return res.data.items;
+};
