@@ -145,7 +145,16 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                         <button type="button" className="navbar-button" onClick={handleLogout}>
                             Kijelentkezés
                         </button>
+
                     )}
+
+                        <button type="button" className="navbar-button" onClick={() => window.location.href = '/artists'}>
+                            Artists Admin
+                        </button>
+
+                        <button type="button" className="navbar-button" onClick={() => window.location.href = '/venues'}>
+                            Venues Admin
+                        </button>
                 </div>
             </nav>
 

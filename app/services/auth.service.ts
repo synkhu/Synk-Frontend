@@ -1,3 +1,4 @@
+"use client";
 // services/auth.service.ts
 import axios from 'axios';
 
@@ -15,6 +16,11 @@ export interface LoginCredentials {
 class AuthService {
   private readonly SESSION_KEY = 'user_session';
   private readonly TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes before expiry
+
+  // Check if we're in browser environment
+  private isBrowser(): boolean {
+    return typeof window !== 'undefined';
+  }
 
   // Login and store session
   async login(credentials: LoginCredentials): Promise<UserSession> {
@@ -42,6 +48,8 @@ class AuthService {
 
   // Store session in localStorage
   setSession(sessionData: UserSession): void {
+    if (!this.isBrowser()) return;
+    
     localStorage.setItem(this.SESSION_KEY, JSON.stringify(sessionData));
     
     // Also set axios default headers for future requests
@@ -52,6 +60,8 @@ class AuthService {
 
   // Get current session
   getSession(): UserSession | null {
+    if (!this.isBrowser()) return null;
+    
     const sessionStr = localStorage.getItem(this.SESSION_KEY);
     if (!sessionStr) return null;
     
@@ -65,6 +75,8 @@ class AuthService {
 
   // Check if session is valid
   isSessionValid(): boolean {
+    if (!this.isBrowser()) return false;
+    
     const session = this.getSession();
     if (!session || !session.token || !session.expiresAt) {
       return false;
@@ -78,6 +90,8 @@ class AuthService {
 
   // Check if session needs refresh
   needsRefresh(): boolean {
+    if (!this.isBrowser()) return false;
+    
     const session = this.getSession();
     if (!session || !session.expiresAt) return true;
 
@@ -90,6 +104,8 @@ class AuthService {
 
   // Refresh token (if your API supports it)
   async refreshToken(): Promise<UserSession | null> {
+    if (!this.isBrowser()) return null;
+    
     try {
       const session = this.getSession();
       if (!session) return null;
@@ -113,6 +129,8 @@ class AuthService {
 
   // Logout and clear session
   logout(): void {
+    if (!this.isBrowser()) return;
+    
     this.clearSession();
     this.stopSessionMonitoring();
     
@@ -125,11 +143,13 @@ class AuthService {
 
   // Clear session from storage
   private clearSession(): void {
+    if (!this.isBrowser()) return;
     localStorage.removeItem(this.SESSION_KEY);
   }
 
   // Get auth token
   getToken(): string | null {
+    if (!this.isBrowser()) return null;
     const session = this.getSession();
     return session?.token || null;
   }
@@ -138,6 +158,8 @@ class AuthService {
   private sessionMonitorInterval: NodeJS.Timeout | null = null;
 
   private startSessionMonitoring(): void {
+    if (!this.isBrowser()) return;
+    
     this.stopSessionMonitoring(); // Clear any existing interval
     
     this.sessionMonitorInterval = setInterval(() => {
@@ -165,6 +187,7 @@ class AuthService {
   }
 
   private dispatchSessionExpired(): void {
+    if (!this.isBrowser()) return;
     // Dispatch custom event that other components can listen to
     const event = new CustomEvent('session-expired');
     window.dispatchEvent(event);
@@ -172,6 +195,8 @@ class AuthService {
 
   // Check session on app start
   initialize(): void {
+    if (!this.isBrowser()) return;
+    
     const session = this.getSession();
     
     if (session && this.isSessionValid()) {

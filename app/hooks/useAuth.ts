@@ -1,3 +1,5 @@
+
+"use client";
 // hooks/useAuth.ts
 import { useState, useEffect } from 'react';
 import { authService } from '../services/auth.service';

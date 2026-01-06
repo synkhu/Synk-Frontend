@@ -1,6 +1,7 @@
-// components/ProtectedRoute.tsx
+'use client';
+
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { redirect } from 'next/navigation';
 import { useAuth } from '../app/hooks/useAuth';
 
 interface ProtectedRouteProps {
@@ -23,7 +24,7 @@ export default function ProtectedRoute({
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo} replace />;
+    redirect(redirectTo);
   }
 
   return <>{children}</>;
