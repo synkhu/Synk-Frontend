@@ -6,53 +6,66 @@ const getToken = () => authService.getToken();
 
 export const getArtists = async () => {
   const res = await axios.get(`${API_URL}/artists`);
-  console.log('API Response:', res.data);
-  return res.data.items; // Changed from res.data.data to res.data.items
+  return res.data.items;
 };
 
-export const createArtist = async (name: string, description: string, spotifyUrl: string) => {
+export const createArtist = async (
+  name: string,
+  description: string,
+  spotifyUrl: string
+) => {
   const token = getToken();
-  
-  if (!token) {
-    throw new Error('No authentication token found. Please log in.');
-  }
-  
-  return axios.post(
+  if (!token) throw new Error("No authentication token found.");
+
+  await axios.post(
     `${API_URL}/artists`,
-    { 
-      name, 
-      description: description || null, 
-      spotifyUrl: spotifyUrl || null 
+    {
+      name,
+      description: description || null,
+      spotifyUrl: spotifyUrl || null,
     },
     {
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     }
   );
+
+  // 🔁 Refetch after create
+  return getArtists();
 };
 
 export const updateArtist = async (id: number, name: string) => {
   const token = getToken();
-  if (!token) throw new Error('No authentication token found.');
-  
-  return axios.put(`${API_URL}/artists/${id}`, { name }, { // ✅ Fixed - parentheses
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  });
+  if (!token) throw new Error("No authentication token found.");
+
+  await axios.put(
+    `${API_URL}/artists/${id}`,
+    { name },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  // 🔁 Refetch after update
+  return getArtists();
 };
 
 export const deleteArtist = async (id: number) => {
   const token = getToken();
-  if (!token) throw new Error('No authentication token found.');
-  
-  return axios.delete(`${API_URL}/artists/${id}`, { // ✅ Fixed - parentheses
+  if (!token) throw new Error("No authentication token found.");
+
+  await axios.delete(`${API_URL}/artists/${id}`, {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
+
+  // 🔁 Refetch after delete
+  return getArtists();
 };
 
 export const searchArtists = async (query: string) => {
@@ -61,7 +74,7 @@ export const searchArtists = async (query: string) => {
   const res = await axios.get(`${API_URL}/artists`, {
     params: {
       Search: query,
-      pageSize: 10, // optional but recommended
+      pageSize: 10,
     },
   });
 
