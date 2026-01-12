@@ -1,6 +1,5 @@
 "use client";
 import { deleteVenue, updateVenue } from "../services/venue.Service";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface Venue {
@@ -13,8 +12,12 @@ interface Venue {
     description: string;
 }
 
-export default function VenueList({ venues = [] }: { venues?: Venue[] }) {
-    const router = useRouter();
+type VenueListProps = {
+    venues?: Venue[];
+    onUpdate: (venues: Venue[]) => void;
+};
+
+export default function VenueList({ venues = [], onUpdate }: VenueListProps) {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         name: "",
@@ -30,14 +33,14 @@ export default function VenueList({ venues = [] }: { venues?: Venue[] }) {
             alert("Venue name cannot be empty");
             return;
         }
-        await updateVenue(id, formData);
+        const updatedVenues = await updateVenue(id, formData);
+        onUpdate(updatedVenues);
         setEditingId(null);
-        router.refresh();
     }
     
     async function remove(id: number) {
-        await deleteVenue(id);
-        router.refresh();
+        const updatedVenues = await deleteVenue(id);
+        onUpdate(updatedVenues);
     }
     
     return (
@@ -47,17 +50,18 @@ export default function VenueList({ venues = [] }: { venues?: Venue[] }) {
                     {editingId === v.id ? (
                         <>
                             <input 
+                                placeholder="Name"
+                                value={formData.name} 
+                                onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                            />
+                            <input 
                                 placeholder="Address"
                                 value={formData.address} 
                                 onChange={(e) => setFormData({...formData, address: e.target.value})} 
                             />
                             <input 
-                                placeholder="Description"
-                                value={formData.description} 
-                                onChange={(e) => setFormData({...formData, description: e.target.value})} 
-                            />
-                            <input 
                                 placeholder="Capacity"
+                                type="number"
                                 value={formData.capacity} 
                                 onChange={(e) => setFormData({...formData, capacity: Number(e.target.value)})} 
                             />
@@ -73,7 +77,7 @@ export default function VenueList({ venues = [] }: { venues?: Venue[] }) {
                             />
                             <textarea 
                                 placeholder="Description"
-                                value={formData.name} 
+                                value={formData.description} 
                                 onChange={(e) => setFormData({...formData, description: e.target.value})} 
                             />
                             <button onClick={() => save(v.id)}>Save</button>

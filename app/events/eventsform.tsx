@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { createEvent, searchArtists, searchVenues } from "../services/event.Service";
-import { useRouter } from "next/navigation";
 
 type Artist = { id: string; name: string };
 type Venue = { id: string; name: string };
 
-export default function EventForm() {
-  const router = useRouter();
+type EventFormProps = {
+  onSuccess: (events: any[]) => void;
+};
 
+export default function EventForm({ onSuccess }: EventFormProps) {
   const [name, setName] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [description, setDescription] = useState("");
@@ -54,42 +55,53 @@ export default function EventForm() {
 
   /* Submit */
   async function submit(e: React.FormEvent) {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!name.trim()) return alert("Event name is required");
-  if (!description.trim()) return alert("Description is required");
-  if (!startTime) return alert("Start time is required");
-  if (!endTime) return alert("End time is required");
-  if (!selectedVenue) return alert("Please select a venue from the list");
+    if (!name.trim()) return alert("Event name is required");
+    if (!description.trim()) return alert("Description is required");
+    if (!startTime) return alert("Start time is required");
+    if (!endTime) return alert("End time is required");
+    if (!selectedVenue) return alert("Please select a venue from the list");
 
-  try {
-    await createEvent(
-      name,                        // Event name
-      description,                 // Event description
-      startTime,                   // datetime-local string
-      endTime,                     // datetime-local string
-      selectedVenue.id,            // ✅ Venue ID
-      thumbnailUrl || undefined,   // optional
-      selectedArtist ?? artistQuery // optional
-    );
+    console.log("🔍 Form values before sending:", {
+      name,
+      description,
+      startTime,
+      endTime,
+      venueId: selectedVenue.id,
+      thumbnailUrl,
+      selectedArtist
+    });
 
-    // Reset form
-    setName(""); setThumbnailUrl(""); setDescription("");
-    setStartTime(""); setEndTime("");
-    setArtistQuery(""); setSelectedArtist(null); setArtistResults([]);
-    setVenueQuery(""); setSelectedVenue(null); setVenueResults([]);
+    try {
+      const updatedEvents = await createEvent(
+        name,
+        description,
+        startTime,
+        endTime,
+        selectedVenue.id,
+        thumbnailUrl || undefined,
+        selectedArtist ?? undefined
+      );
 
-    router.refresh();
-  } catch (err: any) {
-    console.error("Failed to create event:", err);
-    alert(
-      "Failed to create event. Check console. " +
-      (err.response?.data?.errors
-        ? JSON.stringify(err.response.data.errors)
-        : err.message)
-    );
+      // Reset form
+      setName(""); setThumbnailUrl(""); setDescription("");
+      setStartTime(""); setEndTime("");
+      setArtistQuery(""); setSelectedArtist(null); setArtistResults([]);
+      setVenueQuery(""); setSelectedVenue(null); setVenueResults([]);
+
+      onSuccess(updatedEvents);
+    } catch (err: any) {
+      console.error("❌ Full error:", err);
+      console.error("❌ Error response:", err.response?.data);
+      alert(
+        "Failed to create event. Check console. " +
+        (err.response?.data?.errors 
+          ? JSON.stringify(err.response.data.errors)
+          : err.response?.data?.message || err.message)
+      );
+    }
   }
-}
 
   return (
     <form onSubmit={submit} className="relative space-y-3">
@@ -97,6 +109,7 @@ export default function EventForm() {
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Event name"
+        required
       />
 
       <input
@@ -110,18 +123,21 @@ export default function EventForm() {
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Event description"
         rows={4}
+        required
       />
 
       <input
         type="datetime-local"
         value={startTime}
         onChange={(e) => setStartTime(e.target.value)}
+        required
       />
 
       <input
         type="datetime-local"
         value={endTime}
         onChange={(e) => setEndTime(e.target.value)}
+        required
       />
 
       {/* Venue Autocomplete */}
@@ -130,6 +146,7 @@ export default function EventForm() {
           value={venueQuery}
           onChange={(e) => { setVenueQuery(e.target.value); setSelectedVenue(null); }}
           placeholder="Search venue"
+          required
         />
         {venueResults.length > 0 && (
           <ul className="absolute z-50 w-full bg-white border rounded shadow">
@@ -151,7 +168,7 @@ export default function EventForm() {
         <input
           value={artistQuery}
           onChange={(e) => { setArtistQuery(e.target.value); setSelectedArtist(null); }}
-          placeholder="Search artist"
+          placeholder="Search artist (optional)"
         />
         {artistResults.length > 0 && (
           <ul className="absolute z-50 w-full bg-white border rounded shadow">
@@ -167,6 +184,8 @@ export default function EventForm() {
           </ul>
         )}
       </div>
+      
+      {selectedArtist && <p>Selected Artist: <strong>{selectedArtist}</strong></p>}
 
       <button type="submit">Add</button>
     </form>

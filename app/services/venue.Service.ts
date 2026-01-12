@@ -5,7 +5,7 @@ const API_URL = "https://api.synk.hu";
 const getToken = () => authService.getToken();
 
 export const getVenues = async () => {
-  const res = await axios.get(`${API_URL}/venues`); // ✅ PARENTHESES not backticks
+  const res = await axios.get(`${API_URL}/venues`);
   console.log('API Response:', res.data);
   return res.data.items;
 };
@@ -25,7 +25,7 @@ export const createVenue = async (
     throw new Error('No authentication token found. Please log in.');
   }
   
-  return axios.post(
+  await axios.post(
     `${API_URL}/venues`,
     { 
       address,
@@ -43,6 +43,8 @@ export const createVenue = async (
       },
     }
   );
+  
+  return await getVenues();
 };
 
 export const updateVenue = async (id: number, venueData: Partial<{
@@ -59,21 +61,25 @@ export const updateVenue = async (id: number, venueData: Partial<{
   
   console.log('Updating venue with data:', venueData);
   
-  return axios.put(`${API_URL}/venues/${id}`, venueData, { // ✅ PARENTHESES not backticks
+  await axios.put(`${API_URL}/venues/${id}`, venueData, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
   });
+  
+  return await getVenues();
 };
 
 export const deleteVenue = async (id: string | number) => {
   const token = getToken();
   if (!token) throw new Error('No authentication token found.');
   
-  return axios.delete(`${API_URL}/venues/${id}`, { // ✅ PARENTHESES not backticks
+  await axios.delete(`${API_URL}/venues/${id}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },
   });
+  
+  return await getVenues();
 };

@@ -2,9 +2,22 @@
 
 import { useState } from "react";
 import { createVenue } from "../services/venue.Service";
-import { useRouter } from "next/navigation";
 
-export default function VenueForm() {
+interface Venue {
+    id: number;
+    name: string;
+    city: string;
+    address: string;
+    country: string;
+    capacity: number;
+    description: string;
+}
+
+type VenueFormProps = {
+    onSuccess: (venues: Venue[]) => void;
+};
+
+export default function VenueForm({ onSuccess }: VenueFormProps) {
     const [address, setAddress] = useState("");
     const [capacity, setCapacity] = useState(0);
     const [city, setCity] = useState("");
@@ -12,38 +25,38 @@ export default function VenueForm() {
     const [description, setDescription] = useState("");
     const [isAdultOnly, setIsAdultOnly] = useState(false);
     const [name, setName] = useState("");
-    const router = useRouter();
 
     async function submit(e: React.FormEvent) {
         e.preventDefault();
-        await createVenue(address, capacity, city, country, description, isAdultOnly, name);
-        setAddress("");
-        setCapacity(0);
-        setCity("");
-        setCountry("");
-        setDescription("");
-        setIsAdultOnly(false);
-        setName("");
-        router.refresh();
+        
+        try {
+            const updatedVenues = await createVenue(address, capacity, city, country, description, isAdultOnly, name);
+            onSuccess(updatedVenues);
+            
+            setAddress("");
+            setCapacity(0);
+            setCity("");
+            setCountry("");
+            setDescription("");
+            setIsAdultOnly(false);
+            setName("");
+        } catch (err) {
+            console.error("Failed to create venue:", err);
+        }
     }
 
     return (
         <form onSubmit={submit}>
             <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Venue Name"
+                required
+            />
+            <input
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Address"
-            />
-            <input
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Description"
-            />
-            <input
-                value={capacity}
-                onChange={(e) => setCapacity(Number(e.target.value))}
-                placeholder="Capacity"
-                type="number"
             />
             <input
                 value={city}
@@ -56,12 +69,17 @@ export default function VenueForm() {
                 placeholder="Country"
             />
             <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Venue Name"
+                value={capacity}
+                onChange={(e) => setCapacity(Number(e.target.value))}
+                placeholder="Capacity"
+                type="number"
             />
-            
-            <button>Add</button>
+            <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Description"
+            />
+            <button type="submit">Add</button>
         </form>
     );
 }

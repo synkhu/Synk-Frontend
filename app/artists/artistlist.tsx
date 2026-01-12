@@ -1,23 +1,26 @@
 "use client";
 
 import { deleteArtist, updateArtist } from "../services/artist.Service";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function ArtistList({ artists = [] }: { artists?: { id: number; name: string }[] }) {
-  const router = useRouter();
+type ArtistListProps = {
+  artists?: { id: number; name: string }[];
+  onUpdate: (artists: any[]) => void;
+};
+
+export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [name, setName] = useState("");
 
   async function save(id: number) {
-    await updateArtist(id, name);
+    const updatedArtists = await updateArtist(id, name);
+    onUpdate(updatedArtists);
     setEditingId(null);
-    router.refresh();
   }
 
   async function remove(id: number) {
-    await deleteArtist(id);
-    router.refresh();
+    const updatedArtists = await deleteArtist(id);
+    onUpdate(updatedArtists);
   }
 
   return (

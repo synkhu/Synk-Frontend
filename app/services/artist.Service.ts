@@ -32,8 +32,7 @@ export const createArtist = async (
     }
   );
 
-  // 🔁 Refetch after create
-  return getArtists();
+  return await getArtists();
 };
 
 export const updateArtist = async (id: number, name: string) => {
@@ -50,8 +49,7 @@ export const updateArtist = async (id: number, name: string) => {
     }
   );
 
-  // 🔁 Refetch after update
-  return getArtists();
+  return await getArtists();
 };
 
 export const deleteArtist = async (id: number) => {
@@ -64,8 +62,7 @@ export const deleteArtist = async (id: number) => {
     },
   });
 
-  // 🔁 Refetch after delete
-  return getArtists();
+  return await getArtists();
 };
 
 export const searchArtists = async (query: string) => {

@@ -43,16 +43,6 @@ export const getEvents = async () => {
   return res.data.items;
 };
 
-/**
- * Create an event
- * @param name Event name
- * @param description Event description
- * @param startTime Must be datetime-local string like "2026-01-06T18:30"
- * @param endTime Must be datetime-local string
- * @param venueId Must be venue ID from autocomplete, NOT the name
- * @param thumbnailUrl Optional thumbnail
- * @param artistName Optional artist name
- */
 export const createEvent = async (
   name: string,
   description: string,
@@ -69,41 +59,84 @@ export const createEvent = async (
   const startISO = parseDateRFC3339(startTime);
   const endISO = parseDateRFC3339(endTime);
 
-  return axios.post(
+  const payload = {
+    name,
+    description,
+    startTime: startISO,
+    endTime: endISO,
+    venueId,
+    thumbnailUrl: thumbnailUrl || null,
+    artistName: artistName || null, // ✅ Changed from artistname to artistName
+  };
+
+  console.log("🚀 Sending payload to API:", payload);
+
+  await axios.post(
     `${API_URL}/events`,
-    {
-      request: {
-        name,
-        description,
-        startTime: startISO,
-        endTime: endISO,
-        venueId,
-        thumbnailUrl: thumbnailUrl || null,
-        artistname: artistName || null,
-      },
-    },
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload,
+    { 
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}` 
+      } 
+    }
   );
+
+  return await getEvents();
 };
 
-export const updateEvent = async (id: number, name: string) => {
+export const updateEvent = async (
+  id: string,
+  name: string,
+  description: string,
+  startTime: string,
+  endTime: string,
+  venueId: string,
+  thumbnailUrl?: string,
+  artistName?: string
+) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
+  if (!venueId) throw new Error("Venue ID is required.");
 
-  return axios.put(
+  const startISO = parseDateRFC3339(startTime);
+  const endISO = parseDateRFC3339(endTime);
+
+  const payload = {
+    name,
+    description,
+    startTime: startISO,
+    endTime: endISO,
+    venueId,
+    thumbnailUrl: thumbnailUrl || null,
+    artistName: artistName || null, // ✅ Changed from artistname to artistName
+  };
+
+  console.log("🚀 Updating event with payload:", payload);
+
+  await axios.put(
     `${API_URL}/events/${id}`,
-    { name },
-    { headers: { Authorization: `Bearer ${token}` } }
+    payload,
+    { 
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}` 
+      } 
+    }
   );
+
+  return await getEvents();
 };
 
-export const deleteEvent = async (id: number) => {
+export const deleteEvent = async (id: string) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
 
-  return axios.delete(`${API_URL}/events/${id}`, {
+  await axios.delete(`${API_URL}/events/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+  return await getEvents();
 };
 
 /* ===================== ARTIST SEARCH ===================== */
