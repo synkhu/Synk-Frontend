@@ -26,11 +26,6 @@ export default function Home() {
         <div className="carousel-container">
           <Carousel />
         </div>
-
-      {loggedIn && (
-        <div className="login-status">Be vagy jelentkezve</div>
-      )}
-
         <div className="upcoming-events" style={{ marginTop: "1rem" }}>
           <UpcomingEvents />
         </div>
