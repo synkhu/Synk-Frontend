@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './navbar.css'
 import RegisterPopup from './register'
 import LoginPopup from './login'
 import TicketsPopup from './tickets'
+import { authService } from '../app/services/auth.service'
 
 type NavbarProps = {
   loggedIn: boolean;
@@ -15,10 +16,20 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
     const [showLoginPopup, setShowLoginPopup] = useState(false)
     const [showRegisterPopup, setShowRegisterPopup] = useState(false)
     const [showTicketsPopup, setShowTicketsPopup] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false)
 
     const [loginStep, setLoginStep] = useState<'email' | 'code'>('email')
     const [email, setEmail] = useState('')
     const [code, setCode] = useState('')
+
+    // Check admin status when login status changes
+    useEffect(() => {
+        if (loggedIn) {
+            authService.isAdmin().then(setIsAdmin).catch(() => setIsAdmin(false))
+        } else {
+            setIsAdmin(false)
+        }
+    }, [loggedIn])
 
 
     // Open login/tickets popup
@@ -85,20 +96,23 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                         <button type="button" className="navbar-button" onClick={handleLogout}>
                             Kijelentkezés
                         </button>
-
                     )}
 
-                        <button type="button" className="navbar-button" onClick={() => window.location.href = '/artists'}>
-                            Artists Admin
-                        </button>
+                    {isAdmin && (
+                        <>
+                            <button type="button" className="navbar-button" onClick={() => window.location.href = '/artists'}>
+                                Artists Admin
+                            </button>
 
-                        <button type="button" className="navbar-button" onClick={() => window.location.href = '/venues'}>
-                            Venues Admin
-                        </button>
+                            <button type="button" className="navbar-button" onClick={() => window.location.href = '/venues'}>
+                                Venues Admin
+                            </button>
 
-                        <button type="button" className="navbar-button" onClick={() => window.location.href = '/events'}>
-                            Events Admin
-                        </button>
+                            <button type="button" className="navbar-button" onClick={() => window.location.href = '/events'}>
+                                Events Admin
+                            </button>
+                        </>
+                    )}
                 </div>
             </nav>
 

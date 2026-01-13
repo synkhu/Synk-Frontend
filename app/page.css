@@ -1,8 +1,15 @@
 .carousel-container {
-    float: left;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     overflow: hidden;
     border-radius: 10px;
+    padding: 2rem;
+}
+
+.upcoming-events {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 2rem 2rem;
 }

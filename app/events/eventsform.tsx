@@ -86,20 +86,6 @@ export default function EventForm({ onSuccess }: EventFormProps) {
       return alert("All ticket types must have a price greater than 0");
     }
 
-    console.log("🔍 Form values before sending:", {
-      name,
-      description,
-      startTime,
-      endTime,
-      gateTime,
-      totalCapacity,
-      ticketMaxScanCount,
-      venueId: selectedVenue.id,
-      thumbnailUrl,
-      selectedArtistId,
-      ticketTypes: validTicketTypes
-    });
-
     try {
       const updatedEvents = await createEvent(
         name,

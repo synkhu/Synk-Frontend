@@ -1,6 +1,7 @@
 .navbar {
   width: 260px;
   min-height: 100vh;
+  height: 100%;
   background: #2d1b4e;
   color: #fff;
   padding: 1rem;
@@ -8,6 +9,10 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  overflow: visible;
 }
 
 .navbar-logo {
@@ -50,6 +55,11 @@
 
 .navbar-buttons {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: sticky;
+  bottom: 1rem;
 }
 
 .navbar-button {

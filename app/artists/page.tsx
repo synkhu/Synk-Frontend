@@ -1,17 +1,49 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getArtists } from "../services/artist.Service";
 import ArtistForm from "./artistform";
 import ArtistList from "./artistlist";
 import ProtectedRoute from "../../components/ProtectedRoute";
+import { authService } from "../services/auth.service";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<any[]>([]);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    getArtists().then(setArtists);
-  }, []);
+    const checkAuth = async () => {
+      const canAccess = await authService.canAccessAdminPages();
+      if (!canAccess) {
+        router.push('/');
+        return;
+      }
+      setIsAuthorized(true);
+      setIsChecking(false);
+    };
+    checkAuth();
+  }, [router]);
+
+  useEffect(() => {
+    if (isAuthorized) {
+      getArtists().then(setArtists);
+    }
+  }, [isAuthorized]);
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-[#1a0f2e] flex items-center justify-center">
+        <p className="text-white">Checking authorization...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return null;
+  }
 
   return (
     <ProtectedRoute>

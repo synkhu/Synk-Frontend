@@ -4,15 +4,16 @@ import axios from 'axios'
 
 interface Ticket {
     id: string
-    eventName: string
     eventId: string
+    eventName: string
+    ticketTypeId: string
     ticketTypeName: string
-    price: number
-    purchaseDate: string
+    ticketToken: string
+    createdAt: string
     eventStartTime?: string
     venueName?: string
-    qrCode?: string
     thumbnailUrl?: string
+    qrCode?: string
 }
 
 interface TicketsPopupProps {
@@ -67,7 +68,6 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
             }
 
             const { data } = await axios.request(options)
-            console.log('Tickets data:', data)
             
             // Assuming the API returns an array of tickets or an object with items property
             const ticketsArray = Array.isArray(data) ? data : data.items || []
@@ -84,6 +84,7 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
         if (!dateString) return 'N/A'
         try {
             const date = new Date(dateString)
+            if (isNaN(date.getTime())) return 'N/A'
             return date.toLocaleDateString('hu-HU', {
                 year: 'numeric',
                 month: 'long',
@@ -96,11 +97,50 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
         }
     }
 
-    const formatPrice = (price: number) => {
+    const formatPrice = (price?: number) => {
+        if (price === undefined || price === null || isNaN(price)) return 'N/A'
         return new Intl.NumberFormat('hu-HU', {
             style: 'currency',
-            currency: 'HUF'
+            currency: 'HUF',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
         }).format(price)
+    }
+
+    const downloadTicket = async (ticketId: string) => {
+        const token = localStorage.getItem('authToken')
+        
+        if (!token) {
+            alert('Kérjük, jelentkezz be a jegy letöltéséhez')
+            return
+        }
+
+        try {
+            const options = {
+                method: 'GET',
+                url: `https://api.synk.hu/tickets/${ticketId}/download`,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                responseType: 'blob' as const
+            }
+
+            const { data } = await axios.request(options)
+            
+            // Create a blob URL and trigger download
+            const blob = new Blob([data], { type: 'application/pdf' })
+            const url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = `ticket-${ticketId}.pdf`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            window.URL.revokeObjectURL(url)
+        } catch (error) {
+            console.error(error)
+            alert('Nem sikerült letölteni a jegyet')
+        }
     }
 
     if (!visible) return null
@@ -183,17 +223,10 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
                                                 </div>
                                             )}
                                             
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-yellow-400">💰</span>
-                                                <span className="text-gray-300">
-                                                    <strong className="text-white">Ár:</strong> {formatPrice(ticket.price)}
-                                                </span>
-                                            </div>
-                                            
                                             <div className="flex items-center gap-2 md:col-span-2">
                                                 <span className="text-gray-400">🛒</span>
                                                 <span className="text-gray-400 text-xs">
-                                                    Vásárlás: {formatDate(ticket.purchaseDate)}
+                                                    Vásárlás: {formatDate(ticket.createdAt)}
                                                 </span>
                                             </div>
                                         </div>
@@ -208,12 +241,21 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
                                             </div>
                                         )}
                                         
-                                        <button
-                                            onClick={() => window.location.href = `/events/${ticket.eventId}`}
-                                            className="mt-4 w-full bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg font-medium transition"
-                                        >
-                                            Esemény megtekintése
-                                        </button>
+                                        <div className="flex gap-2 mt-4">
+                                            <button
+                                                onClick={() => downloadTicket(ticket.id)}
+                                                className="flex-1 bg-[#5a3d8a] hover:bg-[#6b4d9a] text-white px-4 py-2 rounded-lg font-medium transition flex items-center justify-center gap-2"
+                                            >
+                                                <span>⬇️</span>
+                                                <span>Jegy letöltése</span>
+                                            </button>
+                                            <button
+                                                onClick={() => window.location.href = `/events/${ticket.eventId}`}
+                                                className="flex-1 bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg font-medium transition"
+                                            >
+                                                Esemény megtekintése
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

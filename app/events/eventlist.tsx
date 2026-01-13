@@ -191,13 +191,6 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
     }
   };
 
-  // Debug: log the first event to see its structure
-  useEffect(() => {
-    if (events.length > 0) {
-      console.log("First event data:", events[0]);
-    }
-  }, [events]);
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {!events || events.length === 0 ? (

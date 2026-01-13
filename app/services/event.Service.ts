@@ -90,8 +90,6 @@ export const createEvent = async (
     })) : null
   };
 
-  console.log("🚀 Sending payload to API:", payload);
-
   await axios.post(
     `${API_URL}/events`,
     payload,
@@ -153,8 +151,6 @@ export const updateEvent = async (
       maxSaleCount: tt.maxSaleCount || null
     })) : null
   };
-
-  console.log("🚀 Updating event with payload:", payload);
 
   await axios.put(
     `${API_URL}/events/${id}`,

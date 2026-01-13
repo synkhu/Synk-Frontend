@@ -6,7 +6,6 @@ const getToken = () => authService.getToken();
 
 export const getVenues = async () => {
   const res = await axios.get(`${API_URL}/venues`);
-  console.log('API Response:', res.data);
   return res.data.items;
 };
 
@@ -58,8 +57,6 @@ export const updateVenue = async (id: number, venueData: Partial<{
 }>) => {
   const token = getToken();
   if (!token) throw new Error('No authentication token found.');
-  
-  console.log('Updating venue with data:', venueData);
   
   await axios.put(`${API_URL}/venues/${id}`, venueData, {
     headers: {

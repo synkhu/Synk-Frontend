@@ -22,11 +22,11 @@ export default function Home() {
       <div className="nav">
         <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
       </div>
-      <div className="content-column" style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+      <div className="content-column">
         <div className="carousel-container">
           <Carousel />
         </div>
-        <div className="upcoming-events" style={{ marginTop: "1rem" }}>
+        <div className="upcoming-events">
           <UpcomingEvents />
         </div>
       </div>

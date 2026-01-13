@@ -53,7 +53,6 @@ export default function RegisterPopup({ visible, onClose, onBackToLogin }: Regis
                 headers: {'Content-Type': 'application/json'}
             })
 
-            console.log('Registration successful:', data)
             setRegisterSuccess(true)
             setRegisterError('') 
             setRegisterData({ email: '', password: '', firstName: '', lastName: '' })

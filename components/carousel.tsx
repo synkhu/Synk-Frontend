@@ -24,14 +24,6 @@ export default function Carousel() {
     useEffect(() => {
         axios.get('https://api.synk.hu/events')
             .then(res => {
-                console.log('All events:', res.data.items)
-                
-                // Log the first event's structure to see all available fields
-                if (res.data.items.length > 0) {
-                    console.log('First event full structure:', res.data.items[0])
-                    console.log('Available fields:', Object.keys(res.data.items[0]))
-                }
-                
                 // Since totalCapacity is not available in the list endpoint,
                 // show all events instead
                 setEvents(res.data.items)

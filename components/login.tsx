@@ -54,7 +54,6 @@ export default function LoginPopup({
         try {
             const credentials: LoginCredentials = { email, password }
             const sessionData = await authService.login(credentials)
-            console.log('Login successful:', sessionData)
 
             setLoginSuccess(true)
             setSessionInfo(sessionData)

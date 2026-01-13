@@ -154,6 +154,39 @@ class AuthService {
     return session?.token || null;
   }
 
+  // Get user info from identify endpoint
+  async getUserInfo(): Promise<any> {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const options = {
+        method: 'GET',
+        url: 'https://api.synk.hu/auth/identify',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      };
+
+      const { data } = await axios.request(options);
+      return data;
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+      return null;
+    }
+  }
+
+  // Check if user is admin or organizer
+  async isAdmin(): Promise<boolean> {
+    const userInfo = await this.getUserInfo();
+    return userInfo?.role === 'Administrator' || userInfo?.role === 'Organizer';
+  }
+
+  // Check if user can access admin pages (Administrator or Organizer)
+  async canAccessAdminPages(): Promise<boolean> {
+    return await this.isAdmin();
+  }
+
   // Session monitoring for auto-refresh or logout
   private sessionMonitorInterval: NodeJS.Timeout | null = null;
 
@@ -164,12 +197,10 @@ class AuthService {
     
     this.sessionMonitorInterval = setInterval(() => {
       if (!this.isSessionValid()) {
-        console.log('Session expired, logging out...');
         this.logout();
         // Optional: Dispatch event or redirect
         this.dispatchSessionExpired();
       } else if (this.needsRefresh()) {
-        console.log('Session needs refresh, attempting refresh...');
         this.refreshToken().catch(() => {
           // If refresh fails, logout
           this.logout();
