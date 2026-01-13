@@ -88,14 +88,15 @@ p {
     font-size: 32px;
     border-radius: 50%;
     transform: translateY(-50%);
+    z-index: 10;
     top: 50%;
 }
 
 .carousel-arrow.left { 
-    left: 85px;
+    left: -90px;
  }
 .carousel-arrow.right { 
-    right: 85px;
+    right: -90px;
  }
 
 .upcoming-events h2 {

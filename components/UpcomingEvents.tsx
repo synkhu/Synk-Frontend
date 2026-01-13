@@ -55,7 +55,7 @@ export default function UpcomingEvents() {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className='main'>
+    <div>
       <h2>Upcoming events</h2>
       <div className="event-container">
         <button className="carousel-arrow left" onClick={() => scroll('left', 4)}>&lt;</button>
