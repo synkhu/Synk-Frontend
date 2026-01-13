@@ -87,11 +87,23 @@ export default function LoginPopup({
         }
     }, [visible])
 
+    // Add ESC key handler
+    useEffect(() => {
+        const handleEsc = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && visible && !isLoading) {
+                onClose()
+            }
+        }
+        
+        window.addEventListener('keydown', handleEsc)
+        return () => window.removeEventListener('keydown', handleEsc)
+    }, [visible, isLoading, onClose])
+
     if (!visible) return null
 
     return (
-        <div className="popup-overlay">
-            <div className="popup-container">
+        <div className="popup-overlay" onClick={onClose}>
+            <div className="popup-container" onClick={(e) => e.stopPropagation()}>
                 <div className="popup-header">
                     <h2 className="popup-title">
                         {loginStep === 'email' ? 'Bejelentkezés' : 'Írd be a kódot'}

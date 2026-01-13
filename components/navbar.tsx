@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import './navbar.css'
 import RegisterPopup from './register'
 import LoginPopup from './login'
+import TicketsPopup from './tickets'
 
 type NavbarProps = {
   loggedIn: boolean;
@@ -13,15 +14,19 @@ type NavbarProps = {
 export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
     const [showLoginPopup, setShowLoginPopup] = useState(false)
     const [showRegisterPopup, setShowRegisterPopup] = useState(false)
+    const [showTicketsPopup, setShowTicketsPopup] = useState(false)
 
     const [loginStep, setLoginStep] = useState<'email' | 'code'>('email')
     const [email, setEmail] = useState('')
     const [code, setCode] = useState('')
 
 
-    // Open login popup
+    // Open login/tickets popup
     const openLogin = () => {
-        if (loggedIn) return;
+        if (loggedIn) {
+            setShowTicketsPopup(true)
+            return;
+        }
         setShowLoginPopup(true)
         setLoginStep('email')
         setEmail('')
@@ -128,6 +133,12 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                     setShowRegisterPopup(false)
                     setShowLoginPopup(true)
                 }}
+            />
+
+            {/* Tickets Popup */}
+            <TicketsPopup
+                visible={showTicketsPopup}
+                onClose={() => setShowTicketsPopup(false)}
             />
         </div>
     )

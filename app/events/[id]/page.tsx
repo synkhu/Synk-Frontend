@@ -92,20 +92,52 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       return;
     }
 
-    // Here you would implement the actual ticket purchase logic
-    // For now, we'll just show an alert
-    alert(`Buying ${quantity} ticket(s) of type: ${selectedTicketType}`);
-    
-    // TODO: Implement actual purchase API call
-    // try {
-    //   const response = await axios.post(`${API_URL}/tickets/purchase`, {
-    //     ticketTypeId: selectedTicketType,
-    //     quantity: quantity
-    //   });
-    //   // Handle successful purchase
-    // } catch (err) {
-    //   // Handle error
-    // }
+    if (!eventId) {
+      alert("Event ID not found");
+      return;
+    }
+
+    // Get auth token from localStorage
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("Please login to purchase tickets");
+      router.push("/");
+      return;
+    }
+
+    try {
+      const options = {
+        method: 'POST',
+        url: `${API_URL}/orders/purchase`,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        data: {
+          eventId: eventId,
+          ticketTypeId: selectedTicketType,
+          quantity: quantity
+        }
+      };
+
+      const { data } = await axios.request(options);
+      console.log("Purchase successful:", data);
+      
+      alert(`Successfully purchased ${quantity} ticket(s)! Check your tickets in your account.`);
+      
+      // Reset selection
+      setSelectedTicketType(null);
+      setQuantity(1);
+      
+      // Refresh event details to update remaining tickets
+      const res = await axios.get(`${API_URL}/events/${eventId}`);
+      setEvent(res.data);
+      
+    } catch (error: any) {
+      console.error("Purchase failed:", error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.errors || "Failed to purchase tickets. Please try again.";
+      alert(`Error: ${typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage)}`);
+    }
   };
 
   if (loading) {
@@ -315,7 +347,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                   <span className="text-lg font-semibold">Total:</span>
                   <span className="text-2xl font-bold text-gray-900">
                     ${(
-                      event.ticketTypes.find((t) => t.id === selectedTicketType)?.price || 0 * quantity
+                      (event.ticketTypes.find((t) => t.id === selectedTicketType)?.price || 0) * quantity
                     ).toFixed(2)}
                   </span>
                 </div>

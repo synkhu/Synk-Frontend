@@ -1,5 +1,5 @@
 // Register.tsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './navbar.css'
 
@@ -21,6 +21,18 @@ export default function RegisterPopup({ visible, onClose, onBackToLogin }: Regis
     const [registerLoading, setRegisterLoading] = useState(false)
     const [registerError, setRegisterError] = useState('')
     const [registerSuccess, setRegisterSuccess] = useState(false)
+
+    // Add ESC key handler
+    useEffect(() => {
+        const handleEsc = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && visible && !registerLoading) {
+                onClose()
+            }
+        }
+        
+        window.addEventListener('keydown', handleEsc)
+        return () => window.removeEventListener('keydown', handleEsc)
+    }, [visible, registerLoading, onClose])
 
     const handleRegisterInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -92,8 +104,8 @@ export default function RegisterPopup({ visible, onClose, onBackToLogin }: Regis
     if (!visible) return null
 
     return (
-        <div className="popup-overlay">
-            <div className="popup-container">
+        <div className="popup-overlay" onClick={onClose}>
+            <div className="popup-container" onClick={(e) => e.stopPropagation()}>
 
                 <div className="popup-header">
                     <h2 className="popup-title">Regisztráció</h2>
