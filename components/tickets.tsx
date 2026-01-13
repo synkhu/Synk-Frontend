@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import './navbar.css'
 import axios from 'axios'
 
@@ -25,14 +26,20 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
     const [tickets, setTickets] = useState<Ticket[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
-        if (visible) {
-            fetchTickets()
-        } else {
+        setMounted(true)
+    }, [])
+
+    useEffect(() => {
+        if (!visible) {
             // Reset state when popup closes
             setError(null)
+            return
         }
+
+        fetchTickets()
     }, [visible])
 
     // Add ESC key handler
@@ -68,12 +75,11 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
             }
 
             const { data } = await axios.request(options)
-            
+
             // Assuming the API returns an array of tickets or an object with items property
             const ticketsArray = Array.isArray(data) ? data : data.items || []
             setTickets(ticketsArray)
         } catch (error: any) {
-            console.error('Failed to fetch tickets:', error)
             setError(error.response?.data?.message || 'Nem sikerült betölteni a jegyeket')
         } finally {
             setIsLoading(false)
@@ -126,7 +132,7 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
             }
 
             const { data } = await axios.request(options)
-            
+
             // Create a blob URL and trigger download
             const blob = new Blob([data], { type: 'application/pdf' })
             const url = window.URL.createObjectURL(blob)
@@ -138,16 +144,19 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
             document.body.removeChild(link)
             window.URL.revokeObjectURL(url)
         } catch (error) {
-            console.error(error)
             alert('Nem sikerült letölteni a jegyet')
         }
     }
 
-    if (!visible) return null
+    if (!visible || !mounted) return null
 
-    return (
+    return createPortal(
         <div className="popup-overlay" onClick={onClose}>
-            <div className="popup-container" style={{ maxWidth: '900px', maxHeight: '85vh', overflow: 'auto' }} onClick={(e) => e.stopPropagation()}>
+            <div
+                className="popup-container"
+                style={{ maxWidth: '900px', maxHeight: '85vh', overflow: 'auto' }}
+                onClick={(e) => e.stopPropagation()}
+            >
                 <div className="popup-header">
                     <h2 className="popup-title">Jegyeim</h2>
                     <button
@@ -190,13 +199,13 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
                                             />
                                         </div>
                                     )}
-                                    
+
                                     {/* Ticket Details */}
                                     <div className="p-6 flex-1">
                                         <h3 className="text-xl font-bold text-white mb-3">
                                             {ticket.eventName}
                                         </h3>
-                                        
+
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                             <div className="flex items-center gap-2">
                                                 <span className="text-purple-400">🎫</span>
@@ -204,7 +213,7 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
                                                     <strong className="text-white">Típus:</strong> {ticket.ticketTypeName}
                                                 </span>
                                             </div>
-                                            
+
                                             {ticket.venueName && (
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-green-400">📍</span>
@@ -213,7 +222,7 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
                                                     </span>
                                                 </div>
                                             )}
-                                            
+
                                             {ticket.eventStartTime && (
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-blue-400">📅</span>
@@ -222,7 +231,7 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
                                                     </span>
                                                 </div>
                                             )}
-                                            
+
                                             <div className="flex items-center gap-2 md:col-span-2">
                                                 <span className="text-gray-400">🛒</span>
                                                 <span className="text-gray-400 text-xs">
@@ -233,14 +242,14 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
 
                                         {ticket.qrCode && (
                                             <div className="mt-4 flex justify-center bg-white rounded-lg p-3 inline-block">
-                                                <img 
-                                                    src={ticket.qrCode} 
-                                                    alt="QR Code" 
+                                                <img
+                                                    src={ticket.qrCode}
+                                                    alt="QR Code"
                                                     className="w-32 h-32"
                                                 />
                                             </div>
                                         )}
-                                        
+
                                         <div className="flex gap-2 mt-4">
                                             <button
                                                 onClick={() => downloadTicket(ticket.id)}
@@ -272,6 +281,7 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
                     </button>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
