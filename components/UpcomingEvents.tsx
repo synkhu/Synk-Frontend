@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import './UpcomingEvents.css';
 
 interface EventItem {
@@ -15,6 +18,7 @@ export default function UpcomingEvents() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     axios.get('https://api.synk.hu/events')
@@ -66,7 +70,12 @@ export default function UpcomingEvents() {
                 {event.venueName && <p>Venue: {event.venueName}</p>}
                 {event.artistName && <p>Artist: {event.artistName}</p>}
                 <div className="card-footer">
-                  <button className="details-button">Details</button>
+                  <button 
+                    className="details-button"
+                    onClick={() => router.push(`/events/${event.id}`)}
+                  >
+                    Details
+                  </button>
                 </div>
               </div>
             ))}

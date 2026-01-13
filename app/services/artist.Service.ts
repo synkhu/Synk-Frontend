@@ -35,13 +35,22 @@ export const createArtist = async (
   return await getArtists();
 };
 
-export const updateArtist = async (id: number, name: string) => {
+export const updateArtist = async (
+  id: number,
+  name: string,
+  description?: string,
+  spotifyUrl?: string
+) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
 
   await axios.put(
     `${API_URL}/artists/${id}`,
-    { name },
+    {
+      name,
+      description: description || null,
+      spotifyUrl: spotifyUrl || null,
+    },
     {
       headers: {
         Authorization: `Bearer ${token}`,

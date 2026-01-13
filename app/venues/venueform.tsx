@@ -46,40 +46,52 @@ export default function VenueForm({ onSuccess }: VenueFormProps) {
     }
 
     return (
-        <form onSubmit={submit}>
-            <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Venue Name"
-                required
-            />
-            <input
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Address"
-            />
-            <input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="City"
-            />
-            <input
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder="Country"
-            />
-            <input
-                value={capacity}
-                onChange={(e) => setCapacity(Number(e.target.value))}
-                placeholder="Capacity"
-                type="number"
-            />
+        <form onSubmit={submit} className="max-w-4xl mx-auto p-6 bg-[#2d1b4e] rounded-lg shadow-lg space-y-4 border border-[#5a3d8a] mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Add New Venue</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Venue Name"
+                    required
+                    className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
+                />
+                <input
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="City"
+                    className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
+                />
+                <input
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Address"
+                    className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
+                />
+                <input
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    placeholder="Country"
+                    className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
+                />
+                <input
+                    value={capacity}
+                    onChange={(e) => setCapacity(Number(e.target.value))}
+                    placeholder="Capacity"
+                    type="number"
+                    className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
+                />
+            </div>
             <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Description"
+                rows={3}
+                className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
             />
-            <button type="submit">Add</button>
+            <button type="submit" className="w-full bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-6 py-3 rounded-lg font-semibold transition">
+                Add Venue
+            </button>
         </form>
     );
 }

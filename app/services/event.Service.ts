@@ -50,7 +50,17 @@ export const createEvent = async (
   endTime: string,
   venueId: string,
   thumbnailUrl?: string,
-  artistName?: string
+  artistId?: string | null,
+  gateTime?: string | null,
+  totalCapacity?: number | null,
+  ticketMaxScanCount?: number | null,
+  ticketTypes?: Array<{
+    name: string;
+    price: number;
+    saleStartTime?: string | null;
+    saleEndTime?: string | null;
+    maxSaleCount?: number | null;
+  }> | null
 ) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
@@ -58,6 +68,7 @@ export const createEvent = async (
 
   const startISO = parseDateRFC3339(startTime);
   const endISO = parseDateRFC3339(endTime);
+  const gateISO = gateTime ? parseDateRFC3339(gateTime) : null;
 
   const payload = {
     name,
@@ -66,7 +77,17 @@ export const createEvent = async (
     endTime: endISO,
     venueId,
     thumbnailUrl: thumbnailUrl || null,
-    artistName: artistName || null, // ✅ Changed from artistname to artistName
+    artistId: artistId || null,
+    gateTime: gateISO,
+    totalCapacity: totalCapacity || null,
+    ticketMaxScanCount: ticketMaxScanCount || null,
+    ticketTypes: ticketTypes && ticketTypes.length > 0 ? ticketTypes.map(tt => ({
+      name: tt.name,
+      price: tt.price,
+      saleStartTime: tt.saleStartTime ? parseDateRFC3339(tt.saleStartTime) : null,
+      saleEndTime: tt.saleEndTime ? parseDateRFC3339(tt.saleEndTime) : null,
+      maxSaleCount: tt.maxSaleCount || null
+    })) : null
   };
 
   console.log("🚀 Sending payload to API:", payload);
@@ -93,7 +114,17 @@ export const updateEvent = async (
   endTime: string,
   venueId: string,
   thumbnailUrl?: string,
-  artistName?: string
+  artistId?: string | null,
+  gateTime?: string | null,
+  totalCapacity?: number | null,
+  ticketMaxScanCount?: number | null,
+  ticketTypes?: Array<{
+    name: string;
+    price: number;
+    saleStartTime?: string | null;
+    saleEndTime?: string | null;
+    maxSaleCount?: number | null;
+  }> | null
 ) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
@@ -101,6 +132,7 @@ export const updateEvent = async (
 
   const startISO = parseDateRFC3339(startTime);
   const endISO = parseDateRFC3339(endTime);
+  const gateISO = gateTime ? parseDateRFC3339(gateTime) : null;
 
   const payload = {
     name,
@@ -109,7 +141,17 @@ export const updateEvent = async (
     endTime: endISO,
     venueId,
     thumbnailUrl: thumbnailUrl || null,
-    artistName: artistName || null, // ✅ Changed from artistname to artistName
+    artistId: artistId || null,
+    gateTime: gateISO,
+    totalCapacity: totalCapacity || null,
+    ticketMaxScanCount: ticketMaxScanCount || null,
+    ticketTypes: ticketTypes && ticketTypes.length > 0 ? ticketTypes.map(tt => ({
+      name: tt.name,
+      price: tt.price,
+      saleStartTime: tt.saleStartTime ? parseDateRFC3339(tt.saleStartTime) : null,
+      saleEndTime: tt.saleEndTime ? parseDateRFC3339(tt.saleEndTime) : null,
+      maxSaleCount: tt.maxSaleCount || null
+    })) : null
   };
 
   console.log("🚀 Updating event with payload:", payload);

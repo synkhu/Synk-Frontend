@@ -15,10 +15,12 @@ export default function ArtistsPage() {
 
   return (
     <ProtectedRoute>
-      <div style={{ padding: "2rem" }}>
-        <h1>Artists</h1>
-        <ArtistForm onSuccess={setArtists} />
-        <ArtistList artists={artists} onUpdate={setArtists} />
+      <div className="min-h-screen bg-[#1a0f2e] py-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-white mb-8">Artists</h1>
+          <ArtistForm onSuccess={setArtists} />
+          <ArtistList artists={artists} onUpdate={setArtists} />
+        </div>
       </div>
     </ProtectedRoute>
   );

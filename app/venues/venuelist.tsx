@@ -44,67 +44,116 @@ export default function VenueList({ venues = [], onUpdate }: VenueListProps) {
     }
     
     return (
-        <ul>
-            {!venues || venues.length === 0 ? <li>No venues found</li> : venues.map((v) => (
-                <li key={v.id}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {!venues || venues.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                    <p className="text-gray-400 text-lg">No venues found</p>
+                </div>
+            ) : venues.map((v) => (
+                <div key={v.id}>
                     {editingId === v.id ? (
-                        <>
+                        <div className="bg-[#2d1b4e] rounded-lg shadow-lg p-6 space-y-3 border border-[#5a3d8a]">
+                            <h3 className="text-lg font-bold text-white mb-4">Edit Venue</h3>
                             <input 
                                 placeholder="Name"
                                 value={formData.name} 
                                 onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                                className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
                             />
                             <input 
                                 placeholder="Address"
                                 value={formData.address} 
                                 onChange={(e) => setFormData({...formData, address: e.target.value})} 
+                                className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
                             />
+                            <div className="grid grid-cols-2 gap-2">
+                                <input 
+                                    placeholder="City"
+                                    value={formData.city} 
+                                    onChange={(e) => setFormData({...formData, city: e.target.value})} 
+                                    className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
+                                />
+                                <input 
+                                    placeholder="Country"
+                                    value={formData.country} 
+                                    onChange={(e) => setFormData({...formData, country: e.target.value})} 
+                                    className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
+                                />
+                            </div>
                             <input 
                                 placeholder="Capacity"
                                 type="number"
                                 value={formData.capacity} 
                                 onChange={(e) => setFormData({...formData, capacity: Number(e.target.value)})} 
-                            />
-                            <input 
-                                placeholder="City"
-                                value={formData.city} 
-                                onChange={(e) => setFormData({...formData, city: e.target.value})} 
-                            />
-                            <input 
-                                placeholder="Country"
-                                value={formData.country} 
-                                onChange={(e) => setFormData({...formData, country: e.target.value})} 
+                                className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
                             />
                             <textarea 
                                 placeholder="Description"
                                 value={formData.description} 
                                 onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                                rows={3}
+                                className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
                             />
-                            <button onClick={() => save(v.id)}>Save</button>
-                        </>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => save(v.id)}
+                                    className="flex-1 bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg transition"
+                                >
+                                    Save
+                                </button>
+                                <button 
+                                    onClick={() => setEditingId(null)}
+                                    className="bg-[#3a2659] hover:bg-[#4c3073] text-white px-4 py-2 rounded-lg transition"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
                     ) : (
-                        <>
-                            <strong>{v.name}</strong> - {v.city}, {v.country}<br />
-                            {v.address} | Capacity: {v.capacity}<br />
-                            {v.description}
-                            <button onClick={() => {
-                                setEditingId(v.id);
-                                setFormData({
-                                    name: v.name,
-                                    city: v.city,
-                                    address: v.address,
-                                    country: v.country,
-                                    capacity: v.capacity,
-                                    description: v.description
-                                });
-                            }}>
-                                Edit
-                            </button>
-                            <button onClick={() => remove(v.id)}>Delete</button>
-                        </>
+                        <div className="bg-[#2d1b4e] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-[#5a3d8a]">
+                            <div className="p-6 space-y-3">
+                                <h3 className="text-xl font-bold text-white">{v.name}</h3>
+                                <div className="text-gray-300 text-sm space-y-1">
+                                    <p className="flex items-center gap-2">
+                                        <span>📍</span>
+                                        <span>{v.city}, {v.country}</span>
+                                    </p>
+                                    <p className="text-gray-400">{v.address}</p>
+                                    <p className="flex items-center gap-2">
+                                        <span>👥</span>
+                                        <span>Capacity: {v.capacity}</span>
+                                    </p>
+                                    {v.description && <p className="text-gray-400 mt-2">{v.description}</p>}
+                                </div>
+                                <div className="flex gap-2 pt-4 border-t border-[#5a3d8a]">
+                                    <button 
+                                        onClick={() => {
+                                            setEditingId(v.id);
+                                            setFormData({
+                                                name: v.name,
+                                                city: v.city,
+                                                address: v.address,
+                                                country: v.country,
+                                                capacity: v.capacity,
+                                                description: v.description
+                                            });
+                                        }}
+                                        className="flex-1 bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg transition"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button 
+                                        onClick={() => remove(v.id)}
+                                        className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg transition"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     )}
-                </li>
+                </div>
             ))}
-        </ul>
+        </div>
     );
 }

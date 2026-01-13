@@ -1,12 +1,47 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import axios from 'axios'
 import Image from 'next/image'
 import './carousel.css'
 import Card from './card'
 
+interface EventItem {
+    id: string
+    name: string
+    venueName?: string | null
+    thumbnailUrl?: string | null
+    totalCapacity?: number | null
+}
+
 export default function Carousel() {
     const [currentSlide, setCurrentSlide] = useState(0)
-    const totalSlides = 5
+    const [events, setEvents] = useState<EventItem[]>([])
+    const [loading, setLoading] = useState(true)
+    const router = useRouter()
+    const totalSlides = events.length
+
+    useEffect(() => {
+        axios.get('https://api.synk.hu/events')
+            .then(res => {
+                console.log('All events:', res.data.items)
+                
+                // Log the first event's structure to see all available fields
+                if (res.data.items.length > 0) {
+                    console.log('First event full structure:', res.data.items[0])
+                    console.log('Available fields:', Object.keys(res.data.items[0]))
+                }
+                
+                // Since totalCapacity is not available in the list endpoint,
+                // show all events instead
+                setEvents(res.data.items)
+                setLoading(false)
+            })
+            .catch(err => {
+                console.error('Failed to load events:', err)
+                setLoading(false)
+            })
+    }, [])
 
     const goToSlide = (index: number): void => {
         setCurrentSlide(index)
@@ -20,31 +55,60 @@ export default function Carousel() {
         setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides)
     }
 
+    if (loading) {
+        return (
+            <div className='carousel flex items-center justify-center h-56 md:h-96'>
+                <p className='text-white text-xl'>Loading events...</p>
+            </div>
+        )
+    }
+
+    if (events.length === 0) {
+        return (
+            <div className='carousel flex items-center justify-center h-56 md:h-96'>
+                <p className='text-white text-xl'>No large events available</p>
+            </div>
+        )
+    }
+
     return (
         <div className='carousel'>
             <div className='relative w-full' data-carousel='slide'>
             {/* Carousel wrapper */}
             <div className='relative h-56 overflow-hidden rounded-base md:h-96'>
-                {/* Item 1 */}
-                <div className={`${currentSlide === 0 ? 'block' : 'hidden'} duration-700 ease-in-out h-full`} data-carousel-item>
-                    <Card/>
-                </div>
-                {/* Item 2 */}
-                <div className={`${currentSlide === 1 ? 'block' : 'hidden'} duration-700 ease-in-out h-full`} data-carousel-item>
-                    <Card/>
-                </div>
-                {/* Item 3 */}
-                <div className={`${currentSlide === 2 ? 'block' : 'hidden'} duration-700 ease-in-out h-full`} data-carousel-item>
-                    <Card/>
-                </div>
-                {/* Item 4 */}
-                <div className={`${currentSlide === 3 ? 'block' : 'hidden'} duration-700 ease-in-out h-full`} data-carousel-item>
-                    <Card/>
-                </div>
-                {/* Item 5 */}
-                <div className={`${currentSlide === 4 ? 'block' : 'hidden'} duration-700 ease-in-out h-full`} data-carousel-item>
-                    <Card/>
-                </div>
+                {events.map((event, index) => (
+                    <div 
+                        key={event.id}
+                        className={`${currentSlide === index ? 'block' : 'hidden'} duration-700 ease-in-out h-full cursor-pointer`} 
+                        data-carousel-item
+                        onClick={() => router.push(`/events/${event.id}`)}
+                    >
+                        <div className='relative w-full h-full'>
+                            {event.thumbnailUrl ? (
+                                <img 
+                                    src={event.thumbnailUrl} 
+                                    alt={event.name}
+                                    className='absolute block w-full h-full object-cover'
+                                />
+                            ) : (
+                                <div className='absolute block w-full h-full bg-gradient-to-br from-purple-600 to-blue-600' />
+                            )}
+                            <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6'>
+                                <h3 className='text-white text-2xl font-bold mb-2'>{event.name}</h3>
+                                {event.venueName && (
+                                    <p className='text-white text-lg flex items-center gap-2'>
+                                        <span>📍</span> {event.venueName}
+                                    </p>
+                                )}
+                                {event.totalCapacity && (
+                                    <p className='text-white text-sm mt-1'>
+                                        Capacity: {event.totalCapacity} people
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
             {/* Slider controls - Previous */}
             <button type='button' className='absolute top-0 left-0 z-40 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none' onClick={prevSlide}>
