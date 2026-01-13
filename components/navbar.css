@@ -14,6 +14,7 @@
   align-self: flex-start;
   overflow: visible;
   transition: transform 0.35s ease;
+  position: fixed;
 }
 
 .navbar-logo {

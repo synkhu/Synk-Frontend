@@ -101,9 +101,6 @@ export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpe
                     <h1 className="navbar-logo-text">Synk</h1>
                 </div>
 
-                <label htmlFor="nav-search" className="navbar-search-label">Search</label>
-                <input id="nav-search" type="search" placeholder="Search..." className="navbar-search-input" />
-
                 <div className="navbar-buttons">
                     <button type="button" className="navbar-button" onClick={openLogin}>
                         Jegyeim
