@@ -12,7 +12,8 @@ export const getArtists = async () => {
 export const createArtist = async (
   name: string,
   description: string,
-  spotifyUrl: string
+  spotifyUrl: string,
+  profilePictureUrl?: string
 ) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
@@ -23,6 +24,7 @@ export const createArtist = async (
       name,
       description: description || null,
       spotifyUrl: spotifyUrl || null,
+      profilePictureUrl: profilePictureUrl || null,
     },
     {
       headers: {
@@ -39,7 +41,8 @@ export const updateArtist = async (
   id: number,
   name: string,
   description?: string,
-  spotifyUrl?: string
+  spotifyUrl?: string,
+  profilePictureUrl?: string
 ) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
@@ -50,6 +53,7 @@ export const updateArtist = async (
       name,
       description: description || null,
       spotifyUrl: spotifyUrl || null,
+      profilePictureUrl: profilePictureUrl || null,
     },
     {
       headers: {

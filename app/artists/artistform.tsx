@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createArtist } from "../services/artist.Service";
+import { uploadFile } from "../services/file.service";
 
 type ArtistFormProps = {
   onSuccess: (artists: any[]) => void;
@@ -11,18 +12,33 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [spotifyUrl, setSpotifyUrl] = useState("");
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const updatedArtists = await createArtist(name, description, spotifyUrl);
+      let profilePictureUrl: string | undefined;
+
+      if (profileFile) {
+        profilePictureUrl = await uploadFile(profileFile);
+      }
+
+      const updatedArtists = await createArtist(
+        name,
+        description,
+        spotifyUrl,
+        profilePictureUrl
+      );
 
       onSuccess(updatedArtists);
 
       setName("");
       setDescription("");
       setSpotifyUrl("");
+      setProfileFile(null);
+      setProfilePreview(null);
     } catch (err) {
       console.error("Failed to create artist:", err);
     }
@@ -51,6 +67,31 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
         type="url"
         className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
       />
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-1">
+          Profile picture
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0] || null;
+            setProfileFile(file);
+            setProfilePreview(file ? URL.createObjectURL(file) : null);
+          }}
+          className="w-full text-sm text-gray-300"
+        />
+        {profilePreview && (
+          <div className="mt-3">
+            <p className="text-xs text-gray-400 mb-1">Preview:</p>
+            <img
+              src={profilePreview}
+              alt="Profile preview"
+              className="w-24 h-24 object-cover rounded-full border border-[#5a3d8a]"
+            />
+          </div>
+        )}
+      </div>
       <button type="submit" className="w-full bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-6 py-3 rounded-lg font-semibold transition">
         Add Artist
       </button>

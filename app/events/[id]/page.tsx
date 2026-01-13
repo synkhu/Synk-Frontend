@@ -28,11 +28,39 @@ type EventDetails = {
   thumbnailUrl?: string;
   totalCapacity?: number;
   ticketMaxScanCount?: number;
+  venueId?: string;
   venueName?: string;
   venueAddress?: string;
   artistName?: string;
   artistId?: string;
   ticketTypes?: TicketType[];
+};
+
+const mapEventDetails = (data: any): EventDetails => {
+  return {
+    ...data,
+    venueId: data.venueId ?? data.venueid ?? data.venue?.id ?? undefined,
+    venueName:
+      data.venueName ??
+      data.venuename ??
+      data.venue?.name ??
+      undefined,
+    venueAddress:
+      data.venueAddress ??
+      data.venue_address ??
+      data.venue?.address ??
+      undefined,
+    artistName:
+      data.artistName ??
+      data.artistname ??
+      data.artist?.name ??
+      undefined,
+    artistId:
+      data.artistId ??
+      data.artistid ??
+      data.artist?.id ??
+      undefined,
+  };
 };
 
 export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -62,10 +90,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     async function fetchEventDetails() {
       try {
         const res = await axios.get(`${API_URL}/events/${eventId}`);
-        setEvent(res.data);
+        const data = res.data as any;
+        setEvent(mapEventDetails(data));
         setLoading(false);
       } catch (err: any) {
-        console.error("Failed to fetch event details:", err);
         setError(err.response?.data?.message || "Failed to load event details");
         setLoading(false);
       }
@@ -149,7 +177,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       
       // Refresh event details to update remaining tickets
       const res = await axios.get(`${API_URL}/events/${eventId}`);
-      setEvent(res.data);
+      setEvent(mapEventDetails(res.data));
       
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.response?.data?.errors || "Failed to purchase tickets. Please try again.";
@@ -259,7 +287,17 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     <span className="text-2xl">📍</span>
                     <div>
                       <p className="font-semibold text-purple-300">Venue</p>
-                      <p className="text-gray-300">{event.venueName}</p>
+                      {event.venueId ? (
+                        <button
+                          type="button"
+                          onClick={() => router.push(`/venues/${event.venueId}`)}
+                          className="text-purple-300 hover:text-purple-200 underline underline-offset-2 font-medium"
+                        >
+                          {event.venueName}
+                        </button>
+                      ) : (
+                        <p className="text-gray-300">{event.venueName}</p>
+                      )}
                       {event.venueAddress && (
                         <p className="text-sm text-gray-400">{event.venueAddress}</p>
                       )}
@@ -272,7 +310,17 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     <span className="text-2xl">🎤</span>
                     <div>
                       <p className="font-semibold text-purple-300">Artist</p>
-                      <p className="text-gray-300">{event.artistName}</p>
+                      {event.artistId ? (
+                        <button
+                          type="button"
+                          onClick={() => router.push(`/artists/${event.artistId}`)}
+                          className="text-purple-300 hover:text-purple-200 underline underline-offset-2 font-medium"
+                        >
+                          {event.artistName}
+                        </button>
+                      ) : (
+                        <p className="text-gray-300">{event.artistName}</p>
+                      )}
                     </div>
                   </div>
                 )}

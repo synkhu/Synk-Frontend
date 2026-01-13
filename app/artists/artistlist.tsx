@@ -1,10 +1,17 @@
 "use client";
 
 import { deleteArtist, updateArtist } from "../services/artist.Service";
+import { uploadFile } from "../services/file.service";
 import { useState } from "react";
 
 type ArtistListProps = {
-  artists?: { id: number; name: string; description?: string; spotifyUrl?: string }[];
+  artists?: {
+    id: number;
+    name: string;
+    description?: string;
+    spotifyUrl?: string;
+    profilePictureUrl?: string;
+  }[];
   onUpdate: (artists: any[]) => void;
 };
 
@@ -13,9 +20,23 @@ export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [spotifyUrl, setSpotifyUrl] = useState("");
+  const [profilePictureUrl, setProfilePictureUrl] = useState("");
+  const [profileFile, setProfileFile] = useState<File | null>(null);
 
   async function save(id: number) {
-    const updatedArtists = await updateArtist(id, name, description, spotifyUrl);
+    let finalProfileUrl = profilePictureUrl || undefined;
+
+    if (profileFile) {
+      finalProfileUrl = await uploadFile(profileFile);
+    }
+
+    const updatedArtists = await updateArtist(
+      id,
+      name,
+      description,
+      spotifyUrl,
+      finalProfileUrl
+    );
     onUpdate(updatedArtists);
     setEditingId(null);
   }
@@ -55,6 +76,33 @@ export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) 
                 type="url"
                 className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
               />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Profile picture
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setProfileFile(file);
+                    setProfilePictureUrl(file ? "" : a.profilePictureUrl || "");
+                  }}
+                  className="w-full text-sm text-gray-300"
+                />
+                {(profileFile || a.profilePictureUrl) && (
+                  <div className="mt-3 flex items-center gap-3">
+                    {(profileFile || a.profilePictureUrl) && (
+                      <img
+                        src={profileFile ? URL.createObjectURL(profileFile) : a.profilePictureUrl!}
+                        alt="Profile preview"
+                        className="w-16 h-16 object-cover rounded-full border border-[#5a3d8a]"
+                      />
+                    )}
+                    <span className="text-xs text-gray-400">Current / new picture</span>
+                  </div>
+                )}
+              </div>
               <div className="flex gap-2">
                 <button 
                   onClick={() => save(a.id)}
@@ -73,6 +121,15 @@ export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) 
           ) : (
             <div className="bg-[#2d1b4e] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-[#5a3d8a]">
               <div className="p-6 space-y-3">
+                {a.profilePictureUrl && (
+                  <div className="flex justify-center mb-4">
+                    <img
+                      src={a.profilePictureUrl}
+                      alt={a.name}
+                      className="w-20 h-20 object-cover rounded-full border border-[#5a3d8a]"
+                    />
+                  </div>
+                )}
                 <h3 className="text-xl font-bold text-white">{a.name}</h3>
                 {a.description && <p className="text-gray-300 text-sm">{a.description}</p>}
                 {a.spotifyUrl && (
