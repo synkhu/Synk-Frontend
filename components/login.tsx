@@ -1,5 +1,6 @@
 // Login.tsx
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import './navbar.css'
 import { authService, LoginCredentials } from '../app/services/auth.service'
 
@@ -37,10 +38,15 @@ export default function LoginPopup({
     const [error, setError] = useState<string | null>(null)
     const [loginSuccess, setLoginSuccess] = useState(false)
     const [sessionInfo, setSessionInfo] = useState<any>(null)
+    const [mounted, setMounted] = useState(false)
 
     const handlePasswordChange = (value: string) => {
         setPassword(value)
     }
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     const handleLoginWithAPI = async () => {
         if (!email || !password) {
@@ -98,9 +104,9 @@ export default function LoginPopup({
         return () => window.removeEventListener('keydown', handleEsc)
     }, [visible, isLoading, onClose])
 
-    if (!visible) return null
+    if (!visible || !mounted) return null
 
-    return (
+    return createPortal(
         <div className="popup-overlay" onClick={onClose}>
             <div className="popup-container" onClick={(e) => e.stopPropagation()}>
                 <div className="popup-header">
@@ -216,6 +222,7 @@ export default function LoginPopup({
                     </div>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
