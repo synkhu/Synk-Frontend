@@ -1,47 +1,47 @@
 "use client";
 
-import React, { useState, useEffect } from 'react'
-import './navbar.css'
-import RegisterPopup from './register'
-import LoginPopup from './login'
-import TicketsPopup from './tickets'
-import { authService } from '../app/services/auth.service'
+import React, { useState, useEffect } from 'react';
+import './navbar.css';
+import RegisterPopup from './register';
+import LoginPopup from './login';
+import TicketsPopup from './tickets';
+import { authService } from '../app/services/auth.service';
 
 type NavbarProps = {
-  loggedIn: boolean;
-  setLoggedIn: (value: boolean) => void;
+    loggedIn: boolean;
+    setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+    navbarOpen: boolean;
+    setNavbarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
-    const [showLoginPopup, setShowLoginPopup] = useState(false)
-    const [showRegisterPopup, setShowRegisterPopup] = useState(false)
-    const [showTicketsPopup, setShowTicketsPopup] = useState(false)
-    const [isAdmin, setIsAdmin] = useState(false)
+export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpen }: NavbarProps) {
+    const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+    const [showRegisterPopup, setShowRegisterPopup] = useState<boolean>(false);
+    const [showTicketsPopup, setShowTicketsPopup] = useState<boolean>(false);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-    const [loginStep, setLoginStep] = useState<'email' | 'code'>('email')
-    const [email, setEmail] = useState('')
-    const [code, setCode] = useState('')
+    const [loginStep, setLoginStep] = useState<'email' | 'code'>('email');
+    const [email, setEmail] = useState<string>('');
+    const [code, setCode] = useState<string>('');
 
     // Check admin status when login status changes
     useEffect(() => {
         if (loggedIn) {
-            authService.isAdmin().then(setIsAdmin).catch(() => setIsAdmin(false))
+            authService.isAdmin().then(setIsAdmin).catch(() => setIsAdmin(false));
         } else {
-            setIsAdmin(false)
+            setIsAdmin(false);
         }
-    }, [loggedIn])
+    }, [loggedIn]);
 
-
-    // Open login/tickets popup
     const openLogin = () => {
         if (loggedIn) {
-            setShowTicketsPopup(true)
+            setShowTicketsPopup(true);
             return;
         }
-        setShowLoginPopup(true)
-        setLoginStep('email')
-        setEmail('')
-        setCode('')
+        setShowLoginPopup(true);
+        setLoginStep('email');
+        setEmail('');
+        setCode('');
     }
 
     const handleLogout = () => {
@@ -60,14 +60,14 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                 body: JSON.stringify({ email, password: code }),
             });
 
-            const data = await res.json();
+            const data: { token?: string; errors?: any } = await res.json();
 
             if (!res.ok) {
                 alert(data?.errors?.Password?.[0] || "Login failed");
                 return;
             }
 
-            localStorage.setItem("authToken", data.token);
+            localStorage.setItem("authToken", data.token!);
             setLoggedIn(true);
             setShowLoginPopup(false);
         } catch (error) {
@@ -77,8 +77,25 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
     };
 
     return (
-        <div>
-            <nav className="navbar">
+        <>
+            {/* Hamburger button */}
+            <button
+                className="navbar-toggle"
+                onClick={() => setNavbarOpen(prev => !prev)}
+                aria-label="Toggle navigation"
+            >
+                {navbarOpen ? (
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M6 6L18 18M6 18L18 6" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M3 6h18M3 12h18M3 18h18" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                )}
+            </button>
+
+            <nav className={`navbar ${navbarOpen ? "open" : "closed"}`}>
                 <div className="navbar-logo">
                     <div className="navbar-logo-icon">S</div>
                     <h1 className="navbar-logo-text">Synk</h1>
@@ -87,7 +104,7 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                 <label htmlFor="nav-search" className="navbar-search-label">Search</label>
                 <input id="nav-search" type="search" placeholder="Search..." className="navbar-search-input" />
 
-                <div className="navbar-buttons">    
+                <div className="navbar-buttons">
                     <button type="button" className="navbar-button" onClick={openLogin}>
                         Jegyeim
                     </button>
@@ -129,8 +146,8 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                 onLogin={handleLogin}
                 onLoginSuccess={(sessionData: { token: string }) => {
                     setLoggedIn(true);
-                    setShowLoginPopup(false);
                     localStorage.setItem("authToken", sessionData.token);
+                    setShowLoginPopup(false);
                 }}
                 onOpenRegister={() => {
                     setShowLoginPopup(false)
@@ -138,7 +155,6 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                 }}
                 onBackToEmail={() => setLoginStep('email')}
             />
-
             {/* Register Popup */}
             <RegisterPopup
                 visible={showRegisterPopup}
@@ -154,6 +170,6 @@ export default function Navbar({ loggedIn, setLoggedIn }: NavbarProps) {
                 visible={showTicketsPopup}
                 onClose={() => setShowTicketsPopup(false)}
             />
-        </div>
-    )
+        </>
+    );
 }

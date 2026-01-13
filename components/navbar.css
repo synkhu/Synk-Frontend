@@ -13,6 +13,7 @@
   top: 0;
   align-self: flex-start;
   overflow: visible;
+  transition: transform 0.35s ease;
 }
 
 .navbar-logo {
@@ -389,4 +390,67 @@
 
 .cart-popup-container.closing {
   animation: flowOut 0.3s ease-in forwards;
+}
+
+.navbar.closed {
+  transform: translateX(-100%);
+}
+
+.navbar.open {
+  transform: translateX(0);
+}
+
+.navbar.closed {
+  transform: translateX(-100%);
+}
+
+.navbar.open {
+  transform: translateX(0);
+}
+
+.navbar-toggle {
+  width: 38px;
+  height: 38px;
+  background: #4c3073;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 1rem;
+  z-index: 1100;
+  transition: left 0.35s ease;
+}
+
+.main.nav-open .navbar-toggle {
+  left: calc(260px - 48px);
+}
+
+.main.nav-closed .navbar-toggle {
+  left: 1rem;
+}
+
+.navbar-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+:root {
+  --navbar-width: 260px;
+}
+
+.content-column {
+  flex: 1;
+  transition: margin-left 0.35s ease;
+  padding: 1rem;
+}
+
+.main.nav-open .content-column {
+  margin-left: var(--navbar-width);
+}
+
+.main.nav-closed .content-column {
+  margin-left: 0;
 }
