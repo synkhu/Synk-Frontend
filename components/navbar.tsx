@@ -10,8 +10,8 @@ import { authService } from '../app/services/auth.service';
 type NavbarProps = {
     loggedIn: boolean;
     setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-    navbarOpen: boolean;
-    setNavbarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    navbarOpen?: boolean;
+    setNavbarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpen }: NavbarProps) {
@@ -24,7 +24,16 @@ export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpe
     const [email, setEmail] = useState<string>('');
     const [code, setCode] = useState<string>('');
 
-    // Check admin status when login status changes
+    const [internalNavbarOpen, setInternalNavbarOpen] = useState<boolean>(false);
+    const isNavbarOpen = navbarOpen ?? internalNavbarOpen;
+    const toggleNavbar = () => {
+        if (setNavbarOpen) {
+            setNavbarOpen(prev => !prev);
+        } else {
+            setInternalNavbarOpen(prev => !prev);
+        }
+    };
+
     useEffect(() => {
         if (loggedIn) {
             authService.isAdmin().then(setIsAdmin).catch(() => setIsAdmin(false));
@@ -81,10 +90,10 @@ export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpe
             {/* Hamburger button */}
             <button
                 className="navbar-toggle"
-                onClick={() => setNavbarOpen(prev => !prev)}
+                onClick={toggleNavbar}
                 aria-label="Toggle navigation"
             >
-                {navbarOpen ? (
+                {isNavbarOpen ? (
                     <svg width="24" height="24" viewBox="0 0 24 24">
                         <path d="M6 6L18 18M6 18L18 6" stroke="white" strokeWidth="2" strokeLinecap="round" />
                     </svg>
@@ -95,7 +104,7 @@ export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpe
                 )}
             </button>
 
-            <nav className={`navbar ${navbarOpen ? "open" : "closed"}`}>
+            <nav className={`navbar ${isNavbarOpen ? "open" : "closed"}`}>
                 <div className="navbar-logo">
                     <div className="navbar-logo-icon">S</div>
                     <h1 className="navbar-logo-text">Synk</h1>

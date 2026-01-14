@@ -34,15 +34,12 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
 
     useEffect(() => {
         if (!visible) {
-            // Reset state when popup closes
             setError(null)
             return
         }
 
         fetchTickets()
     }, [visible])
-
-    // Add ESC key handler
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && visible) {
@@ -75,8 +72,6 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
             }
 
             const { data } = await axios.request(options)
-
-            // Assuming the API returns an array of tickets or an object with items property
             const ticketsArray = Array.isArray(data) ? data : data.items || []
             setTickets(ticketsArray)
         } catch (error: any) {
@@ -132,8 +127,6 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
             }
 
             const { data } = await axios.request(options)
-
-            // Create a blob URL and trigger download
             const blob = new Blob([data], { type: 'application/pdf' })
             const url = window.URL.createObjectURL(blob)
             const link = document.createElement('a')

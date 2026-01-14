@@ -9,7 +9,7 @@ import "./page.css";
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
-  const [navbarOpen, setNavbarOpen] = useState(true); // added from new code
+  const [navbarOpen, setNavbarOpen] = useState(true);
 
   useEffect(() => {
     setLoggedIn(!!localStorage.getItem("authToken"));
@@ -24,8 +24,8 @@ export default function Home() {
         <Navbar
           loggedIn={loggedIn}
           setLoggedIn={setLoggedIn}
-          navbarOpen={navbarOpen} // added
-          setNavbarOpen={setNavbarOpen} // added
+          navbarOpen={navbarOpen}
+          setNavbarOpen={setNavbarOpen}
         />
       </div>
       <div className="content-column">

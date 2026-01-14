@@ -1,6 +1,4 @@
-
 "use client";
-// hooks/useAuth.ts
 import { useState, useEffect } from 'react';
 import { authService } from '../services/auth.service';
 
@@ -12,15 +10,11 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check initial auth state
     checkAuth();
     
-    // Listen for session changes
     const handleStorageChange = () => {
       checkAuth();
     };
-    
-    // Listen for session expired event
     const handleSessionExpired = () => {
       setIsAuthenticated(false);
       setUser(null);

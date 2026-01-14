@@ -24,8 +24,6 @@ export default function Carousel() {
     useEffect(() => {
         axios.get('https://api.synk.hu/events')
             .then(res => {
-                // Since totalCapacity is not available in the list endpoint,
-                // show all events instead
                 setEvents(res.data.items)
                 setLoading(false)
             })

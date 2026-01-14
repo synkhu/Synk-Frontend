@@ -1,4 +1,3 @@
-// Login.tsx
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import './navbar.css'
@@ -92,7 +91,6 @@ export default function LoginPopup({
         }
     }, [visible])
 
-    // Add ESC key handler
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && visible && !isLoading) {

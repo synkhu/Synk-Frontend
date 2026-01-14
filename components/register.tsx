@@ -1,4 +1,3 @@
-// Register.tsx
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './navbar.css'
@@ -21,8 +20,6 @@ export default function RegisterPopup({ visible, onClose, onBackToLogin }: Regis
     const [registerLoading, setRegisterLoading] = useState(false)
     const [registerError, setRegisterError] = useState('')
     const [registerSuccess, setRegisterSuccess] = useState(false)
-
-    // Add ESC key handler
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && visible && !registerLoading) {

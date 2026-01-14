@@ -28,12 +28,10 @@ export default function EventForm({ onSuccess }: EventFormProps) {
   const [totalCapacity, setTotalCapacity] = useState("");
   const [ticketMaxScanCount, setTicketMaxScanCount] = useState("");
   
-  /* Ticket types */
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([
     { name: "", price: 0, saleStartTime: "", saleEndTime: "", maxSaleCount: "" }
   ]);
 
-  /* Artist autocomplete */
   const [artistQuery, setArtistQuery] = useState("");
   const [artistResults, setArtistResults] = useState<Artist[]>([]);
   const [selectedArtistId, setSelectedArtistId] = useState<string | null>(null);
@@ -52,7 +50,6 @@ export default function EventForm({ onSuccess }: EventFormProps) {
     return () => clearTimeout(timeout);
   }, [artistQuery]);
 
-  /* Venue autocomplete */
   const [venueQuery, setVenueQuery] = useState("");
   const [venueResults, setVenueResults] = useState<Venue[]>([]);
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
@@ -70,7 +67,6 @@ export default function EventForm({ onSuccess }: EventFormProps) {
     return () => clearTimeout(timeout);
   }, [venueQuery]);
 
-  /* Submit */
   async function submit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -80,7 +76,6 @@ export default function EventForm({ onSuccess }: EventFormProps) {
     if (!endTime) return alert("End time is required");
     if (!selectedVenue) return alert("Please select a venue from the list");
 
-    // Validate ticket types if any are provided
     const validTicketTypes = ticketTypes.filter(tt => tt.name.trim() !== "");
     if (validTicketTypes.some(tt => tt.price <= 0)) {
       return alert("All ticket types must have a price greater than 0");
@@ -106,8 +101,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
           maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null
         })) : null
       );
-
-      // Reset form
+      
       setName(""); setThumbnailUrl(""); setDescription("");
       setStartTime(""); setEndTime(""); setGateTime("");
       setTotalCapacity(""); setTicketMaxScanCount("");

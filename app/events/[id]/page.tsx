@@ -70,6 +70,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   const [ticketQuantities, setTicketQuantities] = useState<Record<string, number>>({});
   const [eventId, setEventId] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
+  const [navbarOpen, setNavbarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -187,12 +188,14 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
   if (loading) {
     return (
-      <div className="main flex">
+      <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
         <div className="nav">
-          <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+          <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} navbarOpen={navbarOpen} setNavbarOpen={setNavbarOpen} />
         </div>
-        <div className="min-h-screen flex items-center justify-center bg-[#1a0f2e] w-full">
-          <div className="text-xl text-white">Loading event details...</div>
+        <div className="content-column">
+          <div className="min-h-screen flex items-center justify-center bg-[#1a0f2e] w-full">
+            <div className="text-xl text-white">Loading event details...</div>
+          </div>
         </div>
       </div>
     );
@@ -200,20 +203,22 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
   if (error || !event) {
     return (
-      <div className="main flex">
+      <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
         <div className="nav">
-          <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+          <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} navbarOpen={navbarOpen} setNavbarOpen={setNavbarOpen} />
         </div>
-        <div className="min-h-screen flex items-center justify-center bg-[#1a0f2e] w-full">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-400 mb-4">Error</h1>
-            <p className="text-gray-300 mb-4">{error || "Event not found"}</p>
-            <button
-              onClick={() => router.push("/")}
-              className="bg-[#5a3d8a] hover:bg-[#6b4d9a] text-white px-6 py-2 rounded-lg transition"
-            >
-              Back to Home
-            </button>
+        <div className="content-column">
+          <div className="min-h-screen flex items-center justify-center bg-[#1a0f2e] w-full">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-red-400 mb-4">Error</h1>
+              <p className="text-gray-300 mb-4">{error || "Event not found"}</p>
+              <button
+                onClick={() => router.push("/")}
+                className="bg-[#5a3d8a] hover:bg-[#6b4d9a] text-white px-6 py-2 rounded-lg transition"
+              >
+                Back to Home
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -221,12 +226,13 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="main flex">
+    <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
       <div className="nav">
-        <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+        <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} navbarOpen={navbarOpen} setNavbarOpen={setNavbarOpen} />
       </div>
-      <div className="min-h-screen bg-[#1a0f2e] py-8 px-4 w-full">
-        <div className="max-w-6xl mx-auto">
+      <div className="content-column">
+        <div className="min-h-screen bg-[#1a0f2e] py-8 px-4 w-full">
+          <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <button
             onClick={() => router.push("/")}
@@ -471,8 +477,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             </div>
           </div>
         )}
+          </div>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

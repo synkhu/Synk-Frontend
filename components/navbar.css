@@ -86,7 +86,6 @@
   margin-bottom: 0;
 }
 
-/* Popup Styles */
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -198,8 +197,6 @@
   margin-bottom: 1rem;
   color: #c4b5fd;
 }
-
-/* Cart Popup Styles */
 .cart-popup-container {
   background: #2d1b4e;
   padding: 2rem;
@@ -354,8 +351,6 @@
   border-color: #7c3aed;
   transform: scale(1.02);
 }
-
-/* Animations */
 @keyframes flowIn {
   from {
     opacity: 0;
