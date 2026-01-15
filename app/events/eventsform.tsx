@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createEvent, searchArtists, searchVenues } from "../services/event.Service";
+import { uploadFile } from "../services/file.service";
 
 type Artist = { id: string; name: string };
 type Venue = { id: string; name: string };
@@ -21,6 +22,7 @@ type EventFormProps = {
 export default function EventForm({ onSuccess }: EventFormProps) {
   const [name, setName] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [description, setDescription] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -82,13 +84,24 @@ export default function EventForm({ onSuccess }: EventFormProps) {
     }
 
     try {
+      let thumbnailToSave: string | undefined = thumbnailUrl || undefined;
+
+      if (selectedFiles.length > 0) {
+        const uploadedUrls = await Promise.all(
+          selectedFiles.map((file) => uploadFile(file))
+        );
+        if (uploadedUrls.length > 0) {
+          thumbnailToSave = uploadedUrls[0];
+        }
+      }
+
       const updatedEvents = await createEvent(
         name,
         description,
         startTime,
         endTime,
         selectedVenue.id,
-        thumbnailUrl || undefined,
+        thumbnailToSave,
         selectedArtistId || null,
         gateTime || null,
         totalCapacity ? parseInt(totalCapacity) : null,
@@ -102,7 +115,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
         })) : null
       );
       
-      setName(""); setThumbnailUrl(""); setDescription("");
+      setName(""); setThumbnailUrl(""); setSelectedFiles([]); setDescription("");
       setStartTime(""); setEndTime(""); setGateTime("");
       setTotalCapacity(""); setTicketMaxScanCount("");
       setArtistQuery(""); setSelectedArtistId(null); setSelectedArtistName(""); setArtistResults([]);
@@ -145,14 +158,23 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
-            Thumbnail URL
+            Event Images (first will be used as thumbnail)
           </label>
           <input
-            value={thumbnailUrl}
-            onChange={(e) => setThumbnailUrl(e.target.value)}
-            placeholder="https://example.com/image.jpg"
-            className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              setSelectedFiles(files);
+            }}
+            className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4c3073] file:text-white hover:file:bg-[#5a3d8a]"
           />
+          {selectedFiles.length > 0 && (
+            <p className="mt-1 text-xs text-gray-400">
+              {selectedFiles.length} image(s) selected. The first one will be used as the event thumbnail.
+            </p>
+          )}
         </div>
 
         <div>
