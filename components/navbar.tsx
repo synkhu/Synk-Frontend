@@ -116,9 +116,19 @@ export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpe
                     </button>
 
                     {loggedIn && (
-                        <button type="button" className="navbar-button" onClick={handleLogout}>
-                            Kijelentkezés
-                        </button>
+                        <>
+                            <button
+                                type="button"
+                                className="navbar-button"
+                                onClick={() => { window.location.href = '/my-profile'; }}
+                            >
+                                My Profile
+                            </button>
+
+                            <button type="button" className="navbar-button" onClick={handleLogout}>
+                                Kijelentkezés
+                            </button>
+                        </>
                     )}
 
                     {isAdmin && (
