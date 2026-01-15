@@ -3,18 +3,11 @@ import { authService } from "./auth.service";
 
 const API_URL = "https://api.synk.hu";
 const getToken = () => authService.getToken();
-
-/* ===================== HELPERS ===================== */
-
-/**
- * Converts datetime-local input (YYYY-MM-DDTHH:mm) to RFC 3339 ISO string
- */
 const parseDateRFC3339 = (value: string | null | undefined): string => {
   if (!value || value.trim() === "") {
     throw new Error("parseDateRFC3339: empty value");
   }
 
-  // Accepts "YYYY-MM-DDTHH:mm" or "YYYY-MM-DDTHH:mm:ss"
   const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
   if (!match) {
     throw new Error(`parseDateRFC3339: invalid format "${value}"`);
@@ -22,7 +15,7 @@ const parseDateRFC3339 = (value: string | null | undefined): string => {
 
   const [, yearStr, monthStr, dayStr, hourStr, minStr, secStr] = match;
   const year = parseInt(yearStr, 10);
-  const month = parseInt(monthStr, 10) - 1; // JS month 0-based
+  const month = parseInt(monthStr, 10) - 1;
   const day = parseInt(dayStr, 10);
   const hours = parseInt(hourStr, 10);
   const minutes = parseInt(minStr, 10);
@@ -35,8 +28,6 @@ const parseDateRFC3339 = (value: string | null | undefined): string => {
 
   return date.toISOString();
 };
-
-/* ===================== EVENTS ===================== */
 
 export const getEvents = async () => {
   const res = await axios.get(`${API_URL}/events`);
@@ -51,7 +42,6 @@ export const createEvent = async (
   venueId: string,
   thumbnailUrl?: string,
   artistId?: string | null,
-  gateTime?: string | null,
   totalCapacity?: number | null,
   ticketMaxScanCount?: number | null,
   ticketTypes?: Array<{
@@ -68,7 +58,6 @@ export const createEvent = async (
 
   const startISO = parseDateRFC3339(startTime);
   const endISO = parseDateRFC3339(endTime);
-  const gateISO = gateTime ? parseDateRFC3339(gateTime) : null;
 
   const payload = {
     name,
@@ -78,7 +67,6 @@ export const createEvent = async (
     venueId,
     thumbnailUrl: thumbnailUrl || null,
     artistId: artistId || null,
-    gateTime: gateISO,
     totalCapacity: totalCapacity ?? null,
     ticketMaxScanCount: ticketMaxScanCount ?? null,
     ticketTypes: ticketTypes && ticketTypes.length > 0 ? ticketTypes.map(tt => ({
@@ -86,7 +74,6 @@ export const createEvent = async (
       price: tt.price,
       saleStartTime: tt.saleStartTime ? parseDateRFC3339(tt.saleStartTime) : null,
       saleEndTime: tt.saleEndTime ? parseDateRFC3339(tt.saleEndTime) : null,
-      // preserve 0, only null when undefined/null
       maxSaleCount: tt.maxSaleCount ?? null
     })) : null
   };
@@ -114,7 +101,6 @@ export const updateEvent = async (
   venueId: string,
   thumbnailUrl?: string,
   artistId?: string | null,
-  gateTime?: string | null,
   totalCapacity?: number | null,
   ticketMaxScanCount?: number | null,
   ticketTypes?: Array<{
@@ -131,7 +117,6 @@ export const updateEvent = async (
 
   const startISO = parseDateRFC3339(startTime);
   const endISO = parseDateRFC3339(endTime);
-  const gateISO = gateTime ? parseDateRFC3339(gateTime) : null;
 
   const payload = {
     name,
@@ -141,7 +126,6 @@ export const updateEvent = async (
     venueId,
     thumbnailUrl: thumbnailUrl || null,
     artistId: artistId || null,
-    gateTime: gateISO,
     totalCapacity: totalCapacity ?? null,
     ticketMaxScanCount: ticketMaxScanCount ?? null,
     ticketTypes: ticketTypes && ticketTypes.length > 0 ? ticketTypes.map(tt => ({
@@ -178,8 +162,6 @@ export const deleteEvent = async (id: string) => {
   return await getEvents();
 };
 
-/* ===================== ARTIST SEARCH ===================== */
-
 export const searchArtists = async (query: string) => {
   const trimmed = query.trim();
   if (!trimmed) return [];
@@ -190,8 +172,6 @@ export const searchArtists = async (query: string) => {
 
   return res.data.items;
 };
-
-/* ===================== VENUE SEARCH ===================== */
 
 export const searchVenues = async (query: string) => {
   const trimmed = query.trim();

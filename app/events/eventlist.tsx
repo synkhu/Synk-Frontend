@@ -19,7 +19,6 @@ type Event = {
   description?: string;
   startTime?: string;
   endTime?: string;
-  gateTime?: string;
   venueId?: string;
   venueName?: string;
   thumbnailUrl?: string;
@@ -44,7 +43,6 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
     description: "",
     startTime: "",
     endTime: "",
-    gateTime: "",
     venueId: "",
     thumbnailUrl: "",
     artistId: "",
@@ -101,7 +99,6 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
       formData.venueId,
       formData.thumbnailUrl || undefined,
       formData.artistId || null,
-      formData.gateTime || null,
       formData.totalCapacity ? parseInt(formData.totalCapacity) : null,
       formData.ticketMaxScanCount ? parseInt(formData.ticketMaxScanCount) : null,
       validTicketTypes.length > 0 ? validTicketTypes.map(tt => ({
@@ -125,8 +122,7 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
   async function startEdit(event: Event) {
     setEditingId(event.id);
     onEditStart();
-    
-    // Fetch full event details to get ticket types and other fields
+
     try {
       const response = await axios.get(`https://api.synk.hu/events/${event.id}`);
       const fullEvent = response.data;
@@ -136,7 +132,6 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
         description: fullEvent.description || "",
         startTime: toDateTimeLocal(fullEvent.startTime),
         endTime: toDateTimeLocal(fullEvent.endTime),
-        gateTime: toDateTimeLocal(fullEvent.gateTime),
         venueId: fullEvent.venueId || "",
         thumbnailUrl: fullEvent.thumbnailUrl || "",
         artistId: fullEvent.artistId || "",
@@ -144,7 +139,7 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
         ticketMaxScanCount: fullEvent.ticketMaxScanCount?.toString() || ""
       });
       
-      // Set ticket types if available
+  
       if (fullEvent.ticketTypes && fullEvent.ticketTypes.length > 0) {
         setTicketTypes(fullEvent.ticketTypes.map((tt: any) => ({
           name: tt.name || "",
@@ -165,7 +160,6 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
     }
   }
 
-  // Convert ISO date to datetime-local format (YYYY-MM-DDTHH:mm)
   const toDateTimeLocal = (isoString?: string) => {
     if (!isoString) return "";
     try {
@@ -179,7 +173,6 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
     }
   };
 
-  // Format date for display
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     try {
@@ -239,15 +232,6 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
                     type="datetime-local"
                     value={formData.endTime}
                     onChange={(ev) => setFormData({ ...formData, endTime: ev.target.value })}
-                    className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Gate Time</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.gateTime}
-                    onChange={(ev) => setFormData({ ...formData, gateTime: ev.target.value })}
                     className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
                   />
                 </div>

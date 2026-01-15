@@ -26,7 +26,6 @@ export default function EventForm({ onSuccess }: EventFormProps) {
   const [description, setDescription] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [gateTime, setGateTime] = useState("");
   const [totalCapacity, setTotalCapacity] = useState("");
   const [ticketMaxScanCount, setTicketMaxScanCount] = useState("");
   
@@ -103,7 +102,6 @@ export default function EventForm({ onSuccess }: EventFormProps) {
         selectedVenue.id,
         thumbnailToSave,
         selectedArtistId || null,
-        gateTime || null,
         totalCapacity ? parseInt(totalCapacity) : null,
         ticketMaxScanCount ? parseInt(ticketMaxScanCount) : null,
         validTicketTypes.length > 0 ? validTicketTypes.map(tt => ({
@@ -116,7 +114,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
       );
       
       setName(""); setThumbnailUrl(""); setSelectedFiles([]); setDescription("");
-      setStartTime(""); setEndTime(""); setGateTime("");
+      setStartTime(""); setEndTime("");
       setTotalCapacity(""); setTicketMaxScanCount("");
       setArtistQuery(""); setSelectedArtistId(null); setSelectedArtistName(""); setArtistResults([]);
       setVenueQuery(""); setSelectedVenue(null); setVenueResults([]);
@@ -219,18 +217,6 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Gate Opening Time
-            </label>
-            <input
-              type="datetime-local"
-              value={gateTime}
-              onChange={(e) => setGateTime(e.target.value)}
               className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
             />
           </div>

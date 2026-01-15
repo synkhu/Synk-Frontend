@@ -24,7 +24,6 @@ type EventDetails = {
   description: string;
   startTime: string;
   endTime: string;
-  gateTime?: string;
   thumbnailUrl?: string;
   totalCapacity?: number;
   ticketMaxScanCount?: number;
@@ -332,16 +331,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     <p className="text-gray-300">{formatDate(event.endTime)}</p>
                   </div>
                 </div>
-
-                {event.gateTime && (
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">🚪</span>
-                    <div>
-                      <p className="font-semibold text-purple-300">Gates Open</p>
-                      <p className="text-gray-300">{formatDate(event.gateTime)}</p>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Venue & Artist Info */}
