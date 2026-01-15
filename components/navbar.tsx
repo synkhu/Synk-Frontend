@@ -112,7 +112,7 @@ export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpe
 
                 <div className="navbar-buttons">
                     <button type="button" className="navbar-button" onClick={openLogin}>
-                        Jegyeim
+                        {loggedIn ? "Jegyeim" : "Log in"}
                     </button>
 
                     {loggedIn && (

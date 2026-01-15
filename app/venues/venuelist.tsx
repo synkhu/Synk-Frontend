@@ -1,5 +1,6 @@
 "use client";
-import { deleteVenue, updateVenue } from "../services/venue.Service";
+import { deleteVenue, updateVenue, addVenueImages } from "../services/venue.Service";
+import { uploadFile } from "../services/file.service";
 import { useState } from "react";
 
 interface Venue {
@@ -27,6 +28,7 @@ export default function VenueList({ venues = [], onUpdate }: VenueListProps) {
         capacity: 0,
         description: ""
     });
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
     
     async function save(id: number) {
         if (!formData.name.trim()) {
@@ -34,8 +36,19 @@ export default function VenueList({ venues = [], onUpdate }: VenueListProps) {
             return;
         }
         const updatedVenues = await updateVenue(id, formData);
+
+        if (imageFiles.length > 0) {
+            try {
+                const imageUrls = await Promise.all(imageFiles.map((file) => uploadFile(file)));
+                await addVenueImages(id, imageUrls);
+            } catch (err) {
+                console.error("Failed to upload or attach venue images:", err);
+            }
+        }
+
         onUpdate(updatedVenues);
         setEditingId(null);
+        setImageFiles([]);
     }
     
     async function remove(id: number) {
@@ -87,6 +100,26 @@ export default function VenueList({ venues = [], onUpdate }: VenueListProps) {
                                 onChange={(e) => setFormData({...formData, capacity: Number(e.target.value)})} 
                                 className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
                             />
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Add Images
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files || []);
+                                        setImageFiles(files);
+                                    }}
+                                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4c3073] file:text-white hover:file:bg-[#5a3d8a]"
+                                />
+                                {imageFiles.length > 0 && (
+                                    <p className="mt-1 text-xs text-gray-400">
+                                        {imageFiles.length} new image(s) will be uploaded and attached.
+                                    </p>
+                                )}
+                            </div>
                             <textarea 
                                 placeholder="Description"
                                 value={formData.description} 

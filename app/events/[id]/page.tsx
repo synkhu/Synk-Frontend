@@ -71,6 +71,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   const [eventId, setEventId] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [navbarOpen, setNavbarOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -121,8 +122,12 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     }
   };
 
+  useEffect(() => {
+    // Reset image index when event changes
+    setCurrentImageIndex(0);
+  }, [event?.id]);
+
   const handleBuyTicket = async () => {
-    // Get selected tickets with quantities > 0
     const selectedItems = Object.entries(ticketQuantities)
       .filter(([_, quantity]) => quantity > 0)
       .map(([ticketTypeId, quantity]) => ({
@@ -140,7 +145,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       return;
     }
 
-    // Get auth token from localStorage
     const token = localStorage.getItem("authToken");
     if (!token) {
       alert("Please login to purchase tickets");
@@ -164,7 +168,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
       const { data } = await axios.request(options);
       
-      // Show success message with order details
       alert(
         `Successfully purchased ${data.ticketCount} ticket(s)!\n\n` +
         `Order ID: ${data.orderId}\n` +
@@ -172,11 +175,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         `Status: ${data.status}\n\n` +
         `Check your tickets in "Jegyeim" section.`
       );
-      
-      // Reset selection
+
       setTicketQuantities({});
-      
-      // Refresh event details to update remaining tickets
+
       const res = await axios.get(`${API_URL}/events/${eventId}`);
       setEvent(mapEventDetails(res.data));
       
@@ -243,15 +244,72 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
         {/* Event Header */}
         <div className="bg-[#2d1b4e] rounded-lg shadow-lg overflow-hidden mb-6 border border-[#5a3d8a]">
-          {event.thumbnailUrl && (
-            <div className="w-full h-96 overflow-hidden bg-gray-900">
-              <img
-                src={event.thumbnailUrl}
-                alt={event.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
+          {(() => {
+            const raw = event as any;
+            const imageUrls: string[] =
+              (Array.isArray(raw?.imageUrls) ? raw.imageUrls : null) ||
+              (Array.isArray(raw?.images) ? raw.images : null) ||
+              (Array.isArray(raw?.gallery) ? raw.gallery : null) ||
+              (event.thumbnailUrl ? [event.thumbnailUrl] : []);
+
+            if (!imageUrls.length) return null;
+
+            const total = imageUrls.length;
+            const current = Math.min(currentImageIndex, total - 1);
+            const canSlide = total > 1;
+
+            const goPrev = () => {
+              setCurrentImageIndex((prev) => (prev - 1 + total) % total);
+            };
+
+            const goNext = () => {
+              setCurrentImageIndex((prev) => (prev + 1) % total);
+            };
+
+            return (
+              <div className="relative w-full h-96 overflow-hidden bg-gray-900">
+                <img
+                  src={imageUrls[current]}
+                  alt={event.name}
+                  className="w-full h-full object-cover"
+                />
+
+                {canSlide && (
+                  <>
+                    {/* Navigation arrows */}
+                    <button
+                      type="button"
+                      onClick={goPrev}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      onClick={goNext}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition"
+                    >
+                      ›
+                    </button>
+
+                    {/* Dots indicator */}
+                    <div className="absolute bottom-4 inset-x-0 flex justify-center gap-2">
+                      {imageUrls.map((_, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setCurrentImageIndex(idx)}
+                          className={`w-2.5 h-2.5 rounded-full border border-white/60 transition ${
+                            idx === current ? "bg-white" : "bg-white/20"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })()}
           
           <div className="p-8">
             <h1 className="text-4xl font-bold text-white mb-4">{event.name}</h1>
@@ -359,7 +417,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             <div className="space-y-4 mb-8">
               {event.ticketTypes.map((ticket) => {
                 const isAvailable = !ticket.maxSaleCount || (ticket.remainingCount && ticket.remainingCount > 0);
-                const isSaleActive = true; // TODO: Check if current time is between saleStartTime and saleEndTime
+                const isSaleActive = true;
                 const currentQuantity = ticketQuantities[ticket.id] || 0;
                 const maxAllowed = ticket.remainingCount || 10;
                 

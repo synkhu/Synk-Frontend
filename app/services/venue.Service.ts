@@ -10,13 +10,14 @@ export const getVenues = async () => {
 };
 
 export const createVenue = async (
-  address: string, 
-  capacity: number, 
-  city: string, 
-  country: string, 
-  description: string, 
-  isAdultOnly: boolean, 
-  name: string
+  address: string,
+  capacity: number,
+  city: string,
+  country: string,
+  description: string,
+  isAdultOnly: boolean,
+  name: string,
+  imageUrls?: string[]
 ) => {
   const token = getToken();
   
@@ -26,14 +27,15 @@ export const createVenue = async (
   
   await axios.post(
     `${API_URL}/venues`,
-    { 
+    {
       address,
       capacity,
       city,
       country,
       description,
       isAdultOnly,
-      name
+      name,
+      imageUrls: imageUrls && imageUrls.length > 0 ? imageUrls : [],
     },
     {
       headers: {
@@ -79,4 +81,28 @@ export const deleteVenue = async (id: string | number) => {
   });
   
   return await getVenues();
+};
+
+export const addVenueImages = async (id: string | number, imageUrls: string[]) => {
+  const token = getToken();
+  if (!token) throw new Error('No authentication token found.');
+
+  if (!imageUrls || imageUrls.length === 0) {
+    return;
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  };
+
+  await Promise.all(
+    imageUrls.map((imageUrl) =>
+      axios.post(
+        `${API_URL}/venues/${id}/images`,
+        { imageUrl },
+        { headers }
+      )
+    )
+  );
 };

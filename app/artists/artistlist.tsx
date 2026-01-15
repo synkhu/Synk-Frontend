@@ -88,7 +88,7 @@ export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) 
                     setProfileFile(file);
                     setProfilePictureUrl(file ? "" : a.profilePictureUrl || "");
                   }}
-                  className="w-full text-sm text-gray-300"
+                  className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4c3073] file:text-white hover:file:bg-[#5a3d8a]"
                 />
                 {(profileFile || a.profilePictureUrl) && (
                   <div className="mt-3 flex items-center gap-3">

@@ -154,6 +154,18 @@ export default function LoginPopup({
                                 placeholder="Add meg a jelszavad"
                                 className="popup-input"
                                 disabled={isLoading}
+                                onKeyDown={(e) => {
+                                    if (
+                                        e.key === 'Enter' &&
+                                        !isLoading &&
+                                        !loginSuccess &&
+                                        email &&
+                                        password
+                                    ) {
+                                        e.preventDefault()
+                                        handleLoginWithAPI()
+                                    }
+                                }}
                             />
                         </div>
 
@@ -199,6 +211,17 @@ export default function LoginPopup({
                                 placeholder="Add meg a kódot"
                                 className="popup-input"
                                 disabled={isLoading || loginSuccess}
+                                onKeyDown={(e) => {
+                                    if (
+                                        e.key === 'Enter' &&
+                                        !isLoading &&
+                                        !loginSuccess &&
+                                        code
+                                    ) {
+                                        e.preventDefault()
+                                        onLogin()
+                                    }
+                                }}
                             />
                         </div>
 

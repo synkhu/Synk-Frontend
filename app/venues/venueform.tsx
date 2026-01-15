@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createVenue } from "../services/venue.Service";
+import { uploadFile } from "../services/file.service";
 
 interface Venue {
     id: number;
@@ -25,12 +26,28 @@ export default function VenueForm({ onSuccess }: VenueFormProps) {
     const [description, setDescription] = useState("");
     const [isAdultOnly, setIsAdultOnly] = useState(false);
     const [name, setName] = useState("");
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
 
     async function submit(e: React.FormEvent) {
         e.preventDefault();
         
         try {
-            const updatedVenues = await createVenue(address, capacity, city, country, description, isAdultOnly, name);
+            let imageUrls: string[] | undefined = undefined;
+
+            if (imageFiles.length > 0) {
+                imageUrls = await Promise.all(imageFiles.map((file) => uploadFile(file)));
+            }
+
+            const updatedVenues = await createVenue(
+                address,
+                capacity,
+                city,
+                country,
+                description,
+                isAdultOnly,
+                name,
+                imageUrls
+            );
             onSuccess(updatedVenues);
             
             setAddress("");
@@ -40,6 +57,7 @@ export default function VenueForm({ onSuccess }: VenueFormProps) {
             setDescription("");
             setIsAdultOnly(false);
             setName("");
+            setImageFiles([]);
         } catch (err) {
             console.error("Failed to create venue:", err);
         }
@@ -81,6 +99,26 @@ export default function VenueForm({ onSuccess }: VenueFormProps) {
                     type="number"
                     className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
                 />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Venue Images (you can select multiple)
+                </label>
+                <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        setImageFiles(files);
+                    }}
+                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4c3073] file:text-white hover:file:bg-[#5a3d8a]"
+                />
+                {imageFiles.length > 0 && (
+                    <p className="mt-1 text-xs text-gray-400">
+                        {imageFiles.length} image(s) selected. They will be uploaded and attached to this venue.
+                    </p>
+                )}
             </div>
             <textarea
                 value={description}

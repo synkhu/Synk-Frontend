@@ -79,7 +79,7 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
             setProfileFile(file);
             setProfilePreview(file ? URL.createObjectURL(file) : null);
           }}
-          className="w-full text-sm text-gray-300"
+          className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4c3073] file:text-white hover:file:bg-[#5a3d8a]"
         />
         {profilePreview && (
           <div className="mt-3">

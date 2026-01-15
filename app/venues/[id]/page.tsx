@@ -24,6 +24,7 @@ interface VenueDetails {
   description?: string | null;
   capacity?: number | null;
   isAdultOnly?: boolean | null;
+  images?: { id?: string; imageUrl?: string }[] | null;
 }
 
 interface VenueEventsResponse {
@@ -39,6 +40,7 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
   const [venueId, setVenueId] = useState<string | null>(null);
   const [venueDetails, setVenueDetails] = useState<VenueDetails | null>(null);
   const [venueEvents, setVenueEvents] = useState<VenueEventsResponse | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     setLoggedIn(!!localStorage.getItem("authToken"));
@@ -81,6 +83,11 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
           description: v.description ?? null,
           capacity: v.capacity ?? null,
           isAdultOnly: v.isAdultOnly ?? v.is_adult_only ?? null,
+          images: Array.isArray(v.images)
+            ? v.images
+            : Array.isArray(v.imageUrls)
+            ? v.imageUrls.map((u: string) => ({ imageUrl: u }))
+            : null,
         });
 
         setVenueEvents({ items });
@@ -94,6 +101,36 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
 
     fetchVenueData();
   }, [venueId]);
+
+  // Reset image index when venue changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [venueDetails?.id]);
+
+  // Auto-advance carousel when there are multiple images
+  useEffect(() => {
+    if (!venueDetails) return;
+
+    const raw = venueDetails as any;
+    const imagesArray: { imageUrl?: string }[] = Array.isArray(raw?.images)
+      ? raw.images
+      : Array.isArray(raw?.imageUrls)
+      ? raw.imageUrls.map((u: string) => ({ imageUrl: u }))
+      : [];
+
+    const imageUrls: string[] = imagesArray
+      .map((img) => img?.imageUrl)
+      .filter((u): u is string => typeof u === "string" && u.length > 0);
+
+    if (imageUrls.length <= 1) return;
+
+    const total = imageUrls.length;
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % total);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [venueDetails?.id]);
 
   const formatDate = (value?: string) => {
     if (!value) return "";
@@ -161,6 +198,77 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
           </button>
 
           <div className="bg-[#2d1b4e] rounded-lg shadow-lg overflow-hidden mb-6 border border-[#5a3d8a]">
+            {(() => {
+              const raw = venueDetails as any;
+              const imagesArray: { imageUrl?: string }[] = Array.isArray(raw?.images)
+                ? raw.images
+                : Array.isArray(raw?.imageUrls)
+                ? raw.imageUrls.map((u: string) => ({ imageUrl: u }))
+                : [];
+
+              const imageUrls: string[] = imagesArray
+                .map((img) => img?.imageUrl)
+                .filter((u): u is string => typeof u === "string" && u.length > 0);
+
+              if (!imageUrls.length) return null;
+
+              const total = imageUrls.length;
+              const current = Math.min(currentImageIndex, total - 1);
+              const canSlide = total > 1;
+
+              const goPrev = () => {
+                setCurrentImageIndex((prev) => (prev - 1 + total) % total);
+              };
+
+              const goNext = () => {
+                setCurrentImageIndex((prev) => (prev + 1) % total);
+              };
+
+              return (
+                <div className="relative w-full h-72 md:h-96 overflow-hidden bg-black">
+                  <img
+                    src={imageUrls[current]}
+                    alt={venueDetails.name}
+                    className="w-full h-full object-cover"
+                  />
+
+                  {canSlide && (
+                    <>
+                      {/* Navigation arrows */}
+                      <button
+                        type="button"
+                        onClick={goPrev}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        onClick={goNext}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition"
+                      >
+                        ›
+                      </button>
+
+                      {/* Dots indicator */}
+                      <div className="absolute bottom-4 inset-x-0 flex justify-center gap-2">
+                        {imageUrls.map((_, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setCurrentImageIndex(idx)}
+                            className={`w-2.5 h-2.5 rounded-full border border-white/60 transition ${
+                              idx === current ? "bg-white" : "bg-white/20"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })()}
+
             <div className="p-8">
               <h1 className="text-4xl font-bold text-white mb-4">{venueDetails.name}</h1>
               {venueDetails.address && (
