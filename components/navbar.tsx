@@ -268,6 +268,28 @@ export default function Navbar({ loggedIn, setLoggedIn, navbarOpen, setNavbarOpe
                                 <span className="nav-label">Events</span>
                                 <span className="nav-tooltip">Events</span>
                             </button>
+
+                            <button
+                                type="button"
+                                className="nav-icon-button"
+                                onClick={() => window.location.href = '/all-events'}
+                                aria-label="All events (filters)"
+                            >
+                                <span className="nav-icon">
+                                    {/* list / filter icon */}
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path
+                                            d="M4 7h16M7 12h10M10 17h4"
+                                            stroke="currentColor"
+                                            strokeWidth="1.6"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </span>
+                                <span className="nav-label">All events</span>
+                                <span className="nav-tooltip">All events</span>
+                            </button>
                         </div>
                     )}
 

@@ -193,7 +193,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
           <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} navbarOpen={navbarOpen} setNavbarOpen={setNavbarOpen} />
         </div>
         <div className="content-column">
-          <div className="min-h-screen flex items-center justify-center bg-[#1a0f2e] w-full">
+          <div
+            className="min-h-screen flex items-center justify-center w-full"
+            style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
+          >
             <div className="text-xl text-white">Loading event details...</div>
           </div>
         </div>
@@ -208,7 +211,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
           <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} navbarOpen={navbarOpen} setNavbarOpen={setNavbarOpen} />
         </div>
         <div className="content-column">
-          <div className="min-h-screen flex items-center justify-center bg-[#1a0f2e] w-full">
+          <div
+            className="min-h-screen flex items-center justify-center w-full"
+            style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
+          >
             <div className="text-center">
               <h1 className="text-2xl font-bold text-red-400 mb-4">Error</h1>
               <p className="text-gray-300 mb-4">{error || "Event not found"}</p>
@@ -231,7 +237,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} navbarOpen={navbarOpen} setNavbarOpen={setNavbarOpen} />
       </div>
       <div className="content-column">
-        <div className="min-h-screen bg-[#1a0f2e] py-8 px-4 w-full">
+        <div
+          className="min-h-screen py-8 px-4 w-full"
+          style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
+        >
           <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <button

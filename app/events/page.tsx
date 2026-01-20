@@ -36,7 +36,10 @@ export default function EventsPage() {
 
   if (isChecking) {
     return (
-      <div className="min-h-screen bg-[#1a0f2e] flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
+      >
         <p className="text-white">Checking authorization...</p>
       </div>
     );
@@ -48,7 +51,10 @@ export default function EventsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-[#1a0f2e] py-8 px-4">
+      <div
+        className="min-h-screen py-8 px-4"
+        style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
+      >
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold text-white mb-8">Events</h1>
           

@@ -28,7 +28,7 @@ body {
 .main {
   display: flex;
   min-height: 100vh;
-  background: #1a0f2e;
+  background: radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%);
 }
 
 .main.nav-open {

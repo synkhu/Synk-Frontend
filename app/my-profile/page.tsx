@@ -157,7 +157,7 @@ export default function MyProfilePage() {
           />
         </div>
         <div className="content-column">
-          <div className="min-h-screen flex items-center justify-center bg-[#1a0f2e] w-full">
+          <div className="min-h-screen flex items-center justify-center w-full" style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}>
             <div className="text-xl text-white">Loading profile...</div>
           </div>
         </div>
@@ -177,7 +177,7 @@ export default function MyProfilePage() {
           />
         </div>
         <div className="content-column">
-          <div className="min-h-screen flex items-center justify-center bg-[#1a0f2e] w-full">
+          <div className="min-h-screen flex items-center justify-center w-full" style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}>
             <div className="text-center">
               <h1 className="text-2xl font-bold text-red-400 mb-4">My Profile</h1>
               <p className="text-gray-300 mb-4">
@@ -205,7 +205,7 @@ export default function MyProfilePage() {
         />
       </div>
       <div className="content-column">
-        <div className="min-h-screen bg-[#1a0f2e] py-8 px-4 w-full">
+        <div className="min-h-screen py-8 px-4 w-full" style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}>
           <div className="max-w-4xl mx-auto space-y-6">
             <h1 className="text-3xl font-bold text-white mb-4">My Profile</h1>
 
