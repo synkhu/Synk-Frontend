@@ -55,12 +55,10 @@ export default function EventsPage() {
         className="min-h-screen py-8 px-4"
         style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
       >
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-white mb-8">Events</h1>
-          
+        <div className="max-w-6xl mx-auto rounded-3xl border border-purple-500/40 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] p-6">
+          <h1 className="text-3xl font-extrabold text-white mb-6 tracking-wide">Events</h1>
           {!isEditing && <EventForm onSuccess={setEvents} />}
-          
-          <div className="mt-8">
+          <div className="mt-6">
             <EventList 
               events={events} 
               onUpdate={setEvents} 

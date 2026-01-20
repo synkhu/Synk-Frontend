@@ -29,11 +29,21 @@ export default function Home() {
         />
       </div>
       <div className="content-column">
-        <div className="carousel-container">
-          <Carousel />
-        </div>
-        <div className="upcoming-events">
-          <UpcomingEvents />
+        <div
+          className="min-h-screen w-full py-8"
+          style={{
+            background:
+              "radial-gradient(circle at 0 0, #53306f 0%, #2c1846 32%, #120626 80%)",
+          }}
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="carousel-container">
+              <Carousel />
+            </div>
+            <div className="upcoming-events">
+              <UpcomingEvents />
+            </div>
+          </div>
         </div>
       </div>
     </div>

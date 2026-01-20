@@ -134,7 +134,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
   }
 
   return (
-    <form onSubmit={submit} className="max-w-4xl mx-auto p-6 bg-[#2d1b4e] rounded-lg shadow-lg space-y-6 border border-[#5a3d8a]">
+    <form onSubmit={submit} className="max-w-4xl mx-auto p-6 rounded-3xl border border-purple-500/40 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] space-y-6">
       <h2 className="text-2xl font-bold text-white mb-6">Create New Event</h2>
 
       {/* Basic Information Section */}

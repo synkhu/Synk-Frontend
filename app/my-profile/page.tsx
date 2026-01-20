@@ -210,7 +210,7 @@ export default function MyProfilePage() {
             <h1 className="text-3xl font-bold text-white mb-4">My Profile</h1>
 
             {/* Overview card */}
-            <div className="bg-[#2d1b4e] rounded-lg shadow-lg border border-[#5a3d8a] p-6 flex flex-col md:flex-row gap-6 items-center">
+            <div className="rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_22px_70px_rgba(0,0,0,0.88)] p-6 flex flex-col md:flex-row gap-6 items-center">
               <div className="relative">
                 {profilePictureUrl || profilePreview ? (
                   <img
@@ -235,7 +235,7 @@ export default function MyProfilePage() {
             </div>
 
             {/* Profile info form */}
-            <div className="bg-[#2d1b4e] rounded-lg shadow-lg border border-[#5a3d8a] p-6 space-y-4">
+            <div className="rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_22px_70px_rgba(0,0,0,0.88)] p-6 space-y-4">
               <h2 className="text-xl font-semibold text-white mb-2">Basic information</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -286,7 +286,7 @@ export default function MyProfilePage() {
             </div>
 
             {/* Profile picture section */}
-            <div className="bg-[#2d1b4e] rounded-lg shadow-lg border border-[#5a3d8a] p-6 space-y-4">
+            <div className="rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_22px_70px_rgba(0,0,0,0.88)] p-6 space-y-4">
               <h2 className="text-xl font-semibold text-white mb-2">Profile picture</h2>
 
               <div className="flex flex-col md:flex-row items-start gap-4">
@@ -330,7 +330,7 @@ export default function MyProfilePage() {
             </div>
 
             {/* Password section */}
-            <div className="bg-[#2d1b4e] rounded-lg shadow-lg border border-[#5a3d8a] p-6 space-y-4">
+            <div className="rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_22px_70px_rgba(0,0,0,0.88)] p-6 space-y-4">
               <h2 className="text-xl font-semibold text-white mb-2">Change password</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

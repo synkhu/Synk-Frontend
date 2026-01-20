@@ -193,7 +193,7 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
       ) : events.map((e) => (
         <div key={e.id}>
           {editingId === e.id ? (
-            <div className="col-span-full max-w-4xl mx-auto p-6 bg-[#2d1b4e] rounded-lg shadow-lg space-y-4 mb-4 border border-[#5a3d8a]">
+            <div className="col-span-full max-w-4xl mx-auto p-6 rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_22px_70px_rgba(0,0,0,0.88)] space-y-4 mb-4">
               <h3 className="text-xl font-bold text-white">Edit Event</h3>
               
               <input
@@ -311,10 +311,10 @@ export default function EventList({ events = [], onUpdate, onEditStart, onEditEn
               </div>
               
               {/* Ticket Types */}
-              <div className="border-t pt-4">
-                <h4 className="font-semibold text-gray-700 mb-3">Ticket Types</h4>
+              <div className="border-t border-purple-500/40 pt-4">
+                <h4 className="font-semibold text-gray-200 mb-3">Ticket Types</h4>
                 {ticketTypes.map((ticket, index) => (
-                  <div key={index} className="border border-gray-300 p-3 rounded-lg bg-[#3a2659] mb-3 space-y-2">
+                  <div key={index} className="border border-purple-500/40 p-3 rounded-xl bg-[#1b1033] mb-3 space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="font-medium text-sm">Ticket Type {index + 1}</span>
                       {ticketTypes.length > 1 && (

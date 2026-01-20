@@ -25,6 +25,7 @@ interface ArtistDetails {
   name: string;
   description?: string | null;
   profilePictureUrl?: string | null;
+  spotifyUrl?: string | null;
 }
 
 export default function ArtistDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -85,6 +86,13 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           profilePictureUrl:
             artist.profilePictureUrl ??
             artist.profile_picture_url ??
+            null,
+          spotifyUrl:
+            artist.spotifyUrl ??
+            artist.spotify_url ??
+            artist.spotifyLink ??
+            artist.spotify_link ??
+            artist.spotify ??
             null,
         });
 
@@ -175,38 +183,52 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           >
             <span>←</span> Back to Home
           </button>
-
-          <div className="bg-[#2d1b4e] rounded-lg shadow-lg overflow-hidden mb-6 border border-[#5a3d8a] flex flex-col md:flex-row">
+          <div className="relative overflow-hidden mb-8 rounded-3xl border border-purple-500/40 bg-gradient-to-br from-fuchsia-700/60 via-purple-900/80 to-slate-950/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] flex flex-col md:flex-row">
             {artistDetails.profilePictureUrl && (
-              <div className="md:w-64 md:h-64 w-full h-64 overflow-hidden bg-gray-900 flex-shrink-0">
+              <div className="md:w-72 md:h-72 w-full h-64 overflow-hidden bg-gray-900 flex-shrink-0 relative">
                 <img
                   src={artistDetails.profilePictureUrl}
                   alt={artistDetails.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover scale-105"
                 />
+                <div className="absolute inset-0 bg-gradient-to-tr from-purple-950/95 via-fuchsia-700/50 to-transparent" />
               </div>
             )}
             <div className="p-8 flex-1">
-              <h1 className="text-4xl font-bold text-white mb-4">{artistDetails.name}</h1>
+              <p className="text-sm font-semibold tracking-[0.25em] uppercase text-purple-200/80 mb-2">Performer</p>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-[0_10px_25px_rgba(0,0,0,0.75)]">{artistDetails.name}</h1>
               {artistDetails.description && (
-                <p className="text-gray-300 mb-3 whitespace-pre-wrap">
+                <p className="text-gray-200 mb-3 whitespace-pre-wrap max-w-2xl">
                   {artistDetails.description}
                 </p>
               )}
-              <p className="text-gray-400 text-sm">
-                Események, ahol ez az előadó fellép.
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-2">
+                <p className="text-purple-100/80 text-sm max-w-md">
+                  Upcoming events and past shows with this artist.
+                </p>
+                {artistDetails.spotifyUrl && (
+                  <a
+                    href={artistDetails.spotifyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-emerald-300/70 bg-gradient-to-r from-emerald-500/80 via-emerald-400/80 to-lime-400/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-950 shadow-[0_12px_30px_rgba(0,0,0,0.7)] hover:shadow-[0_18px_40px_rgba(0,0,0,0.85)] hover:scale-[1.02] transition-transform"
+                  >
+                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-900" />
+                    <span>Listen on Spotify</span>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="bg-[#2d1b4e] rounded-lg shadow-lg p-6 border border-[#5a3d8a]">
-            <h2 className="text-2xl font-bold text-white mb-4">Events</h2>
+          <div className="mt-4 rounded-3xl bg-gradient-to-br from-purple-900/80 via-[#2d1b4e] to-[#120626] shadow-[0_18px_60px_rgba(0,0,0,0.85)] p-6 border border-purple-500/40">
+            <h2 className="text-2xl font-bold text-white mb-4 tracking-wide">Events</h2>
             {artistEvents?.items && artistEvents.items.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {artistEvents.items.map((event) => (
                   <div
                     key={event.id}
-                    className="bg-[#1a0f2e] rounded-lg border border-[#5a3d8a] overflow-hidden hover:border-purple-400 transition cursor-pointer flex flex-col"
+                    className="bg-[#1a0f2e] rounded-2xl border border-purple-500/40 overflow-hidden hover:border-pink-400 hover:shadow-[0_18px_55px_rgba(0,0,0,0.9)] transition cursor-pointer flex flex-col"
                     onClick={() => router.push(`/events/${event.id}`)}
                   >
                     {event.thumbnailUrl && (
@@ -242,7 +264,7 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
                       {event.startTime && (
                         <p className="text-sm text-gray-400 mb-2">🕒 {formatDate(event.startTime)}</p>
                       )}
-                      <span className="mt-auto text-purple-300 text-sm font-medium">View details →</span>
+                      <span className="mt-auto text-pink-300 text-sm font-semibold tracking-wide">View details →</span>
                     </div>
                   </div>
                 ))}

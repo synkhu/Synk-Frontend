@@ -45,7 +45,7 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
   };
 
   return (
-    <form onSubmit={submit} className="max-w-4xl mx-auto p-6 bg-[#2d1b4e] rounded-lg shadow-lg space-y-4 border border-[#5a3d8a] mb-8">
+    <form onSubmit={submit} className="max-w-4xl mx-auto p-6 rounded-3xl border border-purple-500/40 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] space-y-4 mb-8">
       <h2 className="text-2xl font-bold text-white mb-4">Add New Artist</h2>
       <input
         value={name}

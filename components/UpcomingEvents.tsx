@@ -92,7 +92,7 @@ export default function UpcomingEvents() {
     <div>
       <h2>Upcoming events</h2>
       <div className="event-container">
-        <button className="carousel-arrow left" onClick={() => scroll('left', 4)}>&lt;</button>
+        <button className="events-arrow events-arrow-left" onClick={() => scroll('left', 4)}>&lt;</button>
         <div className="carousel-viewport">
           <div className="carousel-cards" ref={containerRef}>
             {events.map(event => (
@@ -119,7 +119,7 @@ export default function UpcomingEvents() {
             ))}
           </div>
         </div>
-        <button className="carousel-arrow right" onClick={() => scroll('right', 4)}>&gt;</button>
+        <button className="events-arrow events-arrow-right" onClick={() => scroll('right', 4)}>&gt;</button>
       </div>
     </div>
   );

@@ -33,6 +33,17 @@ export default function Carousel() {
             });
     }, []);
 
+    // Auto-advance the carousel every 2 seconds
+    useEffect(() => {
+        if (totalSlides <= 1) return;
+
+        const intervalId = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % totalSlides);
+        }, 2000);
+
+        return () => clearInterval(intervalId);
+    }, [totalSlides]);
+
     const goToSlide = (index: number): void => {
         setCurrentSlide(index);
     };

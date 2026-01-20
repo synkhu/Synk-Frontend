@@ -55,7 +55,7 @@ export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) 
       ) : artists.map((a) => (
         <div key={a.id}>
           {editingId === a.id ? (
-            <div className="bg-[#2d1b4e] rounded-lg shadow-lg p-6 space-y-3 border border-[#5a3d8a]">
+            <div className="rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-6 space-y-3">
               <h3 className="text-lg font-bold text-white mb-4">Edit Artist</h3>
               <input
                 value={name}
@@ -119,7 +119,7 @@ export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) 
               </div>
             </div>
           ) : (
-            <div className="bg-[#2d1b4e] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-[#5a3d8a]">
+            <div className="rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_18px_50px_rgba(0,0,0,0.8)] overflow-hidden hover:shadow-[0_24px_70px_rgba(236,72,153,0.45)] transition-shadow duration-300">
               <div className="p-6 space-y-3">
                 {a.profilePictureUrl && (
                   <div className="flex justify-center mb-4">

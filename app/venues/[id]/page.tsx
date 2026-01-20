@@ -203,7 +203,7 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
             <span>←</span> Back to Home
           </button>
 
-          <div className="bg-[#2d1b4e] rounded-lg shadow-lg overflow-hidden mb-6 border border-[#5a3d8a]">
+          <div className="relative overflow-hidden mb-8 rounded-3xl border border-purple-500/40 bg-gradient-to-br from-fuchsia-700/60 via-purple-900/80 to-slate-950/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)]">
             {(() => {
               const raw = venueDetails as any;
               const imagesArray: { imageUrl?: string }[] = Array.isArray(raw?.images)
@@ -231,12 +231,13 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
               };
 
               return (
-                <div className="relative w-full h-72 md:h-96 overflow-hidden bg-black">
+                <div className="relative w-full h-72 md:h-96 overflow-hidden">
                   <img
                     src={imageUrls[current]}
                     alt={venueDetails.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover scale-105"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-purple-950/95 via-fuchsia-700/60 to-transparent" />
 
                   {canSlide && (
                     <>
@@ -244,14 +245,14 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
                       <button
                         type="button"
                         onClick={goPrev}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition border border-white/40 backdrop-blur-sm"
                       >
                         ‹
                       </button>
                       <button
                         type="button"
                         onClick={goNext}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition border border-white/40 backdrop-blur-sm"
                       >
                         ›
                       </button>
@@ -276,35 +277,39 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
             })()}
 
             <div className="p-8">
-              <h1 className="text-4xl font-bold text-white mb-4">{venueDetails.name}</h1>
+              <p className="text-sm font-semibold tracking-[0.25em] uppercase text-purple-200/80 mb-2">Venue</p>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-[0_10px_25px_rgba(0,0,0,0.75)]">
+                {venueDetails.name}
+              </h1>
               {venueDetails.address && (
                 <p className="text-gray-300 mb-1">📍 {venueDetails.address}</p>
               )}
               {(venueDetails.city || venueDetails.country) && (
-                <p className="text-gray-400 mb-3">
+                <p className="text-purple-100/80 mb-3">
                   {[venueDetails.city, venueDetails.country].filter(Boolean).join(", ")}
                 </p>
               )}
               {venueDetails.capacity != null && (
-                <p className="text-gray-300 mb-1">👥 Capacity: {venueDetails.capacity} people</p>
+                <p className="text-gray-200 mb-1">👥 Capacity: {venueDetails.capacity} people</p>
               )}
               {venueDetails.isAdultOnly && (
                 <p className="text-red-400 text-sm">🔞 18+ only venue</p>
               )}
               {venueDetails.description && (
-                <p className="text-gray-300 mt-4 whitespace-pre-wrap">{venueDetails.description}</p>
+                <p className="text-gray-200 mt-4 whitespace-pre-wrap max-w-2xl">
+                  {venueDetails.description}
+                </p>
               )}
             </div>
           </div>
-
-          <div className="bg-[#2d1b4e] rounded-lg shadow-lg p-6 border border-[#5a3d8a]">
-            <h2 className="text-2xl font-bold text-white mb-4">Events at this venue</h2>
+          <div className="mt-4 rounded-3xl bg-gradient-to-br from-purple-900/80 via-[#2d1b4e] to-[#120626] shadow-[0_18px_60px_rgba(0,0,0,0.85)] p-6 border border-purple-500/40">
+            <h2 className="text-2xl font-bold text-white mb-4 tracking-wide">Events at this venue</h2>
             {venueEvents?.items && venueEvents.items.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {venueEvents.items.map((event) => (
                   <div
                     key={event.id}
-                    className="bg-[#1a0f2e] rounded-lg border border-[#5a3d8a] overflow-hidden hover:border-purple-400 transition cursor-pointer flex flex-col"
+                    className="bg-[#1a0f2e] rounded-2xl border border-purple-500/40 overflow-hidden hover:border-pink-400 hover:shadow-[0_18px_55px_rgba(0,0,0,0.9)] transition cursor-pointer flex flex-col"
                     onClick={() => router.push(`/events/${event.id}`)}
                   >
                     {event.thumbnailUrl && (
@@ -324,7 +329,7 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
                       {event.startTime && (
                         <p className="text-sm text-gray-400 mb-2">🕒 {formatDate(event.startTime)}</p>
                       )}
-                      <span className="mt-auto text-purple-300 text-sm font-medium">View details →</span>
+                      <span className="mt-auto text-pink-300 text-sm font-semibold tracking-wide">View details →</span>
                     </div>
                   </div>
                 ))}

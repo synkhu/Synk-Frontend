@@ -108,6 +108,18 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
         }).format(price)
     }
 
+    // Try to resolve the best available thumbnail for the ticket's event
+    const getTicketThumbnailUrl = (ticket: Ticket): string | undefined => {
+        const t: any = ticket as any
+        return (
+            ticket.thumbnailUrl ||
+            t.eventThumbnailUrl ||
+            t.eventImageUrl ||
+            (t.event && (t.event.thumbnailUrl || t.event.imageUrl)) ||
+            undefined
+        )
+    }
+
     const downloadTicket = async (ticketId: string) => {
         const token = localStorage.getItem('authToken')
         
@@ -179,14 +191,15 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
                         {tickets.map((ticket) => (
                             <div
                                 key={ticket.id}
-                                className="bg-[#2d1b4e] rounded-lg shadow-lg overflow-hidden border border-[#5a3d8a] hover:shadow-xl transition-shadow duration-300"
+                                className="bg-[#2d1b4e] rounded-lg shadow-lg overflow-hidden border border-[#5a3d8a] hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                                onClick={() => { window.location.href = `/events/${ticket.eventId}` }}
                             >
                                 <div className="md:flex">
                                     {/* Event Image */}
-                                    {ticket.thumbnailUrl && (
+                                    {getTicketThumbnailUrl(ticket) && (
                                         <div className="md:w-48 md:flex-shrink-0">
                                             <img
-                                                src={ticket.thumbnailUrl}
+                                                src={getTicketThumbnailUrl(ticket)!}
                                                 alt={ticket.eventName}
                                                 className="h-48 w-full md:h-full object-cover"
                                             />
@@ -245,17 +258,11 @@ export default function TicketsPopup({ visible, onClose }: TicketsPopupProps) {
 
                                         <div className="flex gap-2 mt-4">
                                             <button
-                                                onClick={() => downloadTicket(ticket.id)}
+                                                onClick={(e) => { e.stopPropagation(); downloadTicket(ticket.id); }}
                                                 className="flex-1 bg-[#5a3d8a] hover:bg-[#6b4d9a] text-white px-4 py-2 rounded-lg font-medium transition flex items-center justify-center gap-2"
                                             >
                                                 <span>⬇️</span>
                                                 <span>Jegy letöltése</span>
-                                            </button>
-                                            <button
-                                                onClick={() => window.location.href = `/events/${ticket.eventId}`}
-                                                className="flex-1 bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg font-medium transition"
-                                            >
-                                                Esemény megtekintése
                                             </button>
                                         </div>
                                     </div>
