@@ -31,6 +31,14 @@ body {
   background: #1a0f2e;
 }
 
+.main.nav-open {
+  --navbar-width: 260px;
+}
+
+.main.nav-closed {
+  --navbar-width: 80px;
+}
+
 .nav {
   position: sticky;
   top: 0;
