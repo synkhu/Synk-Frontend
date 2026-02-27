@@ -40,33 +40,29 @@ const mapEventDetails = (data: any): EventDetails => {
     ...data,
     venueId: data.venueId ?? data.venueid ?? data.venue?.id ?? undefined,
     venueName:
-      data.venueName ??
-      data.venuename ??
-      data.venue?.name ??
-      undefined,
+      data.venueName ?? data.venuename ?? data.venue?.name ?? undefined,
     venueAddress:
       data.venueAddress ??
       data.venue_address ??
       data.venue?.address ??
       undefined,
     artistName:
-      data.artistName ??
-      data.artistname ??
-      data.artist?.name ??
-      undefined,
-    artistId:
-      data.artistId ??
-      data.artistid ??
-      data.artist?.id ??
-      undefined,
+      data.artistName ?? data.artistname ?? data.artist?.name ?? undefined,
+    artistId: data.artistId ?? data.artistid ?? data.artist?.id ?? undefined,
   };
 };
 
-export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EventDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const [event, setEvent] = useState<EventDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [ticketQuantities, setTicketQuantities] = useState<Record<string, number>>({});
+  const [ticketQuantities, setTicketQuantities] = useState<
+    Record<string, number>
+  >({});
   const [eventId, setEventId] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [navbarOpen, setNavbarOpen] = useState(false);
@@ -87,7 +83,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
   useEffect(() => {
     if (!eventId) return;
-    
+
     async function fetchEventDetails() {
       try {
         const res = await axios.get(`${API_URL}/events/${eventId}`);
@@ -131,7 +127,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       .filter(([_, quantity]) => quantity > 0)
       .map(([ticketTypeId, quantity]) => ({
         ticketTypeId,
-        quantity
+        quantity,
       }));
 
     if (selectedItems.length === 0) {
@@ -153,36 +149,40 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
     try {
       const options = {
-        method: 'POST',
+        method: "POST",
         url: `${API_URL}/orders/purchase`,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         data: {
           eventId: eventId,
-          items: selectedItems
-        }
+          items: selectedItems,
+        },
       };
 
       const { data } = await axios.request(options);
-      
+
       alert(
         `Successfully purchased ${data.ticketCount} ticket(s)!\n\n` +
-        `Order ID: ${data.orderId}\n` +
-        `Total Amount: ${data.totalAmount} HUF\n` +
-        `Status: ${data.status}\n\n` +
-        `Check your tickets in "Jegyeim" section.`
+          `Order ID: ${data.orderId}\n` +
+          `Total Amount: ${data.totalAmount} HUF\n` +
+          `Status: ${data.status}\n\n` +
+          `Check your tickets in "My Tickets" section.`,
       );
 
       setTicketQuantities({});
 
       const res = await axios.get(`${API_URL}/events/${eventId}`);
       setEvent(mapEventDetails(res.data));
-      
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.response?.data?.errors || "Failed to purchase tickets. Please try again.";
-      alert(`Error: ${typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage)}`);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.errors ||
+        "Failed to purchase tickets. Please try again.";
+      alert(
+        `Error: ${typeof errorMessage === "string" ? errorMessage : JSON.stringify(errorMessage)}`,
+      );
     }
   };
 
@@ -190,12 +190,20 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     return (
       <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
         <div className="nav">
-          <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} navbarOpen={navbarOpen} setNavbarOpen={setNavbarOpen} />
+          <Navbar
+            loggedIn={loggedIn}
+            setLoggedIn={setLoggedIn}
+            navbarOpen={navbarOpen}
+            setNavbarOpen={setNavbarOpen}
+          />
         </div>
         <div className="content-column">
           <div
             className="min-h-screen flex items-center justify-center w-full"
-            style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
+            style={{
+              background:
+                "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)",
+            }}
           >
             <div className="text-xl text-white">Loading event details...</div>
           </div>
@@ -208,12 +216,20 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     return (
       <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
         <div className="nav">
-          <Navbar loggedIn={loggedIn} setLoggedIn={setLoggedIn} navbarOpen={navbarOpen} setNavbarOpen={setNavbarOpen} />
+          <Navbar
+            loggedIn={loggedIn}
+            setLoggedIn={setLoggedIn}
+            navbarOpen={navbarOpen}
+            setNavbarOpen={setNavbarOpen}
+          />
         </div>
         <div className="content-column">
           <div
             className="min-h-screen flex items-center justify-center w-full"
-            style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
+            style={{
+              background:
+                "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)",
+            }}
           >
             <div className="text-center">
               <h1 className="text-2xl font-bold text-red-400 mb-4">Error</h1>
@@ -244,7 +260,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       <div className="content-column">
         <div
           className="h-screen py-2 px-2 w-full overflow-hidden"
-          style={{ background: "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)" }}
+          style={{
+            background:
+              "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)",
+          }}
         >
           <div className="w-full mx-auto">
             {/* Back Button */}
@@ -257,7 +276,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 items-start h-[calc(100vh-76px)]">
               {/* Event Header */}
-              <div className="relative overflow-hidden rounded-3xl border border-purple-500/40 bg-gradient-to-br from-fuchsia-700/60 via-purple-900/80 to-slate-950/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)]">
+              <div className="relative overflow-hidden rounded-3xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/60 via-[#120626]/80 to-[#120626]/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)]">
                 {(() => {
                   const raw = event as any;
                   const imageUrls: string[] =
@@ -287,7 +306,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         alt={event.name}
                         className="w-full h-full object-cover scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-purple-950/95 via-fuchsia-700/60 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#120626]/95 via-[#2d1b4e]/60 to-transparent" />
 
                       {canSlide && (
                         <>
@@ -340,16 +359,24 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                       <div className="flex items-start gap-3">
                         <span className="text-2xl">📅</span>
                         <div>
-                          <p className="font-semibold text-purple-200">Start Time</p>
-                          <p className="text-gray-100">{formatDate(event.startTime)}</p>
+                          <p className="font-semibold text-purple-200">
+                            Start Time
+                          </p>
+                          <p className="text-gray-100">
+                            {formatDate(event.startTime)}
+                          </p>
                         </div>
                       </div>
 
                       <div className="flex items-start gap-3">
                         <span className="text-2xl">🕐</span>
                         <div>
-                          <p className="font-semibold text-purple-200">End Time</p>
-                          <p className="text-gray-100">{formatDate(event.endTime)}</p>
+                          <p className="font-semibold text-purple-200">
+                            End Time
+                          </p>
+                          <p className="text-gray-100">
+                            {formatDate(event.endTime)}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -360,11 +387,15 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         <div className="flex items-start gap-3">
                           <span className="text-2xl">📍</span>
                           <div>
-                            <p className="font-semibold text-purple-200">Venue</p>
+                            <p className="font-semibold text-purple-200">
+                              Venue
+                            </p>
                             {event.venueId ? (
                               <button
                                 type="button"
-                                onClick={() => router.push(`/venues/${event.venueId}`)}
+                                onClick={() =>
+                                  router.push(`/venues/${event.venueId}`)
+                                }
                                 className="text-purple-300 hover:text-purple-200 underline underline-offset-2 font-medium"
                               >
                                 {event.venueName}
@@ -373,7 +404,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                               <p className="text-gray-100">{event.venueName}</p>
                             )}
                             {event.venueAddress && (
-                              <p className="text-sm text-purple-100/80">{event.venueAddress}</p>
+                              <p className="text-sm text-purple-100/80">
+                                {event.venueAddress}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -383,17 +416,23 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         <div className="flex items-start gap-3">
                           <span className="text-2xl">🎤</span>
                           <div>
-                            <p className="font-semibold text-purple-200">Artist</p>
+                            <p className="font-semibold text-purple-200">
+                              Artist
+                            </p>
                             {event.artistId ? (
                               <button
                                 type="button"
-                                onClick={() => router.push(`/artists/${event.artistId}`)}
+                                onClick={() =>
+                                  router.push(`/artists/${event.artistId}`)
+                                }
                                 className="text-purple-300 hover:text-purple-200 underline underline-offset-2 font-medium"
                               >
                                 {event.artistName}
                               </button>
                             ) : (
-                              <p className="text-gray-100">{event.artistName}</p>
+                              <p className="text-gray-100">
+                                {event.artistName}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -403,8 +442,12 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         <div className="flex items-start gap-3">
                           <span className="text-2xl">👥</span>
                           <div>
-                            <p className="font-semibold text-purple-200">Capacity</p>
-                            <p className="text-gray-100">{event.totalCapacity} people</p>
+                            <p className="font-semibold text-purple-200">
+                              Capacity
+                            </p>
+                            <p className="text-gray-100">
+                              {event.totalCapacity} people
+                            </p>
                           </div>
                         </div>
                       )}
@@ -412,16 +455,20 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                   </div>
 
                   {/* Description */}
-                  <div className="border-t border-purple-500/40 pt-3 mt-1">
-                    <h2 className="text-2xl font-bold text-white mb-3 tracking-wide">About This Event</h2>
-                    <p className="text-gray-200 whitespace-pre-wrap max-w-3xl">{event.description}</p>
+                  <div className="border-t border-[#4c3073]/60 pt-3 mt-1">
+                    <h2 className="text-2xl font-bold text-white mb-3 tracking-wide">
+                      About This Event
+                    </h2>
+                    <p className="text-gray-200 whitespace-pre-wrap max-w-3xl">
+                      {event.description}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Ticket Purchase Section */}
               {event.ticketTypes && event.ticketTypes.length > 0 && (
-                <div className="rounded-3xl bg-gradient-to-br from-purple-900/80 via-[#2d1b4e] to-[#120626] shadow-[0_18px_60px_rgba(0,0,0,0.85)] p-4 border border-purple-500/40 max-h-[65vh] overflow-y-auto tickets-scroll">
+                <div className="rounded-3xl bg-gradient-to-br from-[#2d1b4e]/80 via-[#2d1b4e] to-[#120626] shadow-[0_18px_60px_rgba(0,0,0,0.85)] p-4 border border-[#4c3073]/60 max-h-[65vh] overflow-y-auto tickets-scroll">
                   <div className="text-center mb-4">
                     <p className="text-xs font-semibold tracking-[0.35em] uppercase text-purple-200/80 mb-2">
                       Ticket
@@ -430,31 +477,36 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                       Choose your ticket
                     </h2>
                     <p className="text-sm text-purple-100/80 max-w-xl mx-auto">
-                      Select the perfect option for your night – from a single show
-                      to a full season of music experiences.
+                      Select the perfect option for your night – from a single
+                      show to a full season of music experiences.
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                     {event.ticketTypes!.map((ticket) => {
                       const isAvailable =
-                        !ticket.maxSaleCount || (ticket.remainingCount && ticket.remainingCount > 0);
+                        !ticket.maxSaleCount ||
+                        (ticket.remainingCount && ticket.remainingCount > 0);
                       const isSaleActive = true;
                       const currentQuantity = ticketQuantities[ticket.id] || 0;
                       const maxAllowed = ticket.remainingCount || 10;
 
-                      let borderClasses = "border-purple-500/50";
+                      let borderClasses = "border-[#4c3073]/50";
 
                       if (currentQuantity >= 3) {
-                        borderClasses = "border-pink-400/80";
+                        borderClasses = "border-[#5a3d8a]/80";
                       } else if (currentQuantity >= 1) {
-                        borderClasses = "border-pink-300/70";
+                        borderClasses = "border-[#4c3073]/70";
                       }
 
                       const maxVisualSteps = 5;
-                      const clampedQuantity = Math.min(currentQuantity, maxVisualSteps);
+                      const clampedQuantity = Math.min(
+                        currentQuantity,
+                        maxVisualSteps,
+                      );
                       const strength = clampedQuantity / maxVisualSteps; // 0..1
-                      const overlayOpacity = strength === 0 ? 0 : 0.25 + strength * 0.75; // 0, then 0.4..1
+                      const overlayOpacity =
+                        strength === 0 ? 0 : 0.25 + strength * 0.75; // 0, then 0.4..1
 
                       return (
                         <div
@@ -471,7 +523,8 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                 "radial-gradient(circle at 0 0, rgba(244,114,182,0.7) 0%, rgba(129,140,248,0.9) 32%, rgba(56,189,248,0.6) 55%, rgba(15,23,42,0.98) 90%)",
                               mixBlendMode: "screen",
                               opacity: overlayOpacity,
-                              transition: "opacity 520ms cubic-bezier(0.22, 0.61, 0.36, 1)",
+                              transition:
+                                "opacity 520ms cubic-bezier(0.22, 0.61, 0.36, 1)",
                             }}
                           />
 
@@ -485,13 +538,20 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                               </p>
                               {ticket.maxSaleCount && (
                                 <p className="mt-1 text-[11px] text-purple-100/80">
-                                  {ticket.remainingCount || 0} / {ticket.maxSaleCount} available
+                                  {ticket.remainingCount || 0} /{" "}
+                                  {ticket.maxSaleCount} available
                                 </p>
                               )}
                               {ticket.saleStartTime && ticket.saleEndTime && (
                                 <p className="mt-1 text-[11px] text-purple-100/70">
-                                  Sale: {new Date(ticket.saleStartTime).toLocaleDateString()} –{' '}
-                                  {new Date(ticket.saleEndTime).toLocaleDateString()}
+                                  Sale:{" "}
+                                  {new Date(
+                                    ticket.saleStartTime,
+                                  ).toLocaleDateString()}{" "}
+                                  –{" "}
+                                  {new Date(
+                                    ticket.saleEndTime,
+                                  ).toLocaleDateString()}
                                 </p>
                               )}
                             </div>
@@ -504,7 +564,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                 <div className="flex items-center gap-2 bg-black/30 rounded-full px-3 py-1.5 border border-white/10">
                                   <button
                                     onClick={() => {
-                                      const newQuantity = Math.max(0, currentQuantity - 1);
+                                      const newQuantity = Math.max(
+                                        0,
+                                        currentQuantity - 1,
+                                      );
                                       setTicketQuantities((prev) => ({
                                         ...prev,
                                         [ticket.id]: newQuantity,
@@ -520,7 +583,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                   </span>
                                   <button
                                     onClick={() => {
-                                      const newQuantity = Math.min(maxAllowed, currentQuantity + 1);
+                                      const newQuantity = Math.min(
+                                        maxAllowed,
+                                        currentQuantity + 1,
+                                      );
                                       setTicketQuantities((prev) => ({
                                         ...prev,
                                         [ticket.id]: newQuantity,
@@ -535,8 +601,14 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                               </div>
                             ) : (
                               <div className="mt-auto text-right text-sm">
-                                {!isAvailable && <p className="text-red-300">Sold Out</p>}
-                                {!isSaleActive && <p className="text-orange-300">Not Available</p>}
+                                {!isAvailable && (
+                                  <p className="text-red-300">Sold Out</p>
+                                )}
+                                {!isSaleActive && (
+                                  <p className="text-orange-300">
+                                    Not Available
+                                  </p>
+                                )}
                               </div>
                             )}
                           </div>
@@ -546,42 +618,53 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                   </div>
 
                   {/* Total and Purchase */}
-                  <div className="border-t border-purple-500/40 pt-3 mt-1">
-                    {Object.keys(ticketQuantities).some((id) => ticketQuantities[id] > 0) ? (
+                  <div className="border-t border-[#4c3073]/60 pt-3 mt-1">
+                    {Object.keys(ticketQuantities).some(
+                      (id) => ticketQuantities[id] > 0,
+                    ) ? (
                       <div className="space-y-4">
                         {/* Breakdown */}
                         <div className="space-y-2">
                           {event.ticketTypes
                             .filter((ticket) => ticketQuantities[ticket.id] > 0)
                             .map((ticket) => (
-                              <div key={ticket.id} className="flex justify-between text-gray-300">
+                              <div
+                                key={ticket.id}
+                                className="flex justify-between text-gray-300"
+                              >
                                 <span>
                                   {ticket.name} x {ticketQuantities[ticket.id]}
                                 </span>
                                 <span>
-                                  {(ticket.price * ticketQuantities[ticket.id]).toFixed(0)} HUF
+                                  {(
+                                    ticket.price * ticketQuantities[ticket.id]
+                                  ).toFixed(0)}{" "}
+                                  HUF
                                 </span>
                               </div>
                             ))}
                         </div>
 
                         {/* Total */}
-                        <div className="flex justify-between items-center bg-[#3d2b5e] px-3 py-3 rounded-lg border border-purple-500/40">
-                          <span className="text-2xl font-bold text-white">Total:</span>
+                        <div className="flex justify-between items-center bg-[#2d1b4e] px-3 py-3 rounded-lg border border-[#4c3073]/60">
+                          <span className="text-2xl font-bold text-white">
+                            Total:
+                          </span>
                           <span className="text-3xl font-bold text-purple-200">
                             {event.ticketTypes
                               .reduce((sum, ticket) => {
                                 const qty = ticketQuantities[ticket.id] || 0;
                                 return sum + ticket.price * qty;
                               }, 0)
-                              .toFixed(0)} HUF
+                              .toFixed(0)}{" "}
+                            HUF
                           </span>
                         </div>
 
                         {/* Purchase Button */}
                         <button
                           onClick={handleBuyTicket}
-                          className="w-full bg-gradient-to-r from-fuchsia-600 to-purple-500 hover:from-fuchsia-500 hover:to-purple-400 text-white px-6 py-3 rounded-xl font-semibold text-base transition shadow-[0_16px_40px_rgba(0,0,0,0.9)]"
+                          className="w-full bg-gradient-to-r from-[#4c3073] to-[#2d1b4e] hover:from-[#5a3d8a] hover:to-[#4c3073] text-white px-6 py-3 rounded-xl font-semibold text-base transition shadow-[0_16px_40px_rgba(0,0,0,0.9)]"
                         >
                           Purchase Tickets
                         </button>

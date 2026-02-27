@@ -29,7 +29,7 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
         name,
         description,
         spotifyUrl,
-        profilePictureUrl
+        profilePictureUrl,
       );
 
       onSuccess(updatedArtists);
@@ -45,27 +45,30 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
   };
 
   return (
-    <form onSubmit={submit} className="max-w-4xl mx-auto p-6 rounded-3xl border border-purple-500/40 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] space-y-4 mb-8">
+    <form
+      onSubmit={submit}
+      className="max-w-4xl mx-auto p-6 rounded-3xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] space-y-4 mb-8"
+    >
       <h2 className="text-2xl font-bold text-white mb-4">Add New Artist</h2>
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Artist name"
         required
-        className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
+        className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
       />
       <input
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Artist description"
-        className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
+        className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
       />
       <input
         value={spotifyUrl}
         onChange={(e) => setSpotifyUrl(e.target.value)}
         placeholder="Spotify URL"
         type="url"
-        className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400 focus:ring-2 focus:ring-[#4c3073]"
+        className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
       />
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -79,7 +82,7 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
             setProfileFile(file);
             setProfilePreview(file ? URL.createObjectURL(file) : null);
           }}
-          className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4c3073] file:text-white hover:file:bg-[#5a3d8a]"
+          className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2d1b4e] file:text-white hover:file:bg-[#4c3073]"
         />
         {profilePreview && (
           <div className="mt-3">
@@ -87,12 +90,15 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
             <img
               src={profilePreview}
               alt="Profile preview"
-              className="w-24 h-24 object-cover rounded-full border border-[#5a3d8a]"
+              className="w-24 h-24 object-cover rounded-full border border-[#4c3073]"
             />
           </div>
         )}
       </div>
-      <button type="submit" className="w-full bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-6 py-3 rounded-lg font-semibold transition">
+      <button
+        type="submit"
+        className="w-full bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-6 py-3 rounded-lg font-semibold transition"
+      >
         Add Artist
       </button>
     </form>

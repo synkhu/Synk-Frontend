@@ -15,7 +15,10 @@ type ArtistListProps = {
   onUpdate: (artists: any[]) => void;
 };
 
-export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) {
+export default function ArtistList({
+  artists = [],
+  onUpdate,
+}: ArtistListProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -35,7 +38,7 @@ export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) 
       name,
       description,
       spotifyUrl,
-      finalProfileUrl
+      finalProfileUrl,
     );
     onUpdate(updatedArtists);
     setEditingId(null);
@@ -52,120 +55,134 @@ export default function ArtistList({ artists = [], onUpdate }: ArtistListProps) 
         <div className="col-span-full text-center py-12">
           <p className="text-gray-400 text-lg">No artists found</p>
         </div>
-      ) : artists.map((a) => (
-        <div key={a.id}>
-          {editingId === a.id ? (
-            <div className="rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-6 space-y-3">
-              <h3 className="text-lg font-bold text-white mb-4">Edit Artist</h3>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Artist name"
-                className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
-              />
-              <input
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Description"
-                className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
-              />
-              <input
-                value={spotifyUrl}
-                onChange={(e) => setSpotifyUrl(e.target.value)}
-                placeholder="Spotify URL"
-                type="url"
-                className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg bg-[#1a0f2e] text-white placeholder-gray-400"
-              />
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Profile picture
-                </label>
+      ) : (
+        artists.map((a) => (
+          <div key={a.id}>
+            {editingId === a.id ? (
+              <div className="rounded-2xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-6 space-y-3">
+                <h3 className="text-lg font-bold text-white mb-4">
+                  Edit Artist
+                </h3>
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    setProfileFile(file);
-                    setProfilePictureUrl(file ? "" : a.profilePictureUrl || "");
-                  }}
-                  className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4c3073] file:text-white hover:file:bg-[#5a3d8a]"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Artist name"
+                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
                 />
-                {(profileFile || a.profilePictureUrl) && (
-                  <div className="mt-3 flex items-center gap-3">
-                    {(profileFile || a.profilePictureUrl) && (
-                      <img
-                        src={profileFile ? URL.createObjectURL(profileFile) : a.profilePictureUrl!}
-                        alt="Profile preview"
-                        className="w-16 h-16 object-cover rounded-full border border-[#5a3d8a]"
-                      />
-                    )}
-                    <span className="text-xs text-gray-400">Current / new picture</span>
-                  </div>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => save(a.id)}
-                  className="flex-1 bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg transition"
-                >
-                  Save
-                </button>
-                <button 
-                  onClick={() => setEditingId(null)}
-                  className="bg-[#3a2659] hover:bg-[#4c3073] text-white px-4 py-2 rounded-lg transition"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-purple-500/50 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_18px_50px_rgba(0,0,0,0.8)] overflow-hidden hover:shadow-[0_24px_70px_rgba(236,72,153,0.45)] transition-shadow duration-300">
-              <div className="p-6 space-y-3">
-                {a.profilePictureUrl && (
-                  <div className="flex justify-center mb-4">
-                    <img
-                      src={a.profilePictureUrl}
-                      alt={a.name}
-                      className="w-20 h-20 object-cover rounded-full border border-[#5a3d8a]"
-                    />
-                  </div>
-                )}
-                <h3 className="text-xl font-bold text-white">{a.name}</h3>
-                {a.description && <p className="text-gray-300 text-sm">{a.description}</p>}
-                {a.spotifyUrl && (
-                  <a 
-                    href={a.spotifyUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 text-sm transition"
-                  >
-                    <span>🎵</span> Spotify
-                  </a>
-                )}
-                <div className="flex gap-2 pt-4 border-t border-[#5a3d8a]">
-                  <button 
-                    onClick={() => {
-                      setEditingId(a.id);
-                      setName(a.name);
-                      setDescription(a.description || "");
-                      setSpotifyUrl(a.spotifyUrl || "");
+                <input
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Description"
+                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
+                />
+                <input
+                  value={spotifyUrl}
+                  onChange={(e) => setSpotifyUrl(e.target.value)}
+                  placeholder="Spotify URL"
+                  type="url"
+                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
+                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Profile picture
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      setProfileFile(file);
+                      setProfilePictureUrl(
+                        file ? "" : a.profilePictureUrl || "",
+                      );
                     }}
-                    className="flex-1 bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg transition"
+                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2d1b4e] file:text-white hover:file:bg-[#4c3073]"
+                  />
+                  {(profileFile || a.profilePictureUrl) && (
+                    <div className="mt-3 flex items-center gap-3">
+                      {(profileFile || a.profilePictureUrl) && (
+                        <img
+                          src={
+                            profileFile
+                              ? URL.createObjectURL(profileFile)
+                              : a.profilePictureUrl!
+                          }
+                          alt="Profile preview"
+                          className="w-16 h-16 object-cover rounded-full border border-[#4c3073]"
+                        />
+                      )}
+                      <span className="text-xs text-gray-400">
+                        Current / new picture
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => save(a.id)}
+                    className="flex-1 bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-4 py-2 rounded-lg transition"
                   >
-                    Edit
+                    Save
                   </button>
-                  <button 
-                    onClick={() => remove(a.id)}
-                    className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg transition"
+                  <button
+                    onClick={() => setEditingId(null)}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition"
                   >
-                    Delete
+                    Cancel
                   </button>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      ))}
+            ) : (
+              <div className="rounded-2xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_18px_50px_rgba(0,0,0,0.8)] overflow-hidden hover:shadow-[0_24px_70px_rgba(76,48,115,0.45)] transition-shadow duration-300">
+                <div className="p-6 space-y-3">
+                  {a.profilePictureUrl && (
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={a.profilePictureUrl}
+                        alt={a.name}
+                        className="w-20 h-20 object-cover rounded-full border border-[#4c3073]"
+                      />
+                    </div>
+                  )}
+                  <h3 className="text-xl font-bold text-white">{a.name}</h3>
+                  {a.description && (
+                    <p className="text-gray-300 text-sm">{a.description}</p>
+                  )}
+                  {a.spotifyUrl && (
+                    <a
+                      href={a.spotifyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 text-sm transition"
+                    >
+                      <span>🎵</span> Spotify
+                    </a>
+                  )}
+                  <div className="flex gap-2 pt-4 border-t border-[#4c3073]">
+                    <button
+                      onClick={() => {
+                        setEditingId(a.id);
+                        setName(a.name);
+                        setDescription(a.description || "");
+                        setSpotifyUrl(a.spotifyUrl || "");
+                      }}
+                      className="flex-1 bg-[#1e3a5f] hover:bg-[#24446e] text-white px-4 py-2 rounded-lg border border-[#3b6aa0] shadow-sm transition"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => remove(a.id)}
+                      className="bg-[#4a1f1f] hover:bg-[#5a2525] text-white px-4 py-2 rounded-lg border border-[#7a3333] shadow-sm transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))
+      )}
     </div>
   );
 }

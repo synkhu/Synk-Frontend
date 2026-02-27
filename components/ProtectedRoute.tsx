@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { redirect } from 'next/navigation';
-import { useAuth } from '../app/hooks/useAuth';
+import React from "react";
+import { redirect } from "next/navigation";
+import { useAuth } from "../app/hooks/useAuth";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   redirectTo?: string;
 }
 
-export default function ProtectedRoute({ 
-  children, 
-  redirectTo = '/login' 
+export default function ProtectedRoute({
+  children,
+  redirectTo = "/login",
 }: ProtectedRouteProps) {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner">Betöltés...</div>
+        <div className="loading-spinner">Loading...</div>
       </div>
     );
   }

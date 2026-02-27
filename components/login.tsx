@@ -1,249 +1,262 @@
-import React, { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import './navbar.css'
-import { authService, LoginCredentials } from '../app/services/auth.service'
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import "./navbar.css";
+import { authService, LoginCredentials } from "../app/services/auth.service";
 
 interface LoginPopupProps {
-    visible: boolean
-    email: string
-    code: string
-    loginStep: 'email' | 'code'
-    onClose: () => void
-    onEmailChange: (value: string) => void
-    onCodeChange: (value: string) => void
-    onGetCode: () => void
-    onLogin: () => void
-    onLoginSuccess?: (sessionData: any) => void
-    onOpenRegister: () => void
-    onBackToEmail: () => void
+  visible: boolean;
+  email: string;
+  code: string;
+  loginStep: "email" | "code";
+  onClose: () => void;
+  onEmailChange: (value: string) => void;
+  onCodeChange: (value: string) => void;
+  onGetCode: () => void;
+  onLogin: () => void;
+  onLoginSuccess?: (sessionData: any) => void;
+  onOpenRegister: () => void;
+  onBackToEmail: () => void;
 }
 
 export default function LoginPopup({
-    visible,
-    email,
-    code,
-    loginStep,
-    onClose,
-    onEmailChange,
-    onCodeChange,
-    onGetCode,
-    onLogin,
-    onLoginSuccess,
-    onOpenRegister,
-    onBackToEmail
+  visible,
+  email,
+  code,
+  loginStep,
+  onClose,
+  onEmailChange,
+  onCodeChange,
+  onGetCode,
+  onLogin,
+  onLoginSuccess,
+  onOpenRegister,
+  onBackToEmail,
 }: LoginPopupProps) {
-    const [password, setPassword] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-    const [loginSuccess, setLoginSuccess] = useState(false)
-    const [sessionInfo, setSessionInfo] = useState<any>(null)
-    const [mounted, setMounted] = useState(false)
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [sessionInfo, setSessionInfo] = useState<any>(null);
+  const [mounted, setMounted] = useState(false);
 
-    const handlePasswordChange = (value: string) => {
-        setPassword(value)
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+  };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleLoginWithAPI = async () => {
+    if (!email || !password) {
+      setError("Please fill in the email and password");
+      return;
     }
 
-    useEffect(() => {
-        setMounted(true)
-    }, [])
+    setIsLoading(true);
+    setError(null);
 
-    const handleLoginWithAPI = async () => {
-        if (!email || !password) {
-            setError('Kérjük, töltsd ki az email címet és a jelszót')
-            return
-        }
+    try {
+      const credentials: LoginCredentials = { email, password };
+      const sessionData = await authService.login(credentials);
 
-        setIsLoading(true)
-        setError(null)
+      setLoginSuccess(true);
+      setSessionInfo(sessionData);
 
-        try {
-            const credentials: LoginCredentials = { email, password }
-            const sessionData = await authService.login(credentials)
+      if (onLoginSuccess) onLoginSuccess(sessionData);
 
-            setLoginSuccess(true)
-            setSessionInfo(sessionData)
-
-            if (onLoginSuccess) onLoginSuccess(sessionData)
-
-            setTimeout(() => {
-                onClose()
-                setPassword('')
-                setLoginSuccess(false)
-                setSessionInfo(null)
-            }, 2000)
-        } catch (error: any) {
-            console.error('Login error:', error)
-            if (error?.response && error.response.data) {
-                setError(error.response.data.errors?.Password?.[0] || 'Hibás email vagy jelszó')
-            } else {
-                setError('Hibás email vagy jelszó')
-            }
-        } finally {
-            setIsLoading(false)
-        }
+      setTimeout(() => {
+        onClose();
+        setPassword("");
+        setLoginSuccess(false);
+        setSessionInfo(null);
+      }, 2000);
+    } catch (error: any) {
+      console.error("Login error:", error);
+      if (error?.response && error.response.data) {
+        setError(
+          error.response.data.errors?.Password?.[0] ||
+            "Invalid email or password",
+        );
+      } else {
+        setError("Invalid email or password");
+      }
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    useEffect(() => {
-        if (!visible) {
-            setPassword('')
-            setError(null)
-            setLoginSuccess(false)
-        }
-    }, [visible])
+  useEffect(() => {
+    if (!visible) {
+      setPassword("");
+      setError(null);
+      setLoginSuccess(false);
+    }
+  }, [visible]);
 
-    useEffect(() => {
-        const handleEsc = (event: KeyboardEvent) => {
-            if (event.key === 'Escape' && visible && !isLoading) {
-                onClose()
-            }
-        }
-        
-        window.addEventListener('keydown', handleEsc)
-        return () => window.removeEventListener('keydown', handleEsc)
-    }, [visible, isLoading, onClose])
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && visible && !isLoading) {
+        onClose();
+      }
+    };
 
-    if (!visible || !mounted) return null
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [visible, isLoading, onClose]);
 
-    return createPortal(
-        <div className="popup-overlay" onClick={onClose}>
-            <div className="popup-container" onClick={(e) => e.stopPropagation()}>
-                <div className="popup-header">
-                    <h2 className="popup-title">
-                        {loginStep === 'email' ? 'Bejelentkezés' : 'Írd be a kódot'}
-                    </h2>
-                    <button
-                        onClick={onClose}
-                        className="popup-close"
-                        disabled={isLoading}
-                    >
-                        ×
-                    </button>
-                </div>
+  if (!visible || !mounted) return null;
 
-                {error && <div className="popup-error-message">{error}</div>}
+  return createPortal(
+    <div className="popup-overlay" onClick={onClose}>
+      <div className="popup-container" onClick={(e) => e.stopPropagation()}>
+        <div className="popup-header">
+          <h2 className="popup-title">
+            {loginStep === "email" ? "Log in" : "Enter the code"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="popup-close"
+            disabled={isLoading}
+          >
+            ×
+          </button>
+        </div>
 
-                {loginSuccess && (
-                    <div className="popup-success-message">
-                        ✓ Sikeres bejelentkezés! Átirányítás...
-                        {sessionInfo?.user && (
-                            <div className="session-info">
-                                Üdvözöljük vissza, {sessionInfo.user.name || sessionInfo.user.email}!
-                            </div>
-                        )}
-                    </div>
-                )}
+        {error && <div className="popup-error-message">{error}</div>}
 
-                {loginStep === 'email' ? (
-                    <div>
-                        <div className="popup-input-group">
-                            <label className="popup-label">Email cím</label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => onEmailChange(e.target.value)}
-                                placeholder="Add meg az email címed"
-                                className="popup-input"
-                                disabled={isLoading}
-                            />
+        {loginSuccess && (
+          <div className="popup-success-message">
+            ✓ Login successful! Redirecting...
+            {sessionInfo?.user && (
+              <div className="session-info">
+                Welcome back, {sessionInfo.user.name || sessionInfo.user.email}!
+              </div>
+            )}
+          </div>
+        )}
 
-                            <label className="popup-label">Jelszó</label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => handlePasswordChange(e.target.value)}
-                                placeholder="Add meg a jelszavad"
-                                className="popup-input"
-                                disabled={isLoading}
-                                onKeyDown={(e) => {
-                                    if (
-                                        e.key === 'Enter' &&
-                                        !isLoading &&
-                                        !loginSuccess &&
-                                        email &&
-                                        password
-                                    ) {
-                                        e.preventDefault()
-                                        handleLoginWithAPI()
-                                    }
-                                }}
-                            />
-                        </div>
+        {loginStep === "email" ? (
+          <div>
+            <div className="popup-input-group">
+              <label className="popup-label">Email address</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => onEmailChange(e.target.value)}
+                placeholder="Enter your email"
+                className="popup-input"
+                disabled={isLoading}
+              />
 
-                        <button
-                            onClick={handleLoginWithAPI}
-                            disabled={!email || !password || isLoading || loginSuccess}
-                            className="popup-primary-button"
-                        >
-                            {isLoading ? 'Bejelentkezés folyamatban...' : loginSuccess ? '✓ Sikeres' : 'Bejelentkezés'}
-                        </button>
-
-                        <button
-                            className="popup-secondary-button"
-                            disabled={isLoading || loginSuccess}
-                        >
-                            Elfejeltem a jelszavamat
-                        </button>
-
-                        <a
-                            href="#"
-                            className="popup-register-link"
-                            onClick={(e) => {
-                                e.preventDefault()
-                                if (!isLoading && !loginSuccess) onOpenRegister()
-                            }}
-                            style={{ pointerEvents: isLoading || loginSuccess ? 'none' : 'auto' }}
-                        >
-                            Nincs még fiókod? Regisztrálj most!
-                        </a>
-                    </div>
-                ) : (
-                    <div>
-                        <div className="popup-input-group">
-                            <p className="popup-info-text">
-                                Elküldtünk egy kódot a(z) <strong>{email}</strong> email címre
-                            </p>
-
-                            <label className="popup-label">Ellenőrző kód</label>
-                            <input
-                                type="text"
-                                value={code}
-                                onChange={(e) => onCodeChange(e.target.value)}
-                                placeholder="Add meg a kódot"
-                                className="popup-input"
-                                disabled={isLoading || loginSuccess}
-                                onKeyDown={(e) => {
-                                    if (
-                                        e.key === 'Enter' &&
-                                        !isLoading &&
-                                        !loginSuccess &&
-                                        code
-                                    ) {
-                                        e.preventDefault()
-                                        onLogin()
-                                    }
-                                }}
-                            />
-                        </div>
-
-                        <button
-                            onClick={onLogin}
-                            disabled={!code || isLoading || loginSuccess}
-                            className="popup-primary-button"
-                        >
-                            {isLoading ? 'Ellenőrzés...' : loginSuccess ? '✓ Sikeres' : 'Bejelentkezés'}
-                        </button>
-
-                        <button
-                            onClick={onBackToEmail}
-                            className="popup-secondary-button"
-                            disabled={isLoading || loginSuccess}
-                        >
-                            Vissza
-                        </button>
-                    </div>
-                )}
+              <label className="popup-label">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+                placeholder="Enter your password"
+                className="popup-input"
+                disabled={isLoading}
+                onKeyDown={(e) => {
+                  if (
+                    e.key === "Enter" &&
+                    !isLoading &&
+                    !loginSuccess &&
+                    email &&
+                    password
+                  ) {
+                    e.preventDefault();
+                    handleLoginWithAPI();
+                  }
+                }}
+              />
             </div>
-        </div>,
-        document.body
-    )
+
+            <button
+              onClick={handleLoginWithAPI}
+              disabled={!email || !password || isLoading || loginSuccess}
+              className="popup-primary-button"
+            >
+              {isLoading
+                ? "Logging in..."
+                : loginSuccess
+                  ? "✓ Success"
+                  : "Log in"}
+            </button>
+
+            <button
+              className="popup-secondary-button"
+              disabled={isLoading || loginSuccess}
+            >
+              I forgot my password
+            </button>
+
+            <a
+              href="#"
+              className="popup-register-link"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!isLoading && !loginSuccess) onOpenRegister();
+              }}
+              style={{
+                pointerEvents: isLoading || loginSuccess ? "none" : "auto",
+              }}
+            >
+              Don't have an account? Register now!
+            </a>
+          </div>
+        ) : (
+          <div>
+            <div className="popup-input-group">
+              <p className="popup-info-text">
+                We sent a code to <strong>{email}</strong>
+              </p>
+
+              <label className="popup-label">Verification code</label>
+              <input
+                type="text"
+                value={code}
+                onChange={(e) => onCodeChange(e.target.value)}
+                placeholder="Enter the code"
+                className="popup-input"
+                disabled={isLoading || loginSuccess}
+                onKeyDown={(e) => {
+                  if (
+                    e.key === "Enter" &&
+                    !isLoading &&
+                    !loginSuccess &&
+                    code
+                  ) {
+                    e.preventDefault();
+                    onLogin();
+                  }
+                }}
+              />
+            </div>
+
+            <button
+              onClick={onLogin}
+              disabled={!code || isLoading || loginSuccess}
+              className="popup-primary-button"
+            >
+              {isLoading
+                ? "Verifying..."
+                : loginSuccess
+                  ? "✓ Success"
+                  : "Log in"}
+            </button>
+
+            <button
+              onClick={onBackToEmail}
+              className="popup-secondary-button"
+              disabled={isLoading || loginSuccess}
+            >
+              Back
+            </button>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body,
+  );
 }

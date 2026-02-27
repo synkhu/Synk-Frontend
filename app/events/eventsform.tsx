@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createEvent, searchArtists, searchVenues } from "../services/event.Service";
+import {
+  createEvent,
+  searchArtists,
+  searchVenues,
+} from "../services/event.Service";
 import { uploadFile } from "../services/file.service";
 
 type Artist = { id: string; name: string };
@@ -28,9 +32,15 @@ export default function EventForm({ onSuccess }: EventFormProps) {
   const [endTime, setEndTime] = useState("");
   const [totalCapacity, setTotalCapacity] = useState("");
   const [ticketMaxScanCount, setTicketMaxScanCount] = useState("");
-  
+
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([
-    { name: "", price: 0, saleStartTime: "", saleEndTime: "", maxSaleCount: "" }
+    {
+      name: "",
+      price: 0,
+      saleStartTime: "",
+      saleEndTime: "",
+      maxSaleCount: "",
+    },
   ]);
 
   const [artistQuery, setArtistQuery] = useState("");
@@ -77,8 +87,8 @@ export default function EventForm({ onSuccess }: EventFormProps) {
     if (!endTime) return alert("End time is required");
     if (!selectedVenue) return alert("Please select a venue from the list");
 
-    const validTicketTypes = ticketTypes.filter(tt => tt.name.trim() !== "");
-    if (validTicketTypes.some(tt => tt.price <= 0)) {
+    const validTicketTypes = ticketTypes.filter((tt) => tt.name.trim() !== "");
+    if (validTicketTypes.some((tt) => tt.price <= 0)) {
       return alert("All ticket types must have a price greater than 0");
     }
 
@@ -87,7 +97,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
       if (selectedFiles.length > 0) {
         const uploadedUrls = await Promise.all(
-          selectedFiles.map((file) => uploadFile(file))
+          selectedFiles.map((file) => uploadFile(file)),
         );
         if (uploadedUrls.length > 0) {
           thumbnailToSave = uploadedUrls[0];
@@ -104,21 +114,41 @@ export default function EventForm({ onSuccess }: EventFormProps) {
         selectedArtistId || null,
         totalCapacity ? parseInt(totalCapacity) : null,
         ticketMaxScanCount ? parseInt(ticketMaxScanCount) : null,
-        validTicketTypes.length > 0 ? validTicketTypes.map(tt => ({
-          name: tt.name,
-          price: tt.price,
-          saleStartTime: tt.saleStartTime || null,
-          saleEndTime: tt.saleEndTime || null,
-          maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null
-        })) : null
+        validTicketTypes.length > 0
+          ? validTicketTypes.map((tt) => ({
+              name: tt.name,
+              price: tt.price,
+              saleStartTime: tt.saleStartTime || null,
+              saleEndTime: tt.saleEndTime || null,
+              maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null,
+            }))
+          : null,
       );
-      
-      setName(""); setThumbnailUrl(""); setSelectedFiles([]); setDescription("");
-      setStartTime(""); setEndTime("");
-      setTotalCapacity(""); setTicketMaxScanCount("");
-      setArtistQuery(""); setSelectedArtistId(null); setSelectedArtistName(""); setArtistResults([]);
-      setVenueQuery(""); setSelectedVenue(null); setVenueResults([]);
-      setTicketTypes([{ name: "", price: 0, saleStartTime: "", saleEndTime: "", maxSaleCount: "" }]);
+
+      setName("");
+      setThumbnailUrl("");
+      setSelectedFiles([]);
+      setDescription("");
+      setStartTime("");
+      setEndTime("");
+      setTotalCapacity("");
+      setTicketMaxScanCount("");
+      setArtistQuery("");
+      setSelectedArtistId(null);
+      setSelectedArtistName("");
+      setArtistResults([]);
+      setVenueQuery("");
+      setSelectedVenue(null);
+      setVenueResults([]);
+      setTicketTypes([
+        {
+          name: "",
+          price: 0,
+          saleStartTime: "",
+          saleEndTime: "",
+          maxSaleCount: "",
+        },
+      ]);
 
       onSuccess(updatedEvents);
     } catch (err: any) {
@@ -126,21 +156,26 @@ export default function EventForm({ onSuccess }: EventFormProps) {
       console.error("❌ Error response:", err.response?.data);
       alert(
         "Failed to create event. Check console. " +
-        (err.response?.data?.errors 
-          ? JSON.stringify(err.response.data.errors)
-          : err.response?.data?.message || err.message)
+          (err.response?.data?.errors
+            ? JSON.stringify(err.response.data.errors)
+            : err.response?.data?.message || err.message),
       );
     }
   }
 
   return (
-    <form onSubmit={submit} className="max-w-4xl mx-auto p-6 rounded-3xl border border-purple-500/40 bg-gradient-to-br from-fuchsia-700/40 via-purple-900/80 to-slate-950/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] space-y-6">
+    <form
+      onSubmit={submit}
+      className="max-w-4xl mx-auto p-6 rounded-3xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] space-y-6"
+    >
       <h2 className="text-2xl font-bold text-white mb-6">Create New Event</h2>
 
       {/* Basic Information Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white border-b border-[#5a3d8a] pb-2">Basic Information</h3>
-        
+        <h3 className="text-lg font-semibold text-white border-b border-[#4c3073] pb-2">
+          Basic Information
+        </h3>
+
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
             Event Name <span className="text-red-400">*</span>
@@ -150,7 +185,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter event name"
             required
-            className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
+            className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
           />
         </div>
 
@@ -166,11 +201,12 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               const files = Array.from(e.target.files || []);
               setSelectedFiles(files);
             }}
-            className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4c3073] file:text-white hover:file:bg-[#5a3d8a]"
+            className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2d1b4e] file:text-white hover:file:bg-[#4c3073]"
           />
           {selectedFiles.length > 0 && (
             <p className="mt-1 text-xs text-gray-400">
-              {selectedFiles.length} image(s) selected. The first one will be used as the event thumbnail.
+              {selectedFiles.length} image(s) selected. The first one will be
+              used as the event thumbnail.
             </p>
           )}
         </div>
@@ -185,15 +221,17 @@ export default function EventForm({ onSuccess }: EventFormProps) {
             placeholder="Describe your event..."
             rows={4}
             required
-            className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400 resize-none"
+            className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500 resize-none"
           />
         </div>
       </div>
 
       {/* Date & Time Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#5a3d8a] pb-2">Date & Time</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#4c3073] pb-2">
+          Date & Time
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -204,7 +242,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
+              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
             />
           </div>
 
@@ -217,7 +255,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
+              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
             />
           </div>
         </div>
@@ -225,8 +263,10 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
       {/* Capacity & Tickets Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#5a3d8a] pb-2">Capacity & Tickets</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#4c3073] pb-2">
+          Capacity & Tickets
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -238,7 +278,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               onChange={(e) => setTotalCapacity(e.target.value)}
               placeholder="e.g., 500"
               min="0"
-              className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
+              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
             />
           </div>
 
@@ -252,7 +292,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               onChange={(e) => setTicketMaxScanCount(e.target.value)}
               placeholder="e.g., 1"
               min="1"
-              className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
+              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
             />
           </div>
         </div>
@@ -260,8 +300,10 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
       {/* Venue & Artist Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#5a3d8a] pb-2">Location & Artist</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#4c3073] pb-2">
+          Location & Artist
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Venue Autocomplete */}
           <div className="relative">
@@ -270,18 +312,25 @@ export default function EventForm({ onSuccess }: EventFormProps) {
             </label>
             <input
               value={venueQuery}
-              onChange={(e) => { setVenueQuery(e.target.value); setSelectedVenue(null); }}
+              onChange={(e) => {
+                setVenueQuery(e.target.value);
+                setSelectedVenue(null);
+              }}
               placeholder="Search for venue..."
               required
-              className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
+              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
             />
             {venueResults.length > 0 && (
-              <ul className="absolute z-50 w-full mt-1 bg-white border border-[#5a3d8a] rounded-lg shadow-lg max-h-60 overflow-auto">
+              <ul className="absolute z-50 w-full mt-1 bg-[#120626] border border-[#4c3073] rounded-lg shadow-lg max-h-60 overflow-auto">
                 {venueResults.map((venue) => (
                   <li
                     key={venue.id}
-                    className="cursor-pointer px-4 py-2 hover:bg-[#4c3073] transition"
-                    onClick={() => { setSelectedVenue(venue); setVenueQuery(venue.name); setVenueResults([]); }}
+                    className="cursor-pointer px-4 py-2 text-gray-300 hover:bg-[#2d1b4e] hover:text-white transition"
+                    onClick={() => {
+                      setSelectedVenue(venue);
+                      setVenueQuery(venue.name);
+                      setVenueResults([]);
+                    }}
                   >
                     {venue.name}
                   </li>
@@ -289,7 +338,9 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               </ul>
             )}
             {selectedVenue && (
-              <p className="mt-1 text-sm text-green-600">✓ Selected: {selectedVenue.name}</p>
+              <p className="mt-1 text-sm text-green-600">
+                ✓ Selected: {selectedVenue.name}
+              </p>
             )}
           </div>
 
@@ -300,21 +351,25 @@ export default function EventForm({ onSuccess }: EventFormProps) {
             </label>
             <input
               value={artistQuery}
-              onChange={(e) => { setArtistQuery(e.target.value); setSelectedArtistId(null); setSelectedArtistName(""); }}
+              onChange={(e) => {
+                setArtistQuery(e.target.value);
+                setSelectedArtistId(null);
+                setSelectedArtistName("");
+              }}
               placeholder="Search for artist (optional)..."
-              className="w-full px-4 py-2 border border-[#5a3d8a] rounded-lg focus:ring-2 focus:ring-[#4c3073] focus:border-transparent outline-none transition bg-[#1a0f2e] text-white placeholder-gray-400"
+              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
             />
             {artistResults.length > 0 && (
-              <ul className="absolute z-50 w-full mt-1 bg-white border border-[#5a3d8a] rounded-lg shadow-lg max-h-60 overflow-auto">
+              <ul className="absolute z-50 w-full mt-1 bg-[#120626] border border-[#4c3073] rounded-lg shadow-lg max-h-60 overflow-auto">
                 {artistResults.map((artist) => (
                   <li
                     key={artist.id}
-                    className="cursor-pointer px-4 py-2 hover:bg-[#4c3073] transition"
-                    onClick={() => { 
-                      setSelectedArtistId(artist.id); 
+                    className="cursor-pointer px-4 py-2 text-gray-300 hover:bg-[#2d1b4e] hover:text-white transition"
+                    onClick={() => {
+                      setSelectedArtistId(artist.id);
                       setSelectedArtistName(artist.name);
-                      setArtistQuery(artist.name); 
-                      setArtistResults([]); 
+                      setArtistQuery(artist.name);
+                      setArtistResults([]);
                     }}
                   >
                     {artist.name}
@@ -323,7 +378,9 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               </ul>
             )}
             {selectedArtistName && (
-              <p className="mt-1 text-sm text-green-600">✓ Selected: {selectedArtistName}</p>
+              <p className="mt-1 text-sm text-green-600">
+                ✓ Selected: {selectedArtistName}
+              </p>
             )}
           </div>
         </div>
@@ -331,16 +388,25 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
       {/* Ticket Types Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#5a3d8a] pb-2">Ticket Types</h3>
-        
+        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#4c3073] pb-2">
+          Ticket Types
+        </h3>
+
         {ticketTypes.map((ticket, index) => (
-          <div key={index} className="border border-[#5a3d8a] p-4 rounded-lg bg-[#3a2659] space-y-3">
+          <div
+            key={index}
+            className="border border-[#4c3073] p-4 rounded-lg bg-[#120626]/80 space-y-3"
+          >
             <div className="flex justify-between items-center mb-2">
-              <h4 className="font-medium text-gray-300">Ticket Type {index + 1}</h4>
+              <h4 className="font-medium text-gray-300">
+                Ticket Type {index + 1}
+              </h4>
               {ticketTypes.length > 1 && (
                 <button
                   type="button"
-                  onClick={() => setTicketTypes(ticketTypes.filter((_, i) => i !== index))}
+                  onClick={() =>
+                    setTicketTypes(ticketTypes.filter((_, i) => i !== index))
+                  }
                   className="bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded-md text-sm transition"
                 >
                   Remove
@@ -350,7 +416,9 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Name</label>
+                <label className="block text-xs font-medium text-gray-300 mb-1">
+                  Name
+                </label>
                 <input
                   value={ticket.name}
                   onChange={(e) => {
@@ -359,12 +427,14 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                     setTicketTypes(updated);
                   }}
                   placeholder="e.g., VIP, General, Early Bird"
-                  className="w-full px-3 py-2 border border-[#5a3d8a] rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white placeholder-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Price</label>
+                <label className="block text-xs font-medium text-gray-300 mb-1">
+                  Price
+                </label>
                 <input
                   type="number"
                   value={ticket.price || ""}
@@ -376,12 +446,14 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                   placeholder="0.00"
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-[#5a3d8a] rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white placeholder-gray-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Sale Start Time</label>
+                <label className="block text-xs font-medium text-gray-300 mb-1">
+                  Sale Start Time
+                </label>
                 <input
                   type="datetime-local"
                   value={ticket.saleStartTime}
@@ -390,12 +462,14 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                     updated[index].saleStartTime = e.target.value;
                     setTicketTypes(updated);
                   }}
-                  className="w-full px-3 py-2 border border-[#5a3d8a] rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Sale End Time</label>
+                <label className="block text-xs font-medium text-gray-300 mb-1">
+                  Sale End Time
+                </label>
                 <input
                   type="datetime-local"
                   value={ticket.saleEndTime}
@@ -404,12 +478,14 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                     updated[index].saleEndTime = e.target.value;
                     setTicketTypes(updated);
                   }}
-                  className="w-full px-3 py-2 border border-[#5a3d8a] rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Max Available</label>
+                <label className="block text-xs font-medium text-gray-300 mb-1">
+                  Max Available
+                </label>
                 <input
                   type="number"
                   value={ticket.maxSaleCount}
@@ -420,7 +496,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                   }}
                   placeholder="e.g., 100"
                   min="0"
-                  className="w-full px-3 py-2 border border-[#5a3d8a] rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm"
+                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white placeholder-gray-500"
                 />
               </div>
             </div>
@@ -429,22 +505,31 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
         <button
           type="button"
-          onClick={() => setTicketTypes([...ticketTypes, { name: "", price: 0, saleStartTime: "", saleEndTime: "", maxSaleCount: "" }])}
-          className="w-full bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg transition font-medium"
+          onClick={() =>
+            setTicketTypes([
+              ...ticketTypes,
+              {
+                name: "",
+                price: 0,
+                saleStartTime: "",
+                saleEndTime: "",
+                maxSaleCount: "",
+              },
+            ])
+          }
+          className="w-full bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-4 py-2 rounded-lg transition font-medium"
         >
           + Add Another Ticket Type
         </button>
       </div>
 
       {/* Submit Button */}
-      <button 
-        type="submit" 
-        className="w-full bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-6 py-3 rounded-lg font-semibold text-lg transition shadow-md hover:shadow-lg"
+      <button
+        type="submit"
+        className="w-full bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-6 py-3 rounded-lg font-semibold text-lg transition shadow-md hover:shadow-lg"
       >
         Create Event
       </button>
     </form>
   );
 }
-
-

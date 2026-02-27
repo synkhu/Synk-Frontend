@@ -16,7 +16,7 @@ export default function Home() {
     setLoading(false);
   }, []);
 
-  if (loading) return <div>Betöltés...</div>;
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
