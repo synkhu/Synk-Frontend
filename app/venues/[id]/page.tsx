@@ -197,12 +197,6 @@ export default function VenueDetailsPage({
             <div className="text-center">
               <h1 className="text-2xl font-bold text-red-400 mb-4">Error</h1>
               <p className="text-gray-300 mb-4">{error || "Venue not found"}</p>
-              <button
-                onClick={() => router.push("/")}
-                className="bg-[#5a3d8a] hover:bg-[#6b4d9a] text-white px-6 py-2 rounded-lg transition"
-              >
-                Back to Home
-              </button>
             </div>
           </div>
         </div>
@@ -229,13 +223,6 @@ export default function VenueDetailsPage({
           }}
         >
           <div className="max-w-6xl mx-auto">
-            <button
-              onClick={() => router.push("/")}
-              className="mb-6 text-purple-400 hover:text-purple-300 flex items-center gap-2 transition text-lg font-medium"
-            >
-              <span>←</span> Back to Home
-            </button>
-
             <div className="relative overflow-hidden mb-8 rounded-3xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/60 via-[#120626]/80 to-[#120626]/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)]">
               {(() => {
                 const raw = venueDetails as any;
