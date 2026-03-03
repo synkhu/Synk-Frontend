@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./navbar.css";
+import { getCurrentUser } from "../app/services/user.service";
 
 interface RegisterPopupProps {
   onClose: () => void;
@@ -58,6 +59,16 @@ export default function RegisterPopup({
           headers: { "Content-Type": "application/json" },
         },
       );
+
+      // Log in with the registered credentials and cache user data
+      const { authService } = await import("../app/services/auth.service");
+      await authService.login({
+        email: registerData.email,
+        password: registerData.password,
+      });
+
+      // Fetch and cache user data after successful registration
+      await getCurrentUser();
 
       setRegisterSuccess(true);
       setRegisterError("");

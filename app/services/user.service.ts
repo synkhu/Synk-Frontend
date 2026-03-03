@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { authService } from "./auth.service";
+import { cacheService } from "./cache.service";
 
 const API_URL = "https://api.synk.hu";
 
@@ -20,9 +21,17 @@ export interface CurrentUser {
 
 const getToken = () => authService.getToken();
 
+const USER_CACHE_KEY = "current_user";
+
 export const getCurrentUser = async (): Promise<CurrentUser | null> => {
   const token = getToken();
   if (!token) return null;
+
+  // Check cache first
+  const cachedUser = cacheService.get<CurrentUser>(USER_CACHE_KEY);
+  if (cachedUser) {
+    return cachedUser;
+  }
 
   const { data } = await axios.get(`${API_URL}/users/me`, {
     headers: {
@@ -30,7 +39,25 @@ export const getCurrentUser = async (): Promise<CurrentUser | null> => {
     },
   });
 
-  return data as CurrentUser;
+  // Cache the user data for 1 hour
+  const user = data as CurrentUser;
+  cacheService.set(USER_CACHE_KEY, user, cacheService.USER_CACHE_TTL);
+
+  return user;
+};
+
+/**
+ * Get cached user data without making API calls
+ */
+export const getCachedUser = (): CurrentUser | null => {
+  return cacheService.get<CurrentUser>(USER_CACHE_KEY);
+};
+
+/**
+ * Clear the cached user data
+ */
+export const clearUserCache = (): void => {
+  cacheService.remove(USER_CACHE_KEY);
 };
 
 export const updateUserProfile = async (update: {
@@ -41,6 +68,9 @@ export const updateUserProfile = async (update: {
 }) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
+
+  // Clear cache before updating
+  clearUserCache();
 
   await axios.patch(`${API_URL}/users/me`, update, {
     headers: {
@@ -58,6 +88,9 @@ export const changePassword = async (
 ) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
+
+  // Clear cache before changing password
+  clearUserCache();
 
   await axios.patch(
     `${API_URL}/users/me/password`,

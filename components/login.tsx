@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import "./navbar.css";
 import { authService, LoginCredentials } from "../app/services/auth.service";
+import { getCurrentUser } from "../app/services/user.service";
 
 interface LoginPopupProps {
   visible: boolean;
@@ -59,6 +60,9 @@ export default function LoginPopup({
     try {
       const credentials: LoginCredentials = { email, password };
       const sessionData = await authService.login(credentials);
+
+      // Fetch and cache user data after successful login
+      await getCurrentUser();
 
       setLoginSuccess(true);
       setSessionInfo(sessionData);

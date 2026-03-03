@@ -6,7 +6,11 @@ import RegisterPopup from "./register";
 import LoginPopup from "./login";
 import TicketsPopup from "./tickets";
 import { authService } from "../app/services/auth.service";
-import { getCurrentUser, type CurrentUser } from "../app/services/user.service";
+import {
+  getCachedUser,
+  type CurrentUser,
+  clearUserCache,
+} from "../app/services/user.service";
 
 type NavbarProps = {
   loggedIn: boolean;
@@ -44,13 +48,15 @@ export default function Navbar({
 
   useEffect(() => {
     if (loggedIn) {
+      // Load cached user data only (no server calls)
+      const cachedUser = getCachedUser();
+      setCurrentUser(cachedUser);
+
+      // Load admin status
       authService
         .isAdmin()
         .then(setIsAdmin)
         .catch(() => setIsAdmin(false));
-      getCurrentUser()
-        .then(setCurrentUser)
-        .catch(() => setCurrentUser(null));
     } else {
       setIsAdmin(false);
       setCurrentUser(null);
@@ -82,8 +88,7 @@ export default function Navbar({
       if (currentUser.email) return currentUser.email;
     }
 
-    if (loggedIn) return "User";
-    return "Guest";
+    return "";
   })();
 
   const openLogin = () => {

@@ -9,6 +9,7 @@ import {
   changePassword,
   uploadProfilePicture,
   CurrentUser,
+  clearUserCache,
 } from "../services/user.service";
 
 export default function MyProfilePage() {
