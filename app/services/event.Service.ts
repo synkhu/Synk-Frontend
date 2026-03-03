@@ -1,14 +1,20 @@
 import axios from "axios";
 import { authService } from "./auth.service";
+import { cacheService } from "./cache.service";
 
 const API_URL = "https://api.synk.hu";
 const getToken = () => authService.getToken();
+const CACHE_KEY = "events_list";
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 const parseDateRFC3339 = (value: string | null | undefined): string => {
   if (!value || value.trim() === "") {
     throw new Error("parseDateRFC3339: empty value");
   }
 
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
+  const match = value.match(
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/,
+  );
   if (!match) {
     throw new Error(`parseDateRFC3339: invalid format "${value}"`);
   }
@@ -30,8 +36,18 @@ const parseDateRFC3339 = (value: string | null | undefined): string => {
 };
 
 export const getEvents = async () => {
+  // Check cache first
+  const cached = cacheService.get(CACHE_KEY);
+  if (cached) {
+    return cached;
+  }
+
   const res = await axios.get(`${API_URL}/events`);
-  return res.data.items;
+  const data = res.data.items;
+
+  // Store in cache
+  cacheService.set(CACHE_KEY, data, CACHE_TTL);
+  return data;
 };
 
 export const createEvent = async (
@@ -50,7 +66,7 @@ export const createEvent = async (
     saleStartTime?: string | null;
     saleEndTime?: string | null;
     maxSaleCount?: number | null;
-  }> | null
+  }> | null,
 ) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
@@ -69,26 +85,31 @@ export const createEvent = async (
     artistId: artistId || null,
     totalCapacity: totalCapacity ?? null,
     ticketMaxScanCount: ticketMaxScanCount ?? null,
-    ticketTypes: ticketTypes && ticketTypes.length > 0 ? ticketTypes.map(tt => ({
-      name: tt.name,
-      price: tt.price,
-      saleStartTime: tt.saleStartTime ? parseDateRFC3339(tt.saleStartTime) : null,
-      saleEndTime: tt.saleEndTime ? parseDateRFC3339(tt.saleEndTime) : null,
-      maxSaleCount: tt.maxSaleCount ?? null
-    })) : null
+    ticketTypes:
+      ticketTypes && ticketTypes.length > 0
+        ? ticketTypes.map((tt) => ({
+            name: tt.name,
+            price: tt.price,
+            saleStartTime: tt.saleStartTime
+              ? parseDateRFC3339(tt.saleStartTime)
+              : null,
+            saleEndTime: tt.saleEndTime
+              ? parseDateRFC3339(tt.saleEndTime)
+              : null,
+            maxSaleCount: tt.maxSaleCount ?? null,
+          }))
+        : null,
   };
 
-  await axios.post(
-    `${API_URL}/events`,
-    payload,
-    { 
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}` 
-      } 
-    }
-  );
+  await axios.post(`${API_URL}/events`, payload, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
+  // Invalidate cache
+  cacheService.remove(CACHE_KEY);
   return await getEvents();
 };
 
@@ -109,7 +130,7 @@ export const updateEvent = async (
     saleStartTime?: string | null;
     saleEndTime?: string | null;
     maxSaleCount?: number | null;
-  }> | null
+  }> | null,
 ) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
@@ -128,26 +149,31 @@ export const updateEvent = async (
     artistId: artistId || null,
     totalCapacity: totalCapacity ?? null,
     ticketMaxScanCount: ticketMaxScanCount ?? null,
-    ticketTypes: ticketTypes && ticketTypes.length > 0 ? ticketTypes.map(tt => ({
-      name: tt.name,
-      price: tt.price,
-      saleStartTime: tt.saleStartTime ? parseDateRFC3339(tt.saleStartTime) : null,
-      saleEndTime: tt.saleEndTime ? parseDateRFC3339(tt.saleEndTime) : null,
-      maxSaleCount: tt.maxSaleCount ?? null
-    })) : null
+    ticketTypes:
+      ticketTypes && ticketTypes.length > 0
+        ? ticketTypes.map((tt) => ({
+            name: tt.name,
+            price: tt.price,
+            saleStartTime: tt.saleStartTime
+              ? parseDateRFC3339(tt.saleStartTime)
+              : null,
+            saleEndTime: tt.saleEndTime
+              ? parseDateRFC3339(tt.saleEndTime)
+              : null,
+            maxSaleCount: tt.maxSaleCount ?? null,
+          }))
+        : null,
   };
 
-  await axios.put(
-    `${API_URL}/events/${id}`,
-    payload,
-    { 
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}` 
-      } 
-    }
-  );
+  await axios.put(`${API_URL}/events/${id}`, payload, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
+  // Invalidate cache
+  cacheService.remove(CACHE_KEY);
   return await getEvents();
 };
 
@@ -159,6 +185,8 @@ export const deleteEvent = async (id: string) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 
+  // Invalidate cache
+  cacheService.remove(CACHE_KEY);
   return await getEvents();
 };
 

@@ -65,7 +65,7 @@ export default function EventDetailsPage({
   >({});
   const [eventId, setEventId] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [navbarOpen, setNavbarOpen] = useState(false);
+  const [navbarOpen, setNavbarOpen] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const router = useRouter();
 

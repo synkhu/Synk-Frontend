@@ -38,7 +38,7 @@ export default function VenueDetailsPage({
 }) {
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
-  const [navbarOpen, setNavbarOpen] = useState(false);
+  const [navbarOpen, setNavbarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [venueId, setVenueId] = useState<string | null>(null);

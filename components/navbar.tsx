@@ -57,6 +57,20 @@ export default function Navbar({
     }
   }, [loggedIn]);
 
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setLoggedIn(false);
+      setIsAdmin(false);
+      setCurrentUser(null);
+    };
+
+    window.addEventListener("session-expired", handleSessionExpired);
+
+    return () => {
+      window.removeEventListener("session-expired", handleSessionExpired);
+    };
+  }, [setLoggedIn]);
+
   const displayName: string = (() => {
     if (currentUser) {
       const fullName = [currentUser.firstName, currentUser.lastName]
@@ -149,6 +163,29 @@ export default function Navbar({
                 )}
               </button>
             </div>
+
+            <button
+              type="button"
+              className="nav-icon-button"
+              onClick={() => (window.location.href = "/")}
+              aria-label="Home"
+            >
+              <span className="nav-icon">
+                {/* home icon */}
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M12 2L2 9v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9l-10-7z"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              <span className="nav-label">Home</span>
+              <span className="nav-tooltip">Home</span>
+            </button>
 
             <div className="navbar-header">
               <button

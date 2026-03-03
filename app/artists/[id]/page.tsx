@@ -35,7 +35,7 @@ export default function ArtistDetailsPage({
 }) {
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
-  const [navbarOpen, setNavbarOpen] = useState(false);
+  const [navbarOpen, setNavbarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [artistEvents, setArtistEvents] = useState<ArtistEventsResponse | null>(

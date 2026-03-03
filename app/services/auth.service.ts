@@ -1,10 +1,10 @@
 "use client";
-import axios from 'axios';
+import axios from "axios";
 
 export interface UserSession {
   token: string;
   expiresAt: string;
-  user?: any; 
+  user?: any;
 }
 
 export interface LoginCredentials {
@@ -13,20 +13,20 @@ export interface LoginCredentials {
 }
 
 class AuthService {
-  private readonly SESSION_KEY = 'user_session';
+  private readonly SESSION_KEY = "user_session";
   private readonly TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000;
 
   private isBrowser(): boolean {
-    return typeof window !== 'undefined';
+    return typeof window !== "undefined";
   }
 
   async login(credentials: LoginCredentials): Promise<UserSession> {
     try {
       const options = {
-        method: 'POST',
-        url: 'https://api.synk.hu/auth/login',
-        headers: { 'Content-Type': 'application/json' },
-        data: credentials
+        method: "POST",
+        url: "https://api.synk.hu/auth/login",
+        headers: { "Content-Type": "application/json" },
+        data: credentials,
       };
 
       const { data } = await axios.request(options);
@@ -34,7 +34,7 @@ class AuthService {
       this.setSession(data);
 
       this.startSessionMonitoring();
-      
+
       return data;
     } catch (error) {
       throw error;
@@ -43,20 +43,34 @@ class AuthService {
 
   setSession(sessionData: UserSession): void {
     if (!this.isBrowser()) return;
-    
+
     localStorage.setItem(this.SESSION_KEY, JSON.stringify(sessionData));
 
     if (sessionData.token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${sessionData.token}`;
+      axios.defaults.headers.common["Authorization"] =
+        `Bearer ${sessionData.token}`;
     }
+  }
+
+  private setupAxiosInterceptors(): void {
+    axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          this.logout();
+          this.dispatchSessionExpired();
+        }
+        return Promise.reject(error);
+      },
+    );
   }
 
   getSession(): UserSession | null {
     if (!this.isBrowser()) return null;
-    
+
     const sessionStr = localStorage.getItem(this.SESSION_KEY);
     if (!sessionStr) return null;
-    
+
     try {
       return JSON.parse(sessionStr);
     } catch (error) {
@@ -67,7 +81,7 @@ class AuthService {
 
   isSessionValid(): boolean {
     if (!this.isBrowser()) return false;
-    
+
     const session = this.getSession();
     if (!session || !session.token || !session.expiresAt) {
       return false;
@@ -75,32 +89,32 @@ class AuthService {
 
     const expiresAt = new Date(session.expiresAt);
     const now = new Date();
-    
+
     return expiresAt > now;
   }
 
   needsRefresh(): boolean {
     if (!this.isBrowser()) return false;
-    
+
     const session = this.getSession();
     if (!session || !session.expiresAt) return true;
 
     const expiresAt = new Date(session.expiresAt);
     const now = new Date();
     const timeUntilExpiry = expiresAt.getTime() - now.getTime();
-    
+
     return timeUntilExpiry < this.TOKEN_REFRESH_THRESHOLD;
   }
 
   async refreshToken(): Promise<UserSession | null> {
     if (!this.isBrowser()) return null;
-    
+
     try {
       const session = this.getSession();
       if (!session) return null;
 
-      const response = await axios.post('https://api.synk.hu/auth/refresh', {
-        token: session.token
+      const response = await axios.post("https://api.synk.hu/auth/refresh", {
+        token: session.token,
       });
 
       if (response.data) {
@@ -108,21 +122,20 @@ class AuthService {
         return response.data;
       }
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      console.error("Token refresh failed:", error);
       this.clearSession();
     }
-    
+
     return null;
   }
 
   logout(): void {
     if (!this.isBrowser()) return;
-    
+
     this.clearSession();
     this.stopSessionMonitoring();
 
-    delete axios.defaults.headers.common['Authorization'];
-    
+    delete axios.defaults.headers.common["Authorization"];
   }
 
   private clearSession(): void {
@@ -142,24 +155,24 @@ class AuthService {
 
     try {
       const options = {
-        method: 'GET',
-        url: 'https://api.synk.hu/users/me',
+        method: "GET",
+        url: "https://api.synk.hu/users/me",
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       };
 
       const { data } = await axios.request(options);
       return data;
     } catch (error) {
-      console.error('Error fetching user info:', error);
+      console.error("Error fetching user info:", error);
       return null;
     }
   }
 
   async isAdmin(): Promise<boolean> {
     const userInfo = await this.getUserInfo();
-    return userInfo?.role === 'Administrator' || userInfo?.role === 'Organizer';
+    return userInfo?.role === "Administrator" || userInfo?.role === "Organizer";
   }
 
   async canAccessAdminPages(): Promise<boolean> {
@@ -170,9 +183,9 @@ class AuthService {
 
   private startSessionMonitoring(): void {
     if (!this.isBrowser()) return;
-    
+
     this.stopSessionMonitoring();
-    
+
     this.sessionMonitorInterval = setInterval(() => {
       if (!this.isSessionValid()) {
         this.logout();
@@ -195,18 +208,20 @@ class AuthService {
 
   private dispatchSessionExpired(): void {
     if (!this.isBrowser()) return;
-    const event = new CustomEvent('session-expired');
+    const event = new CustomEvent("session-expired");
     window.dispatchEvent(event);
   }
 
   initialize(): void {
     if (!this.isBrowser()) return;
-    
-    const session = this.getSession();
-    
-    if (session && this.isSessionValid()) {
 
-      axios.defaults.headers.common['Authorization'] = `Bearer ${session.token}`;
+    this.setupAxiosInterceptors();
+
+    const session = this.getSession();
+
+    if (session && this.isSessionValid()) {
+      axios.defaults.headers.common["Authorization"] =
+        `Bearer ${session.token}`;
 
       this.startSessionMonitoring();
 
