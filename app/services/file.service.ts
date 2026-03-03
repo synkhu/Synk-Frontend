@@ -3,6 +3,9 @@ import { authService } from "./auth.service";
 
 const API_URL = "https://api.synk.hu";
 
+// Create a separate axios instance for S3 uploads without global auth headers
+const s3Axios = axios.create();
+
 export const uploadFile = async (file: File): Promise<string> => {
   const token = authService.getToken();
 
@@ -18,17 +21,20 @@ export const uploadFile = async (file: File): Promise<string> => {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-    }
+    },
   );
 
-  const uploadUrl: string | undefined = data.uploadUrl || data.upload_url || data.url;
-  const fileUrl: string | undefined = data.fileUrl || data.file_url || data.publicUrl || data.url;
+  const uploadUrl: string | undefined =
+    data.uploadUrl || data.upload_url || data.url;
+  const fileUrl: string | undefined =
+    data.fileUrl || data.file_url || data.publicUrl || data.url;
 
   if (!uploadUrl || !fileUrl) {
     throw new Error("Invalid file upload response");
   }
 
-  await axios.put(uploadUrl, file, {
+  // Upload directly to S3 using pre-signed URL with separate axios instance
+  await s3Axios.put(uploadUrl, file, {
     headers: {
       "Content-Type": file.type || "application/octet-stream",
     },

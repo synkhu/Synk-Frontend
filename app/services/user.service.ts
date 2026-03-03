@@ -5,6 +5,9 @@ import { authService } from "./auth.service";
 
 const API_URL = "https://api.synk.hu";
 
+// Create a separate axios instance for S3 uploads without global auth headers
+const s3Axios = axios.create();
+
 export interface CurrentUser {
   id?: string;
   email?: string;
@@ -39,21 +42,20 @@ export const updateUserProfile = async (update: {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
 
-  await axios.patch(
-    `${API_URL}/users/me`,
-    update,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  await axios.patch(`${API_URL}/users/me`, update, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   return await getCurrentUser();
 };
 
-export const changePassword = async (oldPassword: string, newPassword: string) => {
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+) => {
   const token = getToken();
   if (!token) throw new Error("No authentication token found.");
 
@@ -65,7 +67,7 @@ export const changePassword = async (oldPassword: string, newPassword: string) =
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 };
 
@@ -84,7 +86,7 @@ export const uploadProfilePicture = async (file: File): Promise<string> => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   const uploadUrl: string | undefined =
@@ -101,7 +103,8 @@ export const uploadProfilePicture = async (file: File): Promise<string> => {
     throw new Error("Invalid profile picture upload response");
   }
 
-  await axios.put(uploadUrl, file, {
+  // Upload directly to S3 using pre-signed URL with separate axios instance
+  await s3Axios.put(uploadUrl, file, {
     headers: {
       "Content-Type": file.type || "application/octet-stream",
     },
