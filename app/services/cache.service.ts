@@ -7,7 +7,7 @@ interface CacheEntry<T> {
 }
 
 class CacheService {
-  private cache = new Map<string, CacheEntry<any>>();
+  private cache = new Map<string, CacheEntry<unknown>>();
   private readonly DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes default
   public readonly USER_CACHE_TTL = 60 * 60 * 1000; // 1 hour for user data
   private readonly CACHE_PREFIX = "synk_cache_";
@@ -32,9 +32,10 @@ class CacheService {
       try {
         const stored = localStorage.getItem(this.getStorageKey(key));
         if (stored) {
-          entry = JSON.parse(stored);
+          const parsed = JSON.parse(stored) as CacheEntry<unknown>;
+          entry = parsed;
           // Restore to in-memory cache
-          this.cache.set(key, entry);
+          this.cache.set(key, parsed);
         }
       } catch (error) {
         console.error("Failed to load cache from localStorage:", error);
