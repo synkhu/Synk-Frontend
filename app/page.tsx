@@ -1,50 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navbar from "../components/navbar";
 import Carousel from "../components/carousel";
 import UpcomingEvents from "../components/UpcomingEvents";
-import "./page.css";
 
 export default function Home() {
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
-  const [navbarOpen, setNavbarOpen] = useState(true);
 
   useEffect(() => {
-    setLoggedIn(!!localStorage.getItem("authToken"));
     setLoading(false);
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-white text-xl animate-pulse">Loading...</div>
+    </div>
+  );
 
   return (
-    <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
-      <div className="nav">
-        <Navbar
-          loggedIn={loggedIn}
-          setLoggedIn={setLoggedIn}
-          navbarOpen={navbarOpen}
-          setNavbarOpen={setNavbarOpen}
-        />
-      </div>
-      <div className="content-column">
-        <div
-          className="min-h-screen w-full py-8"
-          style={{
-            background:
-              "radial-gradient(circle at 0 0, #53306f 0%, #2c1846 32%, #120626 80%)",
-          }}
-        >
-          <div className="max-w-6xl mx-auto">
-            <div className="carousel-container">
-              <Carousel />
-            </div>
-            <div className="upcoming-events">
-              <UpcomingEvents />
-            </div>
-          </div>
-        </div>
+    <div className="py-8 px-4 md:px-8">
+      <div className="max-w-6xl mx-auto space-y-12">
+        <section className="rounded-2xl overflow-hidden shadow-2xl bg-black/20 backdrop-blur-sm border border-white/5 p-6">
+          <Carousel />
+        </section>
+        
+        <section className="space-y-6">
+          <UpcomingEvents />
+        </section>
       </div>
     </div>
   );
