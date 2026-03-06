@@ -69,7 +69,7 @@ export default function Navbar({
 }: NavbarProps) {
   const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
   const [showRegisterPopup, setShowRegisterPopup] = useState<boolean>(false);
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(getCachedUser());
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   const [loginStep, setLoginStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState<string>("");
@@ -87,16 +87,23 @@ export default function Navbar({
 
   useEffect(() => {
     let isMounted = true;
+    const applyUser = (user: CurrentUser | null) => {
+      if (isMounted) setCurrentUser(user);
+    };
+
     const fetchUser = async () => {
       if (loggedIn) {
         try {
+          // If we already have cached user data, populate it after mount.
+          // Scheduled to avoid sync setState directly inside the effect body.
+          queueMicrotask(() => applyUser(getCachedUser()));
           const user = await getCurrentUser();
-          if (isMounted) setCurrentUser(user);
+          applyUser(user);
         } catch {
-          if (isMounted) setCurrentUser(null);
+          applyUser(null);
         }
       } else {
-        if (isMounted) setCurrentUser(null);
+        queueMicrotask(() => applyUser(null));
       }
     };
     fetchUser();
