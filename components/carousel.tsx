@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import "./carousel.css";
 
 interface EventItem {
   id: string;
@@ -33,135 +32,131 @@ export default function Carousel() {
       });
   }, []);
 
-  // Auto-advance the carousel every 2 seconds
   useEffect(() => {
     if (totalSlides <= 1) return;
-
     const intervalId = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % totalSlides);
     }, 10000);
-
     return () => clearInterval(intervalId);
   }, [totalSlides]);
 
-  const goToSlide = (index: number): void => {
-    setCurrentSlide(index);
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-  };
+  const goToSlide = (index: number): void => setCurrentSlide(index);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
 
   if (loading) {
     return (
-      <div className="carousel-shell flex items-center justify-center h-56 md:h-96">
-        <p className="text-white text-xl">Loading events...</p>
+      <div className="flex items-center justify-center h-64 md:h-[400px] bg-white/5 rounded-3xl">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+          <p className="text-gray-400 font-medium">Loading events...</p>
+        </div>
       </div>
     );
   }
 
   if (events.length === 0) {
     return (
-      <div className="carousel-shell flex items-center justify-center h-56 md:h-96">
-        <p className="text-white text-xl">No large events available</p>
+      <div className="flex items-center justify-center h-64 md:h-[400px] bg-white/5 rounded-3xl border border-white/5">
+        <p className="text-gray-400 font-medium text-lg">No large events available</p>
       </div>
     );
   }
 
   return (
-    <div className="carousel-shell">
-      <div className="carousel-outer">
+    <div className="relative w-full py-6 group/carousel">
+      <div className="relative h-[280px] md:h-[360px] perspective-[1600px] overflow-hidden">
+        {/* Navigation Arrows */}
         <button
           type="button"
-          className="carousel-arrow carousel-arrow-left"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-purple-600 transition-all opacity-0 group-hover/carousel:opacity-100 -translate-x-4 group-hover/carousel:translate-x-0"
           onClick={prevSlide}
           aria-label="Previous event"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M15 19 8 12l7-7"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 19 8 12l7-7" /></svg>
         </button>
 
-        <div className="carousel-stage">
-          {events.map((event, index) => {
-            if (!totalSlides) return null;
-            const offset = (index - currentSlide + totalSlides) % totalSlides;
+        <button
+          type="button"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white flex items-center justify-center hover:bg-purple-600 transition-all opacity-0 group-hover/carousel:opacity-100 translate-x-4 group-hover/carousel:translate-x-0"
+          onClick={nextSlide}
+          aria-label="Next event"
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 5 7 7-7 7" /></svg>
+        </button>
 
-            let positionClass = "carousel-card-hidden";
-            if (offset === 0) positionClass = "carousel-card-center";
-            else if (offset === 1) positionClass = "carousel-card-right-1";
-            else if (offset === totalSlides - 1)
-              positionClass = "carousel-card-left-1";
-            else if (offset === 2) positionClass = "carousel-card-right-2";
-            else if (offset === totalSlides - 2)
-              positionClass = "carousel-card-left-2";
+        {/* Slides */}
+        <div className="relative w-full h-full flex items-center justify-center">
+          {events.map((event, index) => {
+            const offset = (index - currentSlide + totalSlides) % totalSlides;
+            let style = {};
+            let zIndex = 0;
+            let opacity = 0;
+            let pointerEvents: "auto" | "none" = "none";
+
+            if (offset === 0) {
+              style = { transform: "translateX(-50%) translateY(-50%) scale(1)" };
+              zIndex = 30;
+              opacity = 1;
+              pointerEvents = "auto";
+            } else if (offset === 1) {
+              style = { transform: "translateX(20%) translateY(-50%) scale(0.85) rotateY(-10deg)" };
+              zIndex = 20;
+              opacity = 0.6;
+            } else if (offset === totalSlides - 1) {
+              style = { transform: "translateX(-120%) translateY(-50%) scale(0.85) rotateY(10deg)" };
+              zIndex = 20;
+              opacity = 0.6;
+            } else if (offset === 2) {
+              style = { transform: "translateX(80%) translateY(-50%) scale(0.7) rotateY(-20deg)" };
+              zIndex = 10;
+              opacity = 0.2;
+            } else if (offset === totalSlides - 2) {
+              style = { transform: "translateX(-180%) translateY(-50%) scale(0.7) rotateY(20deg)" };
+              zIndex = 10;
+              opacity = 0.2;
+            }
 
             return (
               <button
                 key={event.id}
                 type="button"
-                className={`carousel-card ${positionClass}`}
+                className="absolute top-1/2 left-1/2 w-[85%] md:w-[60%] max-w-[640px] aspect-video rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                style={{ ...style, zIndex, opacity, pointerEvents }}
                 onClick={() => router.push(`/events/${event.id}`)}
               >
                 {event.thumbnailUrl ? (
-                  <img
-                    src={event.thumbnailUrl}
-                    alt={event.name}
-                    className="carousel-card-image"
-                  />
+                  <img src={event.thumbnailUrl} alt={event.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="carousel-card-fallback" />
+                  <div className="w-full h-full bg-gradient-to-br from-purple-900 to-indigo-950" />
                 )}
-                <div className="carousel-card-gradient" />
-                <div className="carousel-card-content">
-                  <h3 className="carousel-card-title">{event.name}</h3>
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                
+                <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 text-left">
+                  <h3 className="text-xl md:text-3xl font-bold text-white mb-2 line-clamp-1">{event.name}</h3>
                   {event.venueName && (
-                    <p className="carousel-card-venue">{event.venueName}</p>
+                    <p className="text-sm md:text-base text-gray-300 font-medium mb-4">{event.venueName}</p>
                   )}
-                  <div className="carousel-card-cta">View details</div>
+                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-purple-600 text-white text-xs font-bold uppercase tracking-widest shadow-lg hover:bg-purple-500 transition-colors">
+                    View Event
+                  </div>
                 </div>
               </button>
             );
           })}
         </div>
-
-        <button
-          type="button"
-          className="carousel-arrow carousel-arrow-right"
-          onClick={nextSlide}
-          aria-label="Next event"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="m9 5 7 7-7 7"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
       </div>
 
-      <div className="carousel-dots">
+      {/* Pagination Dots */}
+      <div className="flex justify-center items-center gap-2 mt-6">
         {events.map((_, index) => (
           <button
             key={index}
-            type="button"
-            className={`carousel-dot ${
-              index === currentSlide ? "carousel-dot-active" : ""
-            }`}
             onClick={() => goToSlide(index)}
+            className={`transition-all duration-300 rounded-full h-1.5 ${
+              index === currentSlide ? "w-8 bg-purple-500" : "w-1.5 bg-white/20 hover:bg-white/40"
+            }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}

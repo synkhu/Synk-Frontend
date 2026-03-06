@@ -1,5 +1,4 @@
 "use client";
-import Navbar from "../../components/navbar";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getEvents } from "../services/event.Service";
@@ -13,12 +12,9 @@ export default function EventsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [navbarOpen, setNavbarOpen] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    setLoggedIn(!!localStorage.getItem("authToken"));
     const checkAuth = async () => {
       const canAccess = await authService.canAccessAdminPages();
       if (!canAccess) {
@@ -39,26 +35,8 @@ export default function EventsPage() {
 
   if (isChecking) {
     return (
-      <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
-        <div className="nav">
-          <Navbar
-            loggedIn={loggedIn}
-            setLoggedIn={setLoggedIn}
-            navbarOpen={navbarOpen}
-            setNavbarOpen={setNavbarOpen}
-          />
-        </div>
-        <div className="content-column">
-          <div
-            className="min-h-screen flex items-center justify-center"
-            style={{
-              background:
-                "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)",
-            }}
-          >
-            <p className="text-white">Checking authorization...</p>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-white text-xl animate-pulse">Checking authorization...</p>
       </div>
     );
   }
@@ -69,36 +47,26 @@ export default function EventsPage() {
 
   return (
     <ProtectedRoute>
-      <div className={`main flex ${navbarOpen ? "nav-open" : "nav-closed"}`}>
-        <div className="nav">
-          <Navbar
-            loggedIn={loggedIn}
-            setLoggedIn={setLoggedIn}
-            navbarOpen={navbarOpen}
-            setNavbarOpen={setNavbarOpen}
-          />
-        </div>
-        <div className="content-column">
-          <div
-            className="min-h-screen py-8 px-4"
-            style={{
-              background:
-                "radial-gradient(circle at 0 0, #4c3073 0%, #2d1b4e 32%, #120626 80%)",
-            }}
-          >
-            <div className="max-w-6xl mx-auto rounded-3xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] p-6">
-              <h1 className="text-3xl font-extrabold text-white mb-6 tracking-wide">
-                Events
-              </h1>
-              {!isEditing && <EventForm onSuccess={setEvents} />}
-              <div className="mt-6">
-                <EventList
-                  events={events}
-                  onUpdate={setEvents}
-                  onEditStart={() => setIsEditing(true)}
-                  onEditEnd={() => setIsEditing(false)}
-                />
+      <div className="py-8 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto rounded-3xl border border-white/10 bg-black/40 backdrop-blur-md shadow-2xl p-8">
+          <h1 className="text-4xl font-bold text-white mb-8 tracking-tight">
+            Manage Events
+          </h1>
+          
+          <div className="space-y-8">
+            {!isEditing && (
+              <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
+                <EventForm onSuccess={setEvents} />
               </div>
+            )}
+            
+            <div className="bg-white/5 rounded-2xl overflow-hidden border border-white/5">
+              <EventList
+                events={events}
+                onUpdate={setEvents}
+                onEditStart={() => setIsEditing(true)}
+                onEditEnd={() => setIsEditing(false)}
+              />
             </div>
           </div>
         </div>
