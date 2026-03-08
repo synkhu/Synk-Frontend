@@ -47,57 +47,66 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
   return (
     <form
       onSubmit={submit}
-      className="max-w-4xl mx-auto p-6 rounded-3xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] space-y-4 mb-8"
+      className="max-w-4xl mx-auto space-y-6"
     >
-      <h2 className="text-2xl font-bold text-white mb-4">Add New Artist</h2>
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Artist name"
-        required
-        className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-      />
-      <input
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Artist description"
-        className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-      />
-      <input
-        value={spotifyUrl}
-        onChange={(e) => setSpotifyUrl(e.target.value)}
-        placeholder="Spotify URL"
-        type="url"
-        className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-      />
+      <div className="space-y-4">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Artist name"
+          required
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10"
+        />
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Artist description"
+          rows={3}
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10 resize-none"
+        />
+        <input
+          value={spotifyUrl}
+          onChange={(e) => setSpotifyUrl(e.target.value)}
+          placeholder="Spotify URL"
+          type="url"
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10"
+        />
+      </div>
+      
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">
+        <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider ml-1">
           Profile picture
         </label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0] || null;
-            setProfileFile(file);
-            setProfilePreview(file ? URL.createObjectURL(file) : null);
-          }}
-          className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2d1b4e] file:text-white hover:file:bg-[#4c3073]"
-        />
-        {profilePreview && (
-          <div className="mt-3">
-            <p className="text-xs text-gray-400 mb-1">Preview:</p>
-            <img
-              src={profilePreview}
-              alt="Profile preview"
-              className="w-24 h-24 object-cover rounded-full border border-[#4c3073]"
+        <div className="flex items-center space-x-6">
+          <div className="relative group flex-1">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                setProfileFile(file);
+                setProfilePreview(file ? URL.createObjectURL(file) : null);
+              }}
+              className="w-full text-sm text-gray-400 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-purple-500/10 file:text-purple-400 hover:file:bg-purple-500/20 cursor-pointer border border-white/10 rounded-2xl bg-white/5 p-2"
             />
           </div>
-        )}
+          {profilePreview && (
+            <div className="flex-shrink-0">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-purple-500/50 shadow-lg shadow-purple-500/20">
+                <img
+                  src={profilePreview}
+                  alt="Profile preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+
       <button
         type="submit"
-        className="w-full bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-6 py-3 rounded-lg font-semibold transition"
+        className="w-full bg-white text-black hover:bg-gray-200 px-6 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-white/20"
       >
         Add Artist
       </button>

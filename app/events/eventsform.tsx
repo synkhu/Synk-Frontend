@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   createEvent,
+  updateEvent,
   searchArtists,
   searchVenues,
 } from "../services/event.Service";
@@ -21,9 +22,10 @@ type TicketType = {
 
 type EventFormProps = {
   onSuccess: (events: any[]) => void;
+  initialData?: any;
 };
 
-export default function EventForm({ onSuccess }: EventFormProps) {
+export default function EventForm({ onSuccess, initialData }: EventFormProps) {
   const [name, setName] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -66,6 +68,51 @@ export default function EventForm({ onSuccess }: EventFormProps) {
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
 
   useEffect(() => {
+    if (initialData) {
+      setName(initialData.name || "");
+      setDescription(initialData.description || "");
+      setStartTime(initialData.startTime ? initialData.startTime.slice(0, 16) : "");
+      setEndTime(initialData.endTime ? initialData.endTime.slice(0, 16) : "");
+      setTotalCapacity(initialData.totalCapacity || "");
+      setTicketMaxScanCount(initialData.ticketMaxScanCount || "");
+      setThumbnailUrl(initialData.thumbnailUrl || "");
+
+      if (initialData.venue) {
+        setSelectedVenue(initialData.venue);
+        setVenueQuery(initialData.venue.name);
+      } else if (initialData.venueId) {
+        setSelectedVenue({
+          id: initialData.venueId,
+          name: initialData.venueName || "Selected Venue",
+        });
+        setVenueQuery(initialData.venueName || "Selected Venue");
+      }
+
+      if (initialData.artist) {
+        setSelectedArtistId(initialData.artist.id);
+        setSelectedArtistName(initialData.artist.name);
+        setArtistQuery(initialData.artist.name);
+      } else if (initialData.artistId) {
+        setSelectedArtistId(initialData.artistId);
+        setSelectedArtistName(initialData.artistName || "Selected Artist");
+        setArtistQuery(initialData.artistName || "Selected Artist");
+      }
+
+      if (initialData.ticketTypes && initialData.ticketTypes.length > 0) {
+        setTicketTypes(
+          initialData.ticketTypes.map((tt: any) => ({
+            name: tt.name,
+            price: tt.price,
+            saleStartTime: tt.saleStartTime ? tt.saleStartTime.slice(0, 16) : "",
+            saleEndTime: tt.saleEndTime ? tt.saleEndTime.slice(0, 16) : "",
+            maxSaleCount: tt.maxSaleCount || "",
+          }))
+        );
+      }
+    }
+  }, [initialData]);
+
+  useEffect(() => {
     const timeout = setTimeout(async () => {
       if (venueQuery.trim().length < 2) return setVenueResults([]);
       try {
@@ -104,26 +151,51 @@ export default function EventForm({ onSuccess }: EventFormProps) {
         }
       }
 
-      const updatedEvents = await createEvent(
-        name,
-        description,
-        startTime,
-        endTime,
-        selectedVenue.id,
-        thumbnailToSave,
-        selectedArtistId || null,
-        totalCapacity ? parseInt(totalCapacity) : null,
-        ticketMaxScanCount ? parseInt(ticketMaxScanCount) : null,
-        validTicketTypes.length > 0
-          ? validTicketTypes.map((tt) => ({
-              name: tt.name,
-              price: tt.price,
-              saleStartTime: tt.saleStartTime || null,
-              saleEndTime: tt.saleEndTime || null,
-              maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null,
-            }))
-          : null,
-      );
+      let updatedEvents;
+      if (initialData) {
+        updatedEvents = await updateEvent(
+          initialData.id,
+          name,
+          description,
+          startTime,
+          endTime,
+          selectedVenue.id,
+          thumbnailToSave,
+          selectedArtistId || null,
+          totalCapacity ? parseInt(totalCapacity) : null,
+          ticketMaxScanCount ? parseInt(ticketMaxScanCount) : null,
+          validTicketTypes.length > 0
+            ? validTicketTypes.map((tt) => ({
+                name: tt.name,
+                price: tt.price,
+                saleStartTime: tt.saleStartTime || null,
+                saleEndTime: tt.saleEndTime || null,
+                maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null,
+              }))
+            : null,
+        );
+      } else {
+        updatedEvents = await createEvent(
+          name,
+          description,
+          startTime,
+          endTime,
+          selectedVenue.id,
+          thumbnailToSave,
+          selectedArtistId || null,
+          totalCapacity ? parseInt(totalCapacity) : null,
+          ticketMaxScanCount ? parseInt(ticketMaxScanCount) : null,
+          validTicketTypes.length > 0
+            ? validTicketTypes.map((tt) => ({
+                name: tt.name,
+                price: tt.price,
+                saleStartTime: tt.saleStartTime || null,
+                saleEndTime: tt.saleEndTime || null,
+                maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null,
+              }))
+            : null,
+        );
+      }
 
       setName("");
       setThumbnailUrl("");
@@ -166,96 +238,82 @@ export default function EventForm({ onSuccess }: EventFormProps) {
   return (
     <form
       onSubmit={submit}
-      className="max-w-4xl mx-auto p-6 rounded-3xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_24px_80px_rgba(0,0,0,0.9)] space-y-6"
+      className="max-w-4xl mx-auto space-y-8"
     >
-      <h2 className="text-2xl font-bold text-white mb-6">Create New Event</h2>
-
       {/* Basic Information Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white border-b border-[#4c3073] pb-2">
+        <h3 className="text-lg font-bold text-white border-b border-white/10 pb-3 flex items-center">
+          <span className="bg-purple-500/20 text-purple-400 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">1</span>
           Basic Information
         </h3>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Event Name <span className="text-red-400">*</span>
-          </label>
+        <div className="space-y-4">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter event name"
+            placeholder="Event Name"
             required
-            className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10"
           />
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Event Images (first will be used as thumbnail)
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              const files = Array.from(e.target.files || []);
-              setSelectedFiles(files);
-            }}
-            className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2d1b4e] file:text-white hover:file:bg-[#4c3073]"
-          />
-          {selectedFiles.length > 0 && (
-            <p className="mt-1 text-xs text-gray-400">
-              {selectedFiles.length} image(s) selected. The first one will be
-              used as the event thumbnail.
-            </p>
-          )}
-        </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider ml-1">
+              Event Images
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                setSelectedFiles(files);
+              }}
+              className="w-full text-sm text-gray-400 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-purple-500/10 file:text-purple-400 hover:file:bg-purple-500/20 cursor-pointer border border-white/10 rounded-2xl bg-white/5 p-2"
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">
-            Description <span className="text-red-400">*</span>
-          </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your event..."
             rows={4}
             required
-            className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500 resize-none"
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10 resize-none"
           />
         </div>
       </div>
 
       {/* Date & Time Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#4c3073] pb-2">
+        <h3 className="text-lg font-bold text-white border-b border-white/10 pb-3 flex items-center">
+          <span className="bg-blue-500/20 text-blue-400 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">2</span>
           Date & Time
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Start Time <span className="text-red-400">*</span>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
+              Start Time
             </label>
             <input
               type="datetime-local"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all hover:bg-white/10"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              End Time <span className="text-red-400">*</span>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
+              End Time
             </label>
             <input
               type="datetime-local"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all hover:bg-white/10"
             />
           </div>
         </div>
@@ -263,69 +321,58 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
       {/* Capacity & Tickets Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#4c3073] pb-2">
+        <h3 className="text-lg font-bold text-white border-b border-white/10 pb-3 flex items-center">
+          <span className="bg-green-500/20 text-green-400 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">3</span>
           Capacity & Tickets
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Total Capacity
-            </label>
-            <input
-              type="number"
-              value={totalCapacity}
-              onChange={(e) => setTotalCapacity(e.target.value)}
-              placeholder="e.g., 500"
-              min="0"
-              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
-            />
-          </div>
+          <input
+            type="number"
+            value={totalCapacity}
+            onChange={(e) => setTotalCapacity(e.target.value)}
+            placeholder="Total Capacity"
+            min="0"
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all hover:bg-white/10"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Max Scans Per Ticket
-            </label>
-            <input
-              type="number"
-              value={ticketMaxScanCount}
-              onChange={(e) => setTicketMaxScanCount(e.target.value)}
-              placeholder="e.g., 1"
-              min="1"
-              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
-            />
-          </div>
+          <input
+            type="number"
+            value={ticketMaxScanCount}
+            onChange={(e) => setTicketMaxScanCount(e.target.value)}
+            placeholder="Max Scans Per Ticket"
+            min="1"
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all hover:bg-white/10"
+          />
         </div>
       </div>
 
-      {/* Venue & Artist Section */}
+      {/* Location & Artist Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#4c3073] pb-2">
+        <h3 className="text-lg font-bold text-white border-b border-white/10 pb-3 flex items-center">
+          <span className="bg-pink-500/20 text-pink-400 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">4</span>
           Location & Artist
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Venue Autocomplete */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Venue <span className="text-red-400">*</span>
-            </label>
             <input
               value={venueQuery}
               onChange={(e) => {
                 setVenueQuery(e.target.value);
                 setSelectedVenue(null);
               }}
-              placeholder="Search for venue..."
+              placeholder="Search Venue..."
               required
-              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50 transition-all hover:bg-white/10"
             />
             {venueResults.length > 0 && (
-              <ul className="absolute z-50 w-full mt-1 bg-[#120626] border border-[#4c3073] rounded-lg shadow-lg max-h-60 overflow-auto">
+              <ul className="absolute z-50 w-full mt-2 bg-black/90 border border-white/10 rounded-2xl shadow-2xl max-h-60 overflow-auto backdrop-blur-xl">
                 {venueResults.map((venue) => (
                   <li
                     key={venue.id}
-                    className="cursor-pointer px-4 py-2 text-gray-300 hover:bg-[#2d1b4e] hover:text-white transition"
+                    className="cursor-pointer px-6 py-3 text-gray-300 hover:bg-white/10 hover:text-white transition first:rounded-t-2xl last:rounded-b-2xl"
                     onClick={() => {
                       setSelectedVenue(venue);
                       setVenueQuery(venue.name);
@@ -338,17 +385,14 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               </ul>
             )}
             {selectedVenue && (
-              <p className="mt-1 text-sm text-green-600">
-                ✓ Selected: {selectedVenue.name}
+              <p className="mt-2 text-xs font-bold text-green-400 uppercase tracking-wider ml-1">
+                ✓ Venue Selected: {selectedVenue.name}
               </p>
             )}
           </div>
 
           {/* Artist Autocomplete */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Artist
-            </label>
             <input
               value={artistQuery}
               onChange={(e) => {
@@ -356,15 +400,15 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                 setSelectedArtistId(null);
                 setSelectedArtistName("");
               }}
-              placeholder="Search for artist (optional)..."
-              className="w-full px-4 py-2 border border-[#4c3073] rounded-lg focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition bg-[#120626] text-white placeholder-gray-500"
+              placeholder="Search Artist (optional)..."
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50 transition-all hover:bg-white/10"
             />
             {artistResults.length > 0 && (
-              <ul className="absolute z-50 w-full mt-1 bg-[#120626] border border-[#4c3073] rounded-lg shadow-lg max-h-60 overflow-auto">
+              <ul className="absolute z-50 w-full mt-2 bg-black/90 border border-white/10 rounded-2xl shadow-2xl max-h-60 overflow-auto backdrop-blur-xl">
                 {artistResults.map((artist) => (
                   <li
                     key={artist.id}
-                    className="cursor-pointer px-4 py-2 text-gray-300 hover:bg-[#2d1b4e] hover:text-white transition"
+                    className="cursor-pointer px-6 py-3 text-gray-300 hover:bg-white/10 hover:text-white transition first:rounded-t-2xl last:rounded-b-2xl"
                     onClick={() => {
                       setSelectedArtistId(artist.id);
                       setSelectedArtistName(artist.name);
@@ -378,8 +422,8 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               </ul>
             )}
             {selectedArtistName && (
-              <p className="mt-1 text-sm text-green-600">
-                ✓ Selected: {selectedArtistName}
+              <p className="mt-2 text-xs font-bold text-green-400 uppercase tracking-wider ml-1">
+                ✓ Artist Selected: {selectedArtistName}
               </p>
             )}
           </div>
@@ -388,17 +432,18 @@ export default function EventForm({ onSuccess }: EventFormProps) {
 
       {/* Ticket Types Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-300 border-b border-[#4c3073] pb-2">
+        <h3 className="text-lg font-bold text-white border-b border-white/10 pb-3 flex items-center">
+          <span className="bg-yellow-500/20 text-yellow-400 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">5</span>
           Ticket Types
         </h3>
 
         {ticketTypes.map((ticket, index) => (
           <div
             key={index}
-            className="border border-[#4c3073] p-4 rounded-lg bg-[#120626]/80 space-y-3"
+            className="bg-white/5 border border-white/10 p-6 rounded-3xl space-y-4 relative group hover:bg-white/[0.07] transition-colors"
           >
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="font-medium text-gray-300">
+            <div className="flex justify-between items-center">
+              <h4 className="font-bold text-white text-sm uppercase tracking-wider">
                 Ticket Type {index + 1}
               </h4>
               {ticketTypes.length > 1 && (
@@ -407,53 +452,41 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                   onClick={() =>
                     setTicketTypes(ticketTypes.filter((_, i) => i !== index))
                   }
-                  className="bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded-md text-sm transition"
+                  className="text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider hover:underline"
                 >
                   Remove
                 </button>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">
-                  Name
-                </label>
-                <input
-                  value={ticket.name}
-                  onChange={(e) => {
-                    const updated = [...ticketTypes];
-                    updated[index].name = e.target.value;
-                    setTicketTypes(updated);
-                  }}
-                  placeholder="e.g., VIP, General, Early Bird"
-                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white placeholder-gray-500"
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                value={ticket.name}
+                onChange={(e) => {
+                  const updated = [...ticketTypes];
+                  updated[index].name = e.target.value;
+                  setTicketTypes(updated);
+                }}
+                placeholder="Ticket Name (e.g. VIP)"
+                className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
+              />
 
-              <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">
-                  Price
-                </label>
-                <input
-                  type="number"
-                  value={ticket.price || ""}
-                  onChange={(e) => {
-                    const updated = [...ticketTypes];
-                    updated[index].price = parseFloat(e.target.value) || 0;
-                    setTicketTypes(updated);
-                  }}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white placeholder-gray-500"
-                />
-              </div>
+              <input
+                type="number"
+                value={ticket.price || ""}
+                onChange={(e) => {
+                  const updated = [...ticketTypes];
+                  updated[index].price = parseFloat(e.target.value) || 0;
+                  setTicketTypes(updated);
+                }}
+                placeholder="Price"
+                min="0"
+                step="0.01"
+                className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
+              />
 
-              <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">
-                  Sale Start Time
-                </label>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Sale Start</label>
                 <input
                   type="datetime-local"
                   value={ticket.saleStartTime}
@@ -462,14 +495,12 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                     updated[index].saleStartTime = e.target.value;
                     setTicketTypes(updated);
                   }}
-                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white"
+                  className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">
-                  Sale End Time
-                </label>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Sale End</label>
                 <input
                   type="datetime-local"
                   value={ticket.saleEndTime}
@@ -478,27 +509,22 @@ export default function EventForm({ onSuccess }: EventFormProps) {
                     updated[index].saleEndTime = e.target.value;
                     setTicketTypes(updated);
                   }}
-                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white"
+                  className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1">
-                  Max Available
-                </label>
-                <input
-                  type="number"
-                  value={ticket.maxSaleCount}
-                  onChange={(e) => {
-                    const updated = [...ticketTypes];
-                    updated[index].maxSaleCount = e.target.value;
-                    setTicketTypes(updated);
-                  }}
-                  placeholder="e.g., 100"
-                  min="0"
-                  className="w-full px-3 py-2 border border-[#4c3073] rounded-md focus:ring-2 focus:ring-[#2d1b4e] focus:border-transparent outline-none transition text-sm bg-[#120626] text-white placeholder-gray-500"
-                />
-              </div>
+              <input
+                type="number"
+                value={ticket.maxSaleCount}
+                onChange={(e) => {
+                  const updated = [...ticketTypes];
+                  updated[index].maxSaleCount = e.target.value;
+                  setTicketTypes(updated);
+                }}
+                placeholder="Quantity Available"
+                min="0"
+                className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
+              />
             </div>
           </div>
         ))}
@@ -517,7 +543,7 @@ export default function EventForm({ onSuccess }: EventFormProps) {
               },
             ])
           }
-          className="w-full bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-4 py-2 rounded-lg transition font-medium"
+          className="w-full py-3 border border-dashed border-white/20 rounded-2xl text-gray-400 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all text-sm font-bold uppercase tracking-wider"
         >
           + Add Another Ticket Type
         </button>
@@ -526,9 +552,9 @@ export default function EventForm({ onSuccess }: EventFormProps) {
       {/* Submit Button */}
       <button
         type="submit"
-        className="w-full bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-6 py-3 rounded-lg font-semibold text-lg transition shadow-md hover:shadow-lg"
+        className="w-full bg-white text-black hover:bg-gray-200 px-6 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-white/20"
       >
-        Create Event
+        {initialData ? "Save Changes" : "Create Event"}
       </button>
     </form>
   );

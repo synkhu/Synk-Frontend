@@ -10,6 +10,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+import Modal from "../../components/Modal";
+
 type TicketType = {
   name: string;
   price: number;
@@ -210,387 +212,394 @@ export default function EventList({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {!events || events.length === 0 ? (
-        <div className="col-span-full text-center py-12">
-          <p className="text-gray-500 text-lg">No events found</p>
-        </div>
-      ) : (
-        events.map((e) => (
-          <div key={e.id}>
-            {editingId === e.id ? (
-              <div className="col-span-full max-w-4xl mx-auto p-6 rounded-2xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_22px_70px_rgba(0,0,0,0.88)] space-y-4 mb-4">
-                <h3 className="text-xl font-bold text-white">Edit Event</h3>
-
-                <input
-                  placeholder="Event Name"
-                  value={formData.name}
-                  onChange={(ev) =>
-                    setFormData({ ...formData, name: ev.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-                <textarea
-                  placeholder="Description"
-                  value={formData.description}
-                  onChange={(ev) =>
-                    setFormData({ ...formData, description: ev.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                  rows={3}
-                />
-                <input
-                  placeholder="Thumbnail URL"
-                  value={formData.thumbnailUrl}
-                  onChange={(ev) =>
-                    setFormData({ ...formData, thumbnailUrl: ev.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Start Time
-                    </label>
-                    <input
-                      type="datetime-local"
-                      value={formData.startTime}
-                      onChange={(ev) =>
-                        setFormData({ ...formData, startTime: ev.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white focus:ring-2 focus:ring-[#2d1b4e]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      End Time
-                    </label>
-                    <input
-                      type="datetime-local"
-                      value={formData.endTime}
-                      onChange={(ev) =>
-                        setFormData({ ...formData, endTime: ev.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white focus:ring-2 focus:ring-[#2d1b4e]"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="number"
-                    placeholder="Total Capacity"
-                    value={formData.totalCapacity}
-                    onChange={(ev) =>
-                      setFormData({
-                        ...formData,
-                        totalCapacity: ev.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max Scan Count"
-                    value={formData.ticketMaxScanCount}
-                    onChange={(ev) =>
-                      setFormData({
-                        ...formData,
-                        ticketMaxScanCount: ev.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                  />
-                </div>
-
-                {/* Venue Autocomplete */}
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Venue
-                  </label>
-                  <input
-                    value={venueQuery}
-                    onChange={(ev) => {
-                      setVenueQuery(ev.target.value);
-                    }}
-                    placeholder="Search venue"
-                    className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                  />
-                  {venueResults.length > 0 && (
-                    <ul className="absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto mt-1">
-                      {venueResults.map((venue) => (
-                        <li
-                          key={venue.id}
-                          className="cursor-pointer px-4 py-2 hover:bg-blue-50"
-                          onClick={() => {
-                            setFormData({ ...formData, venueId: venue.id });
-                            setVenueQuery(venue.name);
-                            setVenueResults([]);
-                          }}
-                        >
-                          {venue.name}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                {/* Artist Autocomplete */}
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Artist
-                  </label>
-                  <input
-                    value={artistQuery}
-                    onChange={(ev) => {
-                      setArtistQuery(ev.target.value);
-                    }}
-                    placeholder="Search artist (optional)"
-                    className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                  />
-                  {artistResults.length > 0 && (
-                    <ul className="absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto mt-1">
-                      {artistResults.map((artist) => (
-                        <li
-                          key={artist.id}
-                          className="cursor-pointer px-4 py-2 hover:bg-blue-50"
-                          onClick={() => {
-                            setFormData({ ...formData, artistId: artist.id });
-                            setArtistQuery(artist.name);
-                            setArtistResults([]);
-                          }}
-                        >
-                          {artist.name}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                <div className="border-t border-[#4c3073] pt-4">
-                  <h4 className="text-sm font-medium text-gray-300 mb-2">
-                    Ticket Types
-                  </h4>
-                  {ticketTypes.map((ticket, index) => (
-                    <div
-                      key={index}
-                      className="border border-[#4c3073] p-3 rounded-xl bg-[#120626]/80 mb-3 space-y-2"
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-sm">
-                          Ticket Type {index + 1}
-                        </span>
-                        {ticketTypes.length > 1 && (
-                          <button
-                            onClick={() =>
-                              setTicketTypes(
-                                ticketTypes.filter((_, i) => i !== index),
-                              )
-                            }
-                            className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <input
-                          value={ticket.name}
-                          onChange={(ev) => {
-                            const updated = [...ticketTypes];
-                            updated[index].name = ev.target.value;
-                            setTicketTypes(updated);
-                          }}
-                          placeholder="Ticket Name"
-                          className="w-full px-3 py-2 border border-[#4c3073] rounded-md bg-[#120626] text-white placeholder-gray-500 text-sm focus:ring-2 focus:ring-[#2d1b4e]"
-                        />
-                        <input
-                          type="number"
-                          value={ticket.price || ""}
-                          onChange={(ev) => {
-                            const updated = [...ticketTypes];
-                            updated[index].price =
-                              parseFloat(ev.target.value) || 0;
-                            setTicketTypes(updated);
-                          }}
-                          placeholder="Price"
-                          className="w-full px-3 py-2 border border-[#4c3073] rounded-md bg-[#120626] text-white placeholder-gray-500 text-sm focus:ring-2 focus:ring-[#2d1b4e]"
-                        />
-                        <input
-                          type="datetime-local"
-                          value={ticket.saleStartTime}
-                          onChange={(ev) => {
-                            const updated = [...ticketTypes];
-                            updated[index].saleStartTime = ev.target.value;
-                            setTicketTypes(updated);
-                          }}
-                          placeholder="Sale start"
-                          className="w-full px-3 py-2 border border-[#4c3073] rounded-md bg-[#120626] text-white placeholder-gray-500 text-sm focus:ring-2 focus:ring-[#2d1b4e]"
-                        />
-                        <input
-                          type="datetime-local"
-                          value={ticket.saleEndTime}
-                          onChange={(ev) => {
-                            const updated = [...ticketTypes];
-                            updated[index].saleEndTime = ev.target.value;
-                            setTicketTypes(updated);
-                          }}
-                          placeholder="Sale end"
-                          className="w-full px-3 py-2 border border-[#4c3073] rounded-md bg-[#120626] text-white placeholder-gray-500 text-sm focus:ring-2 focus:ring-[#2d1b4e]"
-                        />
-                        <input
-                          type="number"
-                          value={ticket.maxSaleCount}
-                          onChange={(ev) => {
-                            const updated = [...ticketTypes];
-                            updated[index].maxSaleCount = ev.target.value;
-                            setTicketTypes(updated);
-                          }}
-                          placeholder="Max available"
-                          className="w-full px-3 py-2 border border-[#4c3073] rounded-md bg-[#120626] text-white placeholder-gray-500 text-sm focus:ring-2 focus:ring-[#2d1b4e]"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  <button
-                    onClick={() =>
-                      setTicketTypes([
-                        ...ticketTypes,
-                        {
-                          name: "",
-                          price: 0,
-                          saleStartTime: "",
-                          saleEndTime: "",
-                          maxSaleCount: "",
-                        },
-                      ])
-                    }
-                    className="w-full bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded"
-                  >
-                    + Add Ticket Type
-                  </button>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => save(e.id)}
-                    className="flex-1 bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-4 py-2 rounded-lg transition"
-                  >
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingId(null);
-                      onEditEnd();
-                    }}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {!events || events.length === 0 ? (
+          <div className="col-span-full text-center py-24">
+            <div className="w-24 h-24 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-500/20">
+              <span className="text-4xl">📅</span>
+            </div>
+            <p className="text-white text-xl font-bold">No events found</p>
+            <p className="text-gray-500 mt-2">Start scheduling your events.</p>
+          </div>
+        ) : (
+          events.map((e) => (
+            <div key={e.id}>
               <div
-                className="rounded-2xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_18px_50px_rgba(0,0,0,0.8)] overflow-hidden hover:shadow-[0_24px_70px_rgba(76,48,115,0.45)] transition-shadow duration-300 cursor-pointer"
+                className="group relative h-full rounded-[2rem] border border-white/10 bg-[#1a0b2e]/60 backdrop-blur-sm overflow-hidden hover:bg-[#2d1b4e]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1 flex flex-col cursor-pointer"
                 onClick={() => router.push(`/events/${e.id}`)}
               >
-                {e.thumbnailUrl && (
-                  <div className="relative h-48 w-full overflow-hidden bg-gray-200">
+                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 z-10">
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      startEdit(e);
+                    }}
+                    className="p-2 bg-white/10 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all"
+                    title="Edit"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      remove(e.id);
+                    }}
+                    className="p-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-full backdrop-blur-md transition-all"
+                    title="Delete"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                {e.thumbnailUrl ? (
+                  <div className="h-48 w-full overflow-hidden relative">
                     <img
                       src={e.thumbnailUrl}
                       alt={e.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a0b2e] to-transparent opacity-60"></div>
+                  </div>
+                ) : (
+                  <div className="h-48 w-full bg-gradient-to-br from-purple-900/40 to-indigo-900/40 flex items-center justify-center relative">
+                    <span className="text-5xl opacity-50">📅</span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a0b2e] to-transparent opacity-60"></div>
                   </div>
                 )}
 
-                <div className="p-6 space-y-3">
-                  <h3 className="text-xl font-bold text-white line-clamp-2">
-                    {e.name}
-                  </h3>
+                <div className="p-6 pt-2 flex flex-col space-y-4 flex-grow">
+                  <div className="space-y-1">
+                    <h3 className="text-2xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">
+                      {e.name}
+                    </h3>
+                    {e.venueName && (
+                      <p className="text-purple-400 font-medium text-sm flex items-center">
+                        <span className="mr-1">📍</span> {e.venueName}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    {e.startTime && (
+                      <div className="flex items-center text-sm text-gray-400 bg-white/5 p-3 rounded-xl border border-white/5">
+                        <span className="mr-3 text-lg">📅</span>
+                        <span className="truncate">
+                          {formatDate(e.startTime)}
+                        </span>
+                      </div>
+                    )}
+                    {e.artistName && (
+                      <div className="flex items-center text-sm text-gray-400 bg-white/5 p-3 rounded-xl border border-white/5">
+                        <span className="mr-3 text-lg">🎤</span>
+                        <span className="truncate">{e.artistName}</span>
+                      </div>
+                    )}
+                  </div>
 
                   {e.description && (
-                    <p className="text-gray-300 text-sm line-clamp-3">
+                    <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed mt-2">
                       {e.description}
                     </p>
                   )}
-
-                  <div className="space-y-2 text-sm text-gray-200">
-                    {e.startTime && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-blue-600">📅</span>
-                        <span className="font-medium">Start:</span>
-                        <span>{formatDate(e.startTime)}</span>
-                      </div>
-                    )}
-
-                    {e.endTime && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-blue-600">🕐</span>
-                        <span className="font-medium">End:</span>
-                        <span>{formatDate(e.endTime)}</span>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600">📍</span>
-                      <span className="font-medium">Venue:</span>
-                      <span>{e.venueName || "N/A"}</span>
-                    </div>
-
-                    {e.artistName && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-purple-600">🎤</span>
-                        <span className="font-medium">Artist:</span>
-                        <span>{e.artistName}</span>
-                      </div>
-                    )}
-
-                    {e.totalCapacity && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-orange-600">👥</span>
-                        <span className="font-medium">Capacity:</span>
-                        <span>{e.totalCapacity}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex gap-2 pt-4 border-t border-[#4c3073]">
-                    <button
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        router.push(`/events/${e.id}`);
-                      }}
-                      className="flex-1 bg-[#4c3073] hover:bg-[#5a3d8a] text-white px-4 py-2 rounded-lg transition"
-                    >
-                      View Details
-                    </button>
-                    <button
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        startEdit(e);
-                      }}
-                      className="flex-1 bg-[#1e3a5f] hover:bg-[#24446e] text-white px-4 py-2 rounded-lg border border-[#3b6aa0] shadow-sm transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        remove(e.id);
-                      }}
-                      className="bg-[#4a1f1f] hover:bg-[#5a2525] text-white px-4 py-2 rounded-lg border border-[#7a3333] shadow-sm transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
                 </div>
               </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <Modal
+        isOpen={editingId !== null}
+        onClose={() => {
+          setEditingId(null);
+          onEditEnd();
+        }}
+        title="Edit Event"
+      >
+        <div className="space-y-4">
+          <input
+            placeholder="Event Name"
+            value={formData.name}
+            onChange={(ev) =>
+              setFormData({ ...formData, name: ev.target.value })
+            }
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+          />
+          <textarea
+            placeholder="Description"
+            value={formData.description}
+            onChange={(ev) =>
+              setFormData({ ...formData, description: ev.target.value })
+            }
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm resize-none"
+            rows={3}
+          />
+          <input
+            placeholder="Thumbnail URL"
+            value={formData.thumbnailUrl}
+            onChange={(ev) =>
+              setFormData({ ...formData, thumbnailUrl: ev.target.value })
+            }
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
+                Start Time
+              </label>
+              <input
+                type="datetime-local"
+                value={formData.startTime}
+                onChange={(ev) =>
+                  setFormData({ ...formData, startTime: ev.target.value })
+                }
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
+                End Time
+              </label>
+              <input
+                type="datetime-local"
+                value={formData.endTime}
+                onChange={(ev) =>
+                  setFormData({ ...formData, endTime: ev.target.value })
+                }
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="number"
+              placeholder="Total Capacity"
+              value={formData.totalCapacity}
+              onChange={(ev) =>
+                setFormData({
+                  ...formData,
+                  totalCapacity: ev.target.value,
+                })
+              }
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+            <input
+              type="number"
+              placeholder="Max Scan Count"
+              value={formData.ticketMaxScanCount}
+              onChange={(ev) =>
+                setFormData({
+                  ...formData,
+                  ticketMaxScanCount: ev.target.value,
+                })
+              }
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+          </div>
+
+          {/* Venue Autocomplete */}
+          <div className="relative">
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
+              Venue
+            </label>
+            <input
+              value={venueQuery}
+              onChange={(ev) => {
+                setVenueQuery(ev.target.value);
+              }}
+              placeholder="Search venue"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+            {venueResults.length > 0 && (
+              <ul className="absolute z-50 w-full bg-[#1a0b2e] border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-auto mt-1">
+                {venueResults.map((venue) => (
+                  <li
+                    key={venue.id}
+                    className="cursor-pointer px-4 py-2 hover:bg-white/10 text-white text-sm"
+                    onClick={() => {
+                      setFormData({ ...formData, venueId: venue.id });
+                      setVenueQuery(venue.name);
+                      setVenueResults([]);
+                    }}
+                  >
+                    {venue.name}
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
-        ))
-      )}
-    </div>
+
+          {/* Artist Autocomplete */}
+          <div className="relative">
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
+              Artist
+            </label>
+            <input
+              value={artistQuery}
+              onChange={(ev) => {
+                setArtistQuery(ev.target.value);
+              }}
+              placeholder="Search artist (optional)"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+            {artistResults.length > 0 && (
+              <ul className="absolute z-50 w-full bg-[#1a0b2e] border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-auto mt-1">
+                {artistResults.map((artist) => (
+                  <li
+                    key={artist.id}
+                    className="cursor-pointer px-4 py-2 hover:bg-white/10 text-white text-sm"
+                    onClick={() => {
+                      setFormData({ ...formData, artistId: artist.id });
+                      setArtistQuery(artist.name);
+                      setArtistResults([]);
+                    }}
+                  >
+                    {artist.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="border-t border-white/10 pt-4">
+            <h4 className="text-sm font-bold text-white mb-4">
+              Ticket Types
+            </h4>
+            {ticketTypes.map((ticket, index) => (
+              <div
+                key={index}
+                className="border border-white/10 p-4 rounded-xl bg-white/5 mb-4 space-y-3"
+              >
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-xs text-gray-400 uppercase tracking-wider">
+                    Ticket Type {index + 1}
+                  </span>
+                  {ticketTypes.length > 1 && (
+                    <button
+                      onClick={() =>
+                        setTicketTypes(
+                          ticketTypes.filter((_, i) => i !== index),
+                        )
+                      }
+                      className="text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider transition-colors"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <input
+                    value={ticket.name}
+                    onChange={(ev) => {
+                      const updated = [...ticketTypes];
+                      updated[index].name = ev.target.value;
+                      setTicketTypes(updated);
+                    }}
+                    placeholder="Ticket Name"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
+                  />
+                  <input
+                    type="number"
+                    value={ticket.price || ""}
+                    onChange={(ev) => {
+                      const updated = [...ticketTypes];
+                      updated[index].price =
+                        parseFloat(ev.target.value) || 0;
+                      setTicketTypes(updated);
+                    }}
+                    placeholder="Price"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
+                  />
+                  <input
+                    type="datetime-local"
+                    value={ticket.saleStartTime}
+                    onChange={(ev) => {
+                      const updated = [...ticketTypes];
+                      updated[index].saleStartTime = ev.target.value;
+                      setTicketTypes(updated);
+                    }}
+                    placeholder="Sale start"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
+                  />
+                  <input
+                    type="datetime-local"
+                    value={ticket.saleEndTime}
+                    onChange={(ev) => {
+                      const updated = [...ticketTypes];
+                      updated[index].saleEndTime = ev.target.value;
+                      setTicketTypes(updated);
+                    }}
+                    placeholder="Sale end"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
+                  />
+                  <input
+                    type="number"
+                    value={ticket.maxSaleCount}
+                    onChange={(ev) => {
+                      const updated = [...ticketTypes];
+                      updated[index].maxSaleCount = ev.target.value;
+                      setTicketTypes(updated);
+                    }}
+                    placeholder="Max available"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
+                  />
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={() =>
+                setTicketTypes([
+                  ...ticketTypes,
+                  {
+                    name: "",
+                    price: 0,
+                    saleStartTime: "",
+                    saleEndTime: "",
+                    maxSaleCount: "",
+                  },
+                ])
+              }
+              className="w-full py-2 border border-dashed border-white/20 text-gray-400 hover:text-white hover:border-white/40 rounded-xl text-sm font-bold transition-all"
+            >
+              + Add Ticket Type
+            </button>
+          </div>
+
+          <button
+            onClick={() => editingId && save(editingId)}
+            className="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-white/20"
+          >
+            Save Changes
+          </button>
+        </div>
+      </Modal>
+    </>
   );
 }

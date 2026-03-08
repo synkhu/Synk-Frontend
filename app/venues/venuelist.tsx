@@ -22,6 +22,8 @@ type VenueListProps = {
   onUpdate: (venues: Venue[]) => void;
 };
 
+import Modal from "../../components/Modal";
+
 export default function VenueList({ venues = [], onUpdate }: VenueListProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -63,160 +65,196 @@ export default function VenueList({ venues = [], onUpdate }: VenueListProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {!venues || venues.length === 0 ? (
-        <div className="col-span-full text-center py-12">
-          <p className="text-gray-400 text-lg">No venues found</p>
-        </div>
-      ) : (
-        venues.map((v) => (
-          <div key={v.id}>
-            {editingId === v.id ? (
-              <div className="rounded-2xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-6 space-y-3">
-                <h3 className="text-lg font-bold text-white mb-4">
-                  Edit Venue
-                </h3>
-                <input
-                  placeholder="Name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-                <input
-                  placeholder="Address"
-                  value={formData.address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, address: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    placeholder="City"
-                    value={formData.city}
-                    onChange={(e) =>
-                      setFormData({ ...formData, city: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                  />
-                  <input
-                    placeholder="Country"
-                    value={formData.country}
-                    onChange={(e) =>
-                      setFormData({ ...formData, country: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                  />
-                </div>
-                <input
-                  placeholder="Capacity"
-                  type="number"
-                  value={formData.capacity}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      capacity: Number(e.target.value),
-                    })
-                  }
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Add Images
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      setImageFiles(files);
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {!venues || venues.length === 0 ? (
+          <div className="col-span-full text-center py-24">
+            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-4xl">📍</span>
+            </div>
+            <p className="text-white text-xl font-bold">No venues found</p>
+            <p className="text-gray-500 mt-2">
+              Get started by creating your first venue.
+            </p>
+          </div>
+        ) : (
+          venues.map((v) => (
+            <div key={v.id}>
+              <div className="group relative h-full rounded-[2rem] border border-white/10 bg-[#1a0b2e]/60 backdrop-blur-sm overflow-hidden hover:bg-[#2d1b4e]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1">
+                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 z-10">
+                  <button
+                    onClick={() => {
+                      setEditingId(v.id);
+                      setFormData({
+                        name: v.name,
+                        city: v.city,
+                        address: v.address,
+                        country: v.country,
+                        capacity: v.capacity,
+                        description: v.description,
+                      });
                     }}
-                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2d1b4e] file:text-white hover:file:bg-[#4c3073]"
-                  />
-                  {imageFiles.length > 0 && (
-                    <p className="mt-1 text-xs text-gray-400">
-                      {imageFiles.length} new image(s) will be uploaded and
-                      attached.
+                    className="p-2 bg-white/10 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all"
+                    title="Edit"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => remove(v.id)}
+                    className="p-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-full backdrop-blur-md transition-all"
+                    title="Delete"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="p-8 space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="text-2xl font-bold text-white tracking-tight">
+                      {v.name}
+                    </h3>
+                    <p className="text-purple-400 font-medium text-sm flex items-center">
+                      <span className="mr-1">📍</span> {v.city}, {v.country}
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center text-sm text-gray-400 bg-white/5 p-3 rounded-xl border border-white/5">
+                      <span className="mr-3 text-lg">🏠</span>
+                      <span className="truncate">{v.address}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-400 bg-white/5 p-3 rounded-xl border border-white/5">
+                      <span className="mr-3 text-lg">👥</span>
+                      <span>
+                        Capacity:{" "}
+                        <span className="text-white font-bold">{v.capacity}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {v.description && (
+                    <p className="text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-4 mt-4">
+                      {v.description}
                     </p>
                   )}
                 </div>
-                <textarea
-                  placeholder="Description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => save(v.id)}
-                    className="flex-1 bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-4 py-2 rounded-lg transition"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setEditingId(null)}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
               </div>
-            ) : (
-              <div className="rounded-2xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_18px_50px_rgba(0,0,0,0.8)] overflow-hidden hover:shadow-[0_24px_70px_rgba(76,48,115,0.45)] transition-shadow duration-300">
-                <div className="p-6 space-y-3">
-                  <h3 className="text-xl font-bold text-white">{v.name}</h3>
-                  <div className="text-gray-300 text-sm space-y-1">
-                    <p className="flex items-center gap-2">
-                      <span>📍</span>
-                      <span>
-                        {v.city}, {v.country}
-                      </span>
-                    </p>
-                    <p className="text-gray-400">{v.address}</p>
-                    <p className="flex items-center gap-2">
-                      <span>👥</span>
-                      <span>Capacity: {v.capacity}</span>
-                    </p>
-                    {v.description && (
-                      <p className="text-gray-400 mt-2">{v.description}</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2 pt-4 border-t border-[#4c3073]">
-                    <button
-                      onClick={() => {
-                        setEditingId(v.id);
-                        setFormData({
-                          name: v.name,
-                          city: v.city,
-                          address: v.address,
-                          country: v.country,
-                          capacity: v.capacity,
-                          description: v.description,
-                        });
-                      }}
-                      className="flex-1 bg-[#1e3a5f] hover:bg-[#24446e] text-white px-4 py-2 rounded-lg border border-[#3b6aa0] shadow-sm transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => remove(v.id)}
-                      className="bg-[#4a1f1f] hover:bg-[#5a2525] text-white px-4 py-2 rounded-lg border border-[#7a3333] shadow-sm transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <Modal
+        isOpen={editingId !== null}
+        onClose={() => setEditingId(null)}
+        title="Edit Venue"
+      >
+        <div className="space-y-4">
+          <input
+            placeholder="Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+          />
+          <input
+            placeholder="Address"
+            value={formData.address}
+            onChange={(e) =>
+              setFormData({ ...formData, address: e.target.value })
+            }
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              placeholder="City"
+              value={formData.city}
+              onChange={(e) =>
+                setFormData({ ...formData, city: e.target.value })
+              }
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+            <input
+              placeholder="Country"
+              value={formData.country}
+              onChange={(e) =>
+                setFormData({ ...formData, country: e.target.value })
+              }
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+          </div>
+          <input
+            placeholder="Capacity"
+            type="number"
+            value={formData.capacity}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                capacity: Number(e.target.value),
+              })
+            }
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+          />
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
+              Add Images
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                setImageFiles(files);
+              }}
+              className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
+            />
+            {imageFiles.length > 0 && (
+              <p className="mt-2 text-[10px] font-bold text-green-400 ml-1">
+                {imageFiles.length} new images selected
+              </p>
             )}
           </div>
-        ))
-      )}
-    </div>
+          <textarea
+            placeholder="Description"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            rows={3}
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm resize-none"
+          />
+          <button
+            onClick={() => editingId && save(editingId)}
+            className="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-white/20"
+          >
+            Save Changes
+          </button>
+        </div>
+      </Modal>
+    </>
   );
 }

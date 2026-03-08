@@ -15,6 +15,8 @@ type ArtistListProps = {
   onUpdate: (artists: any[]) => void;
 };
 
+import Modal from "../../components/Modal";
+
 export default function ArtistList({
   artists = [],
   onUpdate,
@@ -50,139 +52,197 @@ export default function ArtistList({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {!artists || artists.length === 0 ? (
-        <div className="col-span-full text-center py-12">
-          <p className="text-gray-400 text-lg">No artists found</p>
-        </div>
-      ) : (
-        artists.map((a) => (
-          <div key={a.id}>
-            {editingId === a.id ? (
-              <div className="rounded-2xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-6 space-y-3">
-                <h3 className="text-lg font-bold text-white mb-4">
-                  Edit Artist
-                </h3>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Artist name"
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-                <input
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Description"
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-                <input
-                  value={spotifyUrl}
-                  onChange={(e) => setSpotifyUrl(e.target.value)}
-                  placeholder="Spotify URL"
-                  type="url"
-                  className="w-full px-4 py-2 border border-[#4c3073] rounded-lg bg-[#120626] text-white placeholder-gray-500 focus:ring-2 focus:ring-[#2d1b4e]"
-                />
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Profile picture
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0] || null;
-                      setProfileFile(file);
-                      setProfilePictureUrl(
-                        file ? "" : a.profilePictureUrl || "",
-                      );
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {!artists || artists.length === 0 ? (
+          <div className="col-span-full text-center py-24">
+            <div className="w-24 h-24 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-500/20">
+              <span className="text-4xl">🎤</span>
+            </div>
+            <p className="text-white text-xl font-bold">No artists found</p>
+            <p className="text-gray-500 mt-2">
+              Start building your roster by adding artists.
+            </p>
+          </div>
+        ) : (
+          artists.map((a) => (
+            <div key={a.id}>
+              <div className="group relative h-full rounded-[2rem] border border-white/10 bg-[#1a0b2e]/60 backdrop-blur-sm overflow-hidden hover:bg-[#2d1b4e]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1 flex flex-col">
+                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 z-10">
+                  <button
+                    onClick={() => {
+                      setEditingId(a.id);
+                      setName(a.name);
+                      setDescription(a.description || "");
+                      setSpotifyUrl(a.spotifyUrl || "");
+                      setProfilePictureUrl(a.profilePictureUrl || "");
+                      setProfileFile(null);
                     }}
-                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2d1b4e] file:text-white hover:file:bg-[#4c3073]"
-                  />
-                  {(profileFile || a.profilePictureUrl) && (
-                    <div className="mt-3 flex items-center gap-3">
-                      {(profileFile || a.profilePictureUrl) && (
-                        <img
-                          src={
-                            profileFile
-                              ? URL.createObjectURL(profileFile)
-                              : a.profilePictureUrl!
-                          }
-                          alt="Profile preview"
-                          className="w-16 h-16 object-cover rounded-full border border-[#4c3073]"
-                        />
-                      )}
-                      <span className="text-xs text-gray-400">
-                        Current / new picture
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => save(a.id)}
-                    className="flex-1 bg-[#2d1b4e] hover:bg-[#4c3073] text-white px-4 py-2 rounded-lg transition"
+                    className="p-2 bg-white/10 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all"
+                    title="Edit"
                   >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setEditingId(null)}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-[#4c3073]/60 bg-gradient-to-br from-[#2d1b4e]/40 via-[#120626]/80 to-[#120626]/90 shadow-[0_18px_50px_rgba(0,0,0,0.8)] overflow-hidden hover:shadow-[0_24px_70px_rgba(76,48,115,0.45)] transition-shadow duration-300">
-                <div className="p-6 space-y-3">
-                  {a.profilePictureUrl && (
-                    <div className="flex justify-center mb-4">
-                      <img
-                        src={a.profilePictureUrl}
-                        alt={a.name}
-                        className="w-20 h-20 object-cover rounded-full border border-[#4c3073]"
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                       />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => remove(a.id)}
+                    className="p-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-full backdrop-blur-md transition-all"
+                    title="Delete"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="p-8 flex flex-col items-center text-center space-y-4 flex-grow">
+                  <div className="relative">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/20 group-hover:border-purple-500/50 shadow-2xl shadow-purple-500/10 transition-all duration-500 group-hover:scale-105">
+                      {a.profilePictureUrl ? (
+                        <img
+                          src={a.profilePictureUrl}
+                          alt={a.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-900 flex items-center justify-center">
+                          <span className="text-4xl font-bold text-white/50">
+                            {a.name.charAt(0)}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <h3 className="text-xl font-bold text-white">{a.name}</h3>
-                  {a.description && (
-                    <p className="text-gray-300 text-sm">{a.description}</p>
-                  )}
+                    {a.spotifyUrl && (
+                      <div className="absolute bottom-0 right-0 bg-[#1DB954] text-white p-2 rounded-full shadow-lg transform translate-y-1 translate-x-1 border-4 border-[#1a0b2e]">
+                        <svg
+                          className="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 w-full">
+                    <h3 className="text-2xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">
+                      {a.name}
+                    </h3>
+                    {a.description && (
+                      <p className="text-gray-400 text-sm line-clamp-3 leading-relaxed">
+                        {a.description}
+                      </p>
+                    )}
+                  </div>
+
                   {a.spotifyUrl && (
                     <a
                       href={a.spotifyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 text-sm transition"
+                      className="mt-auto pt-4 inline-flex items-center text-xs font-bold text-gray-500 hover:text-[#1DB954] uppercase tracking-widest transition-colors"
                     >
-                      <span>🎵</span> Spotify
+                      Listen on Spotify <span className="ml-1">↗</span>
                     </a>
                   )}
-                  <div className="flex gap-2 pt-4 border-t border-[#4c3073]">
-                    <button
-                      onClick={() => {
-                        setEditingId(a.id);
-                        setName(a.name);
-                        setDescription(a.description || "");
-                        setSpotifyUrl(a.spotifyUrl || "");
-                      }}
-                      className="flex-1 bg-[#1e3a5f] hover:bg-[#24446e] text-white px-4 py-2 rounded-lg border border-[#3b6aa0] shadow-sm transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => remove(a.id)}
-                      className="bg-[#4a1f1f] hover:bg-[#5a2525] text-white px-4 py-2 rounded-lg border border-[#7a3333] shadow-sm transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
                 </div>
               </div>
-            )}
+            </div>
+          ))
+        )}
+      </div>
+
+      <Modal
+        isOpen={editingId !== null}
+        onClose={() => setEditingId(null)}
+        title="Edit Artist"
+      >
+        <div className="space-y-4">
+          <div className="flex justify-center mb-6">
+            <div className="relative group cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setProfileFile(file);
+                  // Keep existing URL if file is removed, or update logic if needed
+                  // But here we rely on profileFile being present for save()
+                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              />
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-lg shadow-purple-500/20 group-hover:border-purple-400 transition-all">
+                <img
+                  src={
+                    profileFile
+                      ? URL.createObjectURL(profileFile)
+                      : profilePictureUrl || "https://via.placeholder.com/150"
+                  }
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-white text-xs font-bold uppercase">
+                    Change
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-        ))
-      )}
-    </div>
+
+          <div className="space-y-4">
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Artist name"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Description"
+              rows={3}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm resize-none"
+            />
+            <input
+              value={spotifyUrl}
+              onChange={(e) => setSpotifyUrl(e.target.value)}
+              placeholder="Spotify URL"
+              type="url"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+          </div>
+
+          <button
+            onClick={() => editingId && save(editingId)}
+            className="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-white/20 mt-6"
+          >
+            Save Changes
+          </button>
+        </div>
+      </Modal>
+    </>
   );
 }
