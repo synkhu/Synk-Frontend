@@ -8,6 +8,7 @@ import {
   uploadProfilePicture,
   type CurrentUser,
 } from "../services/user.service";
+import { authService } from "../services/auth.service";
 
 export default function MyProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -29,6 +30,7 @@ export default function MyProfilePage() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editFirstName, setEditFirstName] = useState("");
   const [editLastName, setEditLastName] = useState("");
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -78,6 +80,19 @@ export default function MyProfilePage() {
     } catch (err: any) {
       console.error("Failed to change password:", err);
       setPasswordStatus(err.response?.data?.message || "Failed to change password.");
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    setVerificationStatus(null);
+    try {
+      await authService.sendVerificationEmail();
+      setVerificationStatus("Success! Verification email sent.");
+    } catch (err: any) {
+      console.error("Failed to send verification email:", err);
+      setVerificationStatus(
+        err.response?.data?.message || "Failed to send verification email.",
+      );
     }
   };
 
@@ -171,6 +186,32 @@ export default function MyProfilePage() {
               <p className="text-sm text-gray-500 truncate">{user.email}</p>
             </div>
 
+            {!user.emailVerified && (
+              <div className="flex justify-center pt-2">
+                <div
+                  className="flex items-center space-x-2 text-orange-500 bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20"
+                  title="Email not verified"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                  <span className="text-xs font-bold uppercase tracking-wider">
+                    Unverified
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div className="pt-4 flex justify-center">
               <span className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-widest rounded-full">
                 {user.role || "Member"}
@@ -178,6 +219,28 @@ export default function MyProfilePage() {
             </div>
           </div>
           
+          {!user.emailVerified && (
+            <div className="bg-orange-500/5 border border-orange-500/20 rounded-[2.5rem] p-6 text-center space-y-3">
+              <h4 className="text-white font-bold text-sm">Verify your email</h4>
+              <p className="text-xs text-gray-400">
+                Please verify your email to access all features.
+              </p>
+              <button
+                onClick={handleVerifyEmail}
+                className="w-full py-2 bg-orange-500 text-white text-sm font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20"
+              >
+                Send Verification Email
+              </button>
+              {verificationStatus && (
+                <p
+                  className={`text-xs ${verificationStatus.includes("Success") ? "text-green-400" : "text-red-400"}`}
+                >
+                  {verificationStatus}
+                </p>
+              )}
+            </div>
+          )}
+
           {(pictureStatus || profileStatus) && (
             <div className={`p-4 rounded-2xl border text-sm animate-in fade-in slide-in-from-top-2 ${
               (pictureStatus?.includes("Success") || profileStatus?.includes("Success")) 

@@ -16,6 +16,7 @@ export interface CurrentUser {
   lastName?: string | null;
   role?: string | null;
   profilePictureUrl?: string | null;
+  emailVerified?: boolean;
   [key: string]: any;
 }
 

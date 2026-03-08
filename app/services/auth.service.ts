@@ -149,6 +149,26 @@ class AuthService {
     return session?.token || null;
   }
 
+  async sendVerificationEmail(): Promise<void> {
+    const token = this.getToken();
+    if (!token) throw new Error("No authentication token found.");
+
+    try {
+      await axios.post(
+        "https://api.synk.hu/auth/send-verification-email",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    } catch (error) {
+      console.error("Failed to send verification email:", error);
+      throw error;
+    }
+  }
+
   async getUserInfo(): Promise<any> {
     const token = this.getToken();
     if (!token) return null;
