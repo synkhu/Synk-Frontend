@@ -1,24 +1,13 @@
 import axios from "axios";
 import { authService } from "./auth.service";
-import { cacheService } from "./cache.service";
 
 const API_URL = "https://api.synk.hu";
 const getToken = () => authService.getToken();
-const CACHE_KEY = "artists_list";
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export const getArtists = async () => {
-  // Check cache first
-  const cached = cacheService.get(CACHE_KEY);
-  if (cached) {
-    return cached;
-  }
-
   const res = await axios.get(`${API_URL}/artists`);
   const data = res.data.items;
 
-  // Store in cache
-  cacheService.set(CACHE_KEY, data, CACHE_TTL);
   return data;
 };
 
@@ -48,7 +37,6 @@ export const createArtist = async (
   );
 
   // Invalidate cache
-  cacheService.remove(CACHE_KEY);
   return await getArtists();
 };
 
@@ -78,7 +66,6 @@ export const updateArtist = async (
   );
 
   // Invalidate cache
-  cacheService.remove(CACHE_KEY);
   return await getArtists();
 };
 
@@ -93,7 +80,6 @@ export const deleteArtist = async (id: number) => {
   });
 
   // Invalidate cache
-  cacheService.remove(CACHE_KEY);
   return await getArtists();
 };
 

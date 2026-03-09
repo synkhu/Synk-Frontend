@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Modal from "@/components/Modal";
 
 const API_URL = "https://api.synk.hu";
 
@@ -49,7 +50,74 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   const [ticketQuantities, setTicketQuantities] = useState<Record<string, number>>({});
   const [eventId, setEventId] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
+  
+  const [billingInfo, setBillingInfo] = useState({ 
+    fullName: "", 
+    addressLine1: "", 
+    addressLine2: "", 
+    city: "", 
+    stateOrProvince: "", 
+    postalCode: "", 
+    country: "", 
+    phoneNumber: "" 
+  });
+  const [paymentInfo, setPaymentInfo] = useState({ cardNumber: "", expiry: "", cvc: "" });
+  const [successOrderId, setSuccessOrderId] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    async function fetchAddresses() {
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+      
+      setLoadingAddresses(true);
+      try {
+        const { data } = await axios.get(`${API_URL}/billing-addresses`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSavedAddresses(data);
+        if (data.length > 0) {
+          const defaultAddr = data.find((a: any) => a.isDefault) || data[0];
+          setSelectedAddressId(defaultAddr.id);
+          setIsAddingNewAddress(false);
+        } else {
+          setIsAddingNewAddress(true);
+        }
+      } catch (err) {
+        console.error("Failed to fetch addresses", err);
+        setIsAddingNewAddress(true);
+      } finally {
+        setLoadingAddresses(false);
+      }
+    }
+
+    if (isPurchaseModalOpen) {
+      fetchAddresses();
+    }
+  }, [isPurchaseModalOpen]);
+
+  const handleDeleteAddress = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this address?")) return;
+    
+    const token = localStorage.getItem("authToken");
+    try {
+      await axios.delete(`${API_URL}/billing-addresses/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSavedAddresses(prev => prev.filter(a => a.id !== id));
+      if (selectedAddressId === id) {
+        setSelectedAddressId(null);
+      }
+    } catch (err) {
+      alert("Failed to delete address");
+    }
+  };
 
   useEffect(() => {
     async function unwrapParams() {
@@ -83,10 +151,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     });
   };
 
-  const handleBuyTicket = async () => {
+  const handleCheckout = () => {
     const selectedItems = Object.entries(ticketQuantities)
-      .filter(([_, qty]) => qty > 0)
-      .map(([id, qty]) => ({ ticketTypeId: id, quantity: qty }));
+      .filter(([_, qty]) => qty > 0);
 
     if (selectedItems.length === 0) return alert("Select at least one ticket");
     
@@ -95,18 +162,102 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       alert("Please login to purchase tickets");
       return;
     }
+    
+    setIsPurchaseModalOpen(true);
+  };
+
+  const executePurchase = async () => {
+    const selectedItems = Object.entries(ticketQuantities)
+      .filter(([_, qty]) => qty > 0)
+      .map(([id, qty]) => ({ ticketTypeId: id, quantity: qty }));
+
+    const token = localStorage.getItem("authToken");
+    
+    let finalBillingAddressId = selectedAddressId;
+
+    if (isAddingNewAddress) {
+      // Validate billing info
+      if (!billingInfo.fullName || !billingInfo.addressLine1 || !billingInfo.city || !billingInfo.postalCode || !billingInfo.country) {
+        return alert("Please fill in all required billing fields");
+      }
+      
+      // Validate payment info
+      if (!paymentInfo.cardNumber || !paymentInfo.expiry || !paymentInfo.cvc) {
+        return alert("Please fill in all payment information");
+      }
+
+      try {
+        // Save the new address first
+        const { data: newAddress } = await axios.post(`${API_URL}/billing-addresses`, {
+          ...billingInfo,
+          addressLine2: billingInfo.addressLine2 || null,
+          stateOrProvince: billingInfo.stateOrProvince || null,
+          phoneNumber: billingInfo.phoneNumber || null,
+          isDefault: savedAddresses.length === 0 // Make default if it's the first one
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        finalBillingAddressId = newAddress.id;
+        // Update local state with new address
+        setSavedAddresses(prev => [...prev, newAddress]);
+        setSelectedAddressId(newAddress.id);
+        setIsAddingNewAddress(false);
+      } catch (err: any) {
+        console.error("Failed to save billing address", err);
+        return alert("Failed to save billing address: " + (err.response?.data?.message || err.message));
+      }
+    } else {
+      if (!finalBillingAddressId) return alert("Please select a billing address");
+      if (!paymentInfo.cardNumber || !paymentInfo.expiry || !paymentInfo.cvc) {
+        return alert("Please fill in all payment information");
+      }
+    }
+
+    let billingInfoPayload = {};
+    if (finalBillingAddressId) {
+      const selectedAddr = savedAddresses.find(a => a.id === finalBillingAddressId);
+      if (selectedAddr) {
+        billingInfoPayload = {
+          fullName: selectedAddr.fullName,
+          addressLine1: selectedAddr.addressLine1,
+          addressLine2: selectedAddr.addressLine2,
+          city: selectedAddr.city,
+          stateOrProvince: selectedAddr.stateOrProvince,
+          postalCode: selectedAddr.postalCode,
+          country: selectedAddr.country,
+          phoneNumber: selectedAddr.phoneNumber
+        };
+      }
+    }
+
+    const payload: any = { 
+      eventId, 
+      items: selectedItems,
+      billingAddressId: finalBillingAddressId,
+      billingInfo: billingInfoPayload 
+    };
+    
+    console.log("Executing purchase with payload:", JSON.stringify(payload, null, 2));
 
     try {
       const { data } = await axios.post(`${API_URL}/orders/purchase`, 
-        { eventId, items: selectedItems },
+        payload,
         { headers: { Authorization: `Bearer ${token}` }}
       );
-      alert(`Purchased! Order ID: ${data.orderId}`);
+      setSuccessOrderId(data.orderId);
       setTicketQuantities({});
+      setIsPurchaseModalOpen(false);
+      // Refresh event data
       const res = await axios.get(`${API_URL}/events/${eventId}`);
       setEvent(mapEventDetails(res.data));
     } catch (err: any) {
-      alert("Purchase failed: " + (err.response?.data?.message || "Unknown error"));
+      console.error(err);
+      if (err.message === "Network Error") {
+         alert("Network Error: Unable to reach the server. Please check your internet connection.");
+      } else {
+         alert("Purchase failed: " + (err.response?.data?.message || err.message || "Unknown error"));
+      }
     }
   };
 
@@ -221,7 +372,11 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         </button>
                         <span className="text-white font-bold w-6 text-center">{ticketQuantities[ticket.id] || 0}</span>
                         <button 
-                          onClick={() => setTicketQuantities(p => ({ ...p, [ticket.id]: (p[ticket.id] || 0) + 1 }))}
+                          onClick={() => setTicketQuantities(p => {
+                            const currentTotal = Object.values(p).reduce((a, b) => a + b, 0);
+                            if (currentTotal >= 10) return p;
+                            return { ...p, [ticket.id]: (p[ticket.id] || 0) + 1 };
+                          })}
                           className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 text-white transition-colors"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
@@ -242,7 +397,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                   </span>
                 </div>
                 <button 
-                  onClick={handleBuyTicket}
+                  onClick={handleCheckout}
                   className="w-full py-5 bg-white hover:bg-gray-200 text-black font-extrabold rounded-[2rem] transition-all active:scale-[0.98] shadow-2xl shadow-white/5"
                 >
                   Confirm Purchase
@@ -256,6 +411,238 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
       </div>
+
+      <Modal 
+        isOpen={isPurchaseModalOpen} 
+        onClose={() => setIsPurchaseModalOpen(false)} 
+        title="Complete Purchase"
+      >
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-bold text-white">Billing Address</h3>
+              {!isAddingNewAddress && savedAddresses.length > 0 && (
+                <button 
+                  onClick={() => {
+                    setIsAddingNewAddress(true);
+                    setSelectedAddressId(null);
+                  }}
+                  className="text-sm text-purple-400 hover:text-purple-300 font-medium"
+                >
+                  + Add New Address
+                </button>
+              )}
+              {isAddingNewAddress && savedAddresses.length > 0 && (
+                <button 
+                  onClick={() => setIsAddingNewAddress(false)}
+                  className="text-sm text-gray-400 hover:text-white font-medium"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+
+            {loadingAddresses ? (
+              <div className="text-center py-4 text-gray-500">Loading addresses...</div>
+            ) : !isAddingNewAddress && savedAddresses.length > 0 ? (
+              <div className="space-y-3">
+                {savedAddresses.map((addr: any) => (
+                  <div 
+                    key={addr.id}
+                    onClick={() => setSelectedAddressId(addr.id)}
+                    className={`relative p-4 rounded-xl border cursor-pointer transition-all ${
+                      selectedAddressId === addr.id 
+                        ? "bg-purple-500/10 border-purple-500" 
+                        : "bg-white/5 border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-bold text-white">{addr.fullName}</p>
+                        <p className="text-sm text-gray-400">{addr.addressLine1}</p>
+                        <p className="text-sm text-gray-400">
+                          {addr.city}, {addr.postalCode}
+                        </p>
+                        <p className="text-sm text-gray-500">{addr.country}</p>
+                      </div>
+                      <button 
+                        onClick={(e) => handleDeleteAddress(addr.id, e)}
+                        className="p-2 text-gray-500 hover:text-red-400 hover:bg-white/5 rounded-lg transition-colors"
+                        title="Delete address"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-sm font-medium text-gray-400">Full Name</label>
+                  <input 
+                    type="text" 
+                    value={billingInfo.fullName}
+                    onChange={(e) => setBillingInfo(p => ({ ...p, fullName: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-sm font-medium text-gray-400">Address Line 1</label>
+                  <input 
+                    type="text" 
+                    value={billingInfo.addressLine1}
+                    onChange={(e) => setBillingInfo(p => ({ ...p, addressLine1: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="123 Event St"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-sm font-medium text-gray-400">Address Line 2 (Optional)</label>
+                  <input 
+                    type="text" 
+                    value={billingInfo.addressLine2}
+                    onChange={(e) => setBillingInfo(p => ({ ...p, addressLine2: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="Apt, Suite, etc."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-400">City</label>
+                  <input 
+                    type="text" 
+                    value={billingInfo.city}
+                    onChange={(e) => setBillingInfo(p => ({ ...p, city: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="City"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-400">State / Province</label>
+                  <input 
+                    type="text" 
+                    value={billingInfo.stateOrProvince}
+                    onChange={(e) => setBillingInfo(p => ({ ...p, stateOrProvince: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="State"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-400">ZIP / Postal Code</label>
+                  <input 
+                    type="text" 
+                    value={billingInfo.postalCode}
+                    onChange={(e) => setBillingInfo(p => ({ ...p, postalCode: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="0000"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-400">Country</label>
+                  <input 
+                    type="text" 
+                    value={billingInfo.country}
+                    onChange={(e) => setBillingInfo(p => ({ ...p, country: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="Country"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-sm font-medium text-gray-400">Phone Number (Optional)</label>
+                  <input 
+                    type="text" 
+                    value={billingInfo.phoneNumber}
+                    onChange={(e) => setBillingInfo(p => ({ ...p, phoneNumber: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="+1 234 567 890"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-white/10">
+            <h3 className="text-xl font-bold text-white">Payment Information</h3>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-400">Card Number</label>
+                <input 
+                  type="text" 
+                  value={paymentInfo.cardNumber}
+                  onChange={(e) => setPaymentInfo(p => ({ ...p, cardNumber: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                  placeholder="0000 0000 0000 0000"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-400">Expiry Date</label>
+                  <input 
+                    type="text" 
+                    value={paymentInfo.expiry}
+                    onChange={(e) => setPaymentInfo(p => ({ ...p, expiry: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="MM/YY"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-400">CVC</label>
+                  <input 
+                    type="text" 
+                    value={paymentInfo.cvc}
+                    onChange={(e) => setPaymentInfo(p => ({ ...p, cvc: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                    placeholder="123"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-6">
+            <button 
+              onClick={executePurchase}
+              disabled={!paymentInfo.cardNumber || !paymentInfo.expiry || !paymentInfo.cvc}
+              className={`w-full py-4 font-bold rounded-xl transition-all shadow-lg ${
+                !paymentInfo.cardNumber || !paymentInfo.expiry || !paymentInfo.cvc
+                  ? "bg-gray-600 text-gray-400 cursor-not-allowed shadow-none"
+                  : "bg-purple-600 hover:bg-purple-500 text-white shadow-purple-600/20"
+              }`}
+            >
+              {isAddingNewAddress ? "Save Address & Pay" : "Confirm & Pay"}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={!!successOrderId}
+        onClose={() => setSuccessOrderId(null)}
+        title="Purchase Successful!"
+      >
+        <div className="text-center space-y-6 py-4">
+          <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
+            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-bold text-white">Tickets Purchased!</h3>
+            <p className="text-gray-400">
+              Your order has been confirmed.
+              <br />
+              <span className="text-sm font-mono bg-white/5 px-2 py-1 rounded mt-2 inline-block">Order ID: {successOrderId}</span>
+            </p>
+          </div>
+          <button
+            onClick={() => setSuccessOrderId(null)}
+            className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors"
+          >
+            OK
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

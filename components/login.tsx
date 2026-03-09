@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import axios from "axios";
 import { authService, LoginCredentials } from "../app/services/auth.service";
 import { getCurrentUser } from "../app/services/user.service";
 
@@ -33,10 +34,34 @@ export default function LoginPopup({
   const [error, setError] = useState<string | null>(null);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleForgotPassword = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    setForgotLoading(true);
+    setError(null);
+
+    try {
+      await axios.post("https://api.synk.hu/auth/forgot-password", { email }, {
+        headers: { "Content-Type": "application/json" },
+      });
+      setForgotSuccess(true);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to send reset email. Please try again.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   const handleLoginWithAPI = async () => {
     if (!email || !password) {
@@ -73,6 +98,7 @@ export default function LoginPopup({
       setPassword("");
       setError(null);
       setLoginSuccess(false);
+      setForgotSuccess(false);
     }
   }, [visible]);
 
@@ -86,7 +112,7 @@ export default function LoginPopup({
 
   if (!visible || !mounted) return null;
 
-  return createPortal(
+  const portal = createPortal(
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={onClose}
@@ -136,7 +162,7 @@ export default function LoginPopup({
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
                 <label className="text-sm font-medium text-gray-400">Password</label>
-                <button className="text-xs text-purple-400 hover:text-purple-300 font-medium">Forgot password?</button>
+                <button className="text-xs text-purple-400 hover:text-purple-300 font-medium" onClick={handleForgotPassword} disabled={forgotLoading || isLoading || loginSuccess}>{forgotLoading ? "Sending..." : "Forgot password?"}</button>
               </div>
               <input
                 type="password"
@@ -176,5 +202,26 @@ export default function LoginPopup({
       </div>
     </div>,
     document.body
+  );
+
+  return (
+    <>
+      {portal}
+      {forgotSuccess && mounted && createPortal(
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-6 animate-in zoom-in-95 duration-200">
+            <svg className="w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+            <p className="text-white text-center font-semibold text-lg">Password reset email sent.</p>
+            <button
+              onClick={() => setForgotSuccess(false)}
+              className="w-full py-3 bg-white hover:bg-gray-200 text-black font-bold rounded-2xl transition-all active:scale-[0.98]"
+            >
+              OK
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }

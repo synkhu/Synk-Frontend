@@ -3,6 +3,9 @@
 import {
   deleteEvent,
   updateEvent,
+  createTicketType,
+  deleteTicketType,
+  getEvents,
   searchArtists,
   searchVenues,
 } from "../services/event.Service";
@@ -13,6 +16,7 @@ import axios from "axios";
 import Modal from "../../components/Modal";
 
 type TicketType = {
+  id?: string;
   name: string;
   price: number;
   saleStartTime: string;
@@ -62,6 +66,7 @@ export default function EventList({
     ticketMaxScanCount: "",
   });
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
+  const [deletedTicketTypeIds, setDeletedTicketTypeIds] = useState<string[]>([]);
 
   const [venueQuery, setVenueQuery] = useState("");
   const [venueResults, setVenueResults] = useState<any[]>([]);
@@ -101,33 +106,66 @@ export default function EventList({
     }
 
     const validTicketTypes = ticketTypes.filter((tt) => tt.name.trim() !== "");
+    const existingTicketTypes = validTicketTypes.filter((tt) => tt.id);
+    const newTicketTypes = validTicketTypes.filter((tt) => !tt.id);
 
-    const updatedEvents = await updateEvent(
-      id,
-      formData.name,
-      formData.description,
-      formData.startTime,
-      formData.endTime,
-      formData.venueId,
-      formData.thumbnailUrl || undefined,
-      formData.artistId || null,
-      formData.totalCapacity ? parseInt(formData.totalCapacity) : null,
-      formData.ticketMaxScanCount
-        ? parseInt(formData.ticketMaxScanCount)
-        : null,
-      validTicketTypes.length > 0
-        ? validTicketTypes.map((tt) => ({
-            name: tt.name,
-            price: tt.price,
-            saleStartTime: tt.saleStartTime || null,
-            saleEndTime: tt.saleEndTime || null,
-            maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null,
-          }))
-        : null,
-    );
-    onUpdate(updatedEvents);
-    setEditingId(null);
-    onEditEnd();
+    try {
+      // 1. Update event details and existing ticket types
+      await updateEvent(
+        id,
+        formData.name,
+        formData.description,
+        formData.startTime,
+        formData.endTime,
+        formData.venueId,
+        formData.thumbnailUrl || undefined,
+        formData.artistId || null,
+        formData.totalCapacity ? parseInt(formData.totalCapacity) : null,
+        formData.ticketMaxScanCount
+          ? parseInt(formData.ticketMaxScanCount)
+          : null,
+        existingTicketTypes.length > 0
+          ? existingTicketTypes.map((tt) => ({
+              id: tt.id,
+              name: tt.name,
+              price: tt.price,
+              saleStartTime: tt.saleStartTime ? new Date(tt.saleStartTime).toISOString() : null,
+              saleEndTime: tt.saleEndTime ? new Date(tt.saleEndTime).toISOString() : null,
+              maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null,
+            }))
+          : null,
+      );
+
+      // 2. Create new ticket types
+      for (const tt of newTicketTypes) {
+        await createTicketType(id, {
+          name: tt.name,
+          price: tt.price,
+          saleStartTime: tt.saleStartTime,
+          saleEndTime: tt.saleEndTime,
+          maxSaleCount: tt.maxSaleCount ? parseInt(tt.maxSaleCount) : null,
+        });
+      }
+
+      // 3. Delete removed ticket types
+      for (const ticketId of deletedTicketTypeIds) {
+        try {
+          await deleteTicketType(id, ticketId);
+        } catch (e) {
+          console.warn(`Failed to delete ticket type ${ticketId}`, e);
+        }
+      }
+
+      // 4. Refresh events list
+      const updatedEvents = await getEvents();
+      onUpdate(updatedEvents);
+      setEditingId(null);
+      onEditEnd();
+      setDeletedTicketTypeIds([]);
+    } catch (err) {
+      console.error("Failed to save event:", err);
+      alert("Failed to save event changes");
+    }
   }
 
   async function remove(id: string) {
@@ -160,6 +198,7 @@ export default function EventList({
       if (fullEvent.ticketTypes && fullEvent.ticketTypes.length > 0) {
         setTicketTypes(
           fullEvent.ticketTypes.map((tt: any) => ({
+            id: tt.id,
             name: tt.name || "",
             price: tt.price || 0,
             saleStartTime: toDateTimeLocal(tt.saleStartTime),
@@ -181,6 +220,7 @@ export default function EventList({
 
       setVenueQuery(event.venueName || "");
       setArtistQuery(fullEvent.artistName || "");
+      setDeletedTicketTypeIds([]);
     } catch (err) {
       console.error("Failed to fetch event details:", err);
       alert("Failed to load event details for editing");
@@ -503,11 +543,18 @@ export default function EventList({
                   </span>
                   {ticketTypes.length > 1 && (
                     <button
-                      onClick={() =>
+                      onClick={() => {
+                        const ticket = ticketTypes[index];
+                        if (ticket.id) {
+                          setDeletedTicketTypeIds([
+                            ...deletedTicketTypeIds,
+                            ticket.id,
+                          ]);
+                        }
                         setTicketTypes(
                           ticketTypes.filter((_, i) => i !== index),
-                        )
-                      }
+                        );
+                      }}
                       className="text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider transition-colors"
                     >
                       Remove
@@ -518,9 +565,9 @@ export default function EventList({
                   <input
                     value={ticket.name}
                     onChange={(ev) => {
-                      const updated = [...ticketTypes];
-                      updated[index].name = ev.target.value;
-                      setTicketTypes(updated);
+                      setTicketTypes(ticketTypes.map((t, i) => 
+                        i === index ? { ...t, name: ev.target.value } : t
+                      ));
                     }}
                     placeholder="Ticket Name"
                     className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
@@ -529,10 +576,9 @@ export default function EventList({
                     type="number"
                     value={ticket.price || ""}
                     onChange={(ev) => {
-                      const updated = [...ticketTypes];
-                      updated[index].price =
-                        parseFloat(ev.target.value) || 0;
-                      setTicketTypes(updated);
+                      setTicketTypes(ticketTypes.map((t, i) => 
+                        i === index ? { ...t, price: parseFloat(ev.target.value) || 0 } : t
+                      ));
                     }}
                     placeholder="Price"
                     className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
@@ -541,9 +587,9 @@ export default function EventList({
                     type="datetime-local"
                     value={ticket.saleStartTime}
                     onChange={(ev) => {
-                      const updated = [...ticketTypes];
-                      updated[index].saleStartTime = ev.target.value;
-                      setTicketTypes(updated);
+                      setTicketTypes(ticketTypes.map((t, i) => 
+                        i === index ? { ...t, saleStartTime: ev.target.value } : t
+                      ));
                     }}
                     placeholder="Sale start"
                     className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
@@ -552,9 +598,9 @@ export default function EventList({
                     type="datetime-local"
                     value={ticket.saleEndTime}
                     onChange={(ev) => {
-                      const updated = [...ticketTypes];
-                      updated[index].saleEndTime = ev.target.value;
-                      setTicketTypes(updated);
+                      setTicketTypes(ticketTypes.map((t, i) => 
+                        i === index ? { ...t, saleEndTime: ev.target.value } : t
+                      ));
                     }}
                     placeholder="Sale end"
                     className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"
@@ -563,9 +609,9 @@ export default function EventList({
                     type="number"
                     value={ticket.maxSaleCount}
                     onChange={(ev) => {
-                      const updated = [...ticketTypes];
-                      updated[index].maxSaleCount = ev.target.value;
-                      setTicketTypes(updated);
+                      setTicketTypes(ticketTypes.map((t, i) => 
+                        i === index ? { ...t, maxSaleCount: ev.target.value } : t
+                      ));
                     }}
                     placeholder="Max available"
                     className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition-all"

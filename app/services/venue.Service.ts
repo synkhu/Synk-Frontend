@@ -1,24 +1,13 @@
 import axios from "axios";
 import { authService } from "./auth.service";
-import { cacheService } from "./cache.service";
 
 const API_URL = "https://api.synk.hu";
 const getToken = () => authService.getToken();
-const CACHE_KEY = "venues_list";
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export const getVenues = async () => {
-  // Check cache first
-  const cached = cacheService.get(CACHE_KEY);
-  if (cached) {
-    return cached;
-  }
-
   const res = await axios.get(`${API_URL}/venues`);
   const data = res.data.items;
 
-  // Store in cache
-  cacheService.set(CACHE_KEY, data, CACHE_TTL);
   return data;
 };
 
@@ -59,7 +48,6 @@ export const createVenue = async (
   );
 
   // Invalidate cache
-  cacheService.remove(CACHE_KEY);
   return await getVenues();
 };
 
@@ -86,7 +74,6 @@ export const updateVenue = async (
   });
 
   // Invalidate cache
-  cacheService.remove(CACHE_KEY);
   return await getVenues();
 };
 
@@ -101,7 +88,6 @@ export const deleteVenue = async (id: string | number) => {
   });
 
   // Invalidate cache
-  cacheService.remove(CACHE_KEY);
   return await getVenues();
 };
 
