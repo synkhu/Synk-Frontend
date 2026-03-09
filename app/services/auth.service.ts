@@ -155,7 +155,7 @@ class AuthService {
 
     try {
       await axios.post(
-        "https://api.synk.hu/auth/send-verification-email",
+        "https://api.synk.hu/auth/resend-verification-email",
         {},
         {
           headers: {

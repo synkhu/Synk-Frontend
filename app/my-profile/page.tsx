@@ -6,9 +6,11 @@ import {
   updateUserProfile,
   changePassword,
   uploadProfilePicture,
+  clearUserCache,
   type CurrentUser,
 } from "../services/user.service";
 import { authService } from "../services/auth.service";
+import axios from "axios";
 
 export default function MyProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -54,6 +56,36 @@ export default function MyProfilePage() {
       }
     };
     fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("verification-token");
+    if (!token) return;
+
+    const verifyEmail = async () => {
+      try {
+        await axios.post(
+          "https://api.synk.hu/auth/verify-email",
+          { token },
+          { headers: { "Content-Type": "application/json" } },
+        );
+        clearUserCache();
+        const freshUser = await getCurrentUser();
+        if (freshUser) setUser(freshUser);
+        setVerificationStatus("Success! Your email has been verified.");
+        // Remove the token from the URL without reloading
+        const url = new URL(window.location.href);
+        url.searchParams.delete("verification-token");
+        window.history.replaceState({}, "", url.toString());
+      } catch (err: any) {
+        console.error("Failed to verify email:", err);
+        setVerificationStatus(
+          err.response?.data?.message || "Failed to verify email. The link may be expired.",
+        );
+      }
+    };
+
+    verifyEmail();
   }, []);
 
   const fullName = () => {
@@ -238,6 +270,12 @@ export default function MyProfilePage() {
                   {verificationStatus}
                 </p>
               )}
+            </div>
+          )}
+
+          {user.emailVerified && verificationStatus?.includes("Success") && (
+            <div className="bg-green-500/5 border border-green-500/20 rounded-[2.5rem] p-6 text-center space-y-2">
+              <p className="text-sm text-green-400 font-semibold">{verificationStatus}</p>
             </div>
           )}
 
