@@ -6,8 +6,14 @@ import { cacheService } from "./cache.service";
 
 const API_URL = "https://api.synk.hu";
 
-// Create a separate axios instance for S3 uploads without global auth headers
+// S3 pre-signed URL requests must not carry the Authorization header —
+// axios.create() shares headers.common by reference with the global instance,
+// so we strip the header explicitly in an interceptor.
 const s3Axios = axios.create();
+s3Axios.interceptors.request.use((config) => {
+  delete config.headers["Authorization"];
+  return config;
+});
 
 export interface CurrentUser {
   id?: string;
@@ -17,7 +23,7 @@ export interface CurrentUser {
   role?: string | null;
   profilePictureUrl?: string | null;
   emailVerified?: boolean;
-  [key: string]: any;
+  [key: string]: string | boolean | null | undefined;
 }
 
 const getToken = () => authService.getToken();
