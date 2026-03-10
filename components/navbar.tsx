@@ -261,7 +261,7 @@ export default function Navbar({
           </div>
 
           {/* Main Navigation */}
-          <div className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
+          <div className="flex-1 space-y-2 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <NavItem
               label="Home"
               icon={

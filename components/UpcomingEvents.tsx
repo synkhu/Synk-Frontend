@@ -110,7 +110,7 @@ export default function UpcomingEvents() {
 
       <div 
         ref={containerRef}
-        className="flex space-x-6 overflow-x-auto pb-8 snap-x snap-mandatory no-scrollbar"
+        className="flex space-x-6 overflow-x-auto pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         {events.map(event => (
           <div 
