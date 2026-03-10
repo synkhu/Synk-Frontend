@@ -62,16 +62,23 @@ export default function MyProfilePage() {
     const token = new URLSearchParams(window.location.search).get("verification-token");
     if (!token) return;
 
+    if (!authService.isSessionValid()) return;
+
     const verifyEmail = async () => {
       try {
+        const authToken = authService.getToken();
         await axios.post(
           "https://api.synk.hu/auth/verify-email",
           { token },
-          { headers: { "Content-Type": "application/json" } },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+          },
         );
         clearUserCache();
-        const freshUser = await getCurrentUser();
-        if (freshUser) setUser(freshUser);
+        setUser((prev) => (prev ? { ...prev, emailVerified: true } : prev));
         setVerificationStatus("Success! Your email has been verified.");
         // Remove the token from the URL without reloading
         const url = new URL(window.location.href);
