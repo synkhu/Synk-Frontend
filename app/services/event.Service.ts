@@ -1,8 +1,6 @@
 import axios from "axios";
-import { authService } from "./auth.service";
 
 const API_URL = "https://api.synk.hu";
-const getToken = () => authService.getToken();
 
 const parseDateRFC3339 = (value: string | null | undefined): string => {
   if (!value || value.trim() === "") {
@@ -57,8 +55,6 @@ export const createEvent = async (
     maxSaleCount?: number | null;
   }> | null,
 ) => {
-  const token = getToken();
-  if (!token) throw new Error("No authentication token found.");
   if (!venueId) throw new Error("Venue ID is required.");
 
   const startISO = parseDateRFC3339(startTime);
@@ -93,7 +89,6 @@ export const createEvent = async (
   await axios.post(`${API_URL}/events`, payload, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -121,8 +116,6 @@ export const updateEvent = async (
     maxSaleCount?: number | null;
   }> | null,
 ) => {
-  const token = getToken();
-  if (!token) throw new Error("No authentication token found.");
   if (!venueId) throw new Error("Venue ID is required.");
 
   const startISO = parseDateRFC3339(startTime);
@@ -158,7 +151,6 @@ export const updateEvent = async (
   await axios.put(`${API_URL}/events/${id}`, payload, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -176,9 +168,6 @@ export const createTicketType = async (
     maxSaleCount?: number | null;
   },
 ) => {
-  const token = getToken();
-  if (!token) throw new Error("No authentication token found.");
-
   const payload = {
     name: ticketType.name,
     price: ticketType.price,
@@ -194,33 +183,27 @@ export const createTicketType = async (
   await axios.post(`${API_URL}/events/${eventId}/ticket-types`, payload, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 };
 
 export const deleteTicketType = async (eventId: string, ticketTypeId: string) => {
-  const token = getToken();
-  if (!token) throw new Error("No authentication token found.");
-
   await axios.delete(
     `${API_URL}/events/${eventId}/ticket-types/${ticketTypeId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    },
   );
 };
 
 export const deleteEvent = async (id: string) => {
-  const token = getToken();
-  if (!token) throw new Error("No authentication token found.");
-
-  await axios.delete(`${API_URL}/events/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  await axios.delete(`${API_URL}/events/${id}`);
 
   // Invalidate cache
   return await getEvents();
+};
+
+export const getStaffCode = async (eventId: string): Promise<string> => {
+  const res = await axios.get(`${API_URL}/events/${eventId}/staff-code`);
+
+  return res.data;
 };
 
 export const searchArtists = async (query: string) => {

@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 
 import Modal from "../../components/Modal";
+import GateCodeModal from "../../components/GateCodeModal";
 
 type TicketType = {
   id?: string;
@@ -53,6 +54,7 @@ export default function EventList({
   onEditEnd,
 }: EventListProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [gateCodeEvent, setGateCodeEvent] = useState<{ id: string; name: string } | null>(null);
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -270,6 +272,28 @@ export default function EventList({
                 onClick={() => router.push(`/events/${e.id}`)}
               >
                 <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 z-10">
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      setGateCodeEvent({ id: e.id, name: e.name });
+                    }}
+                    className="p-2 bg-white/10 hover:bg-purple-500 text-white rounded-full backdrop-blur-md transition-all"
+                    title="Gate Code"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </button>
                   <button
                     onClick={(ev) => {
                       ev.stopPropagation();
@@ -646,6 +670,13 @@ export default function EventList({
           </button>
         </div>
       </Modal>
+
+      <GateCodeModal
+        isOpen={!!gateCodeEvent}
+        onClose={() => setGateCodeEvent(null)}
+        eventId={gateCodeEvent?.id || ""}
+        eventName={gateCodeEvent?.name || ""}
+      />
     </>
   );
 }
