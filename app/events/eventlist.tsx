@@ -9,6 +9,7 @@ import {
   searchArtists,
   searchVenues,
 } from "../services/event.Service";
+import { uploadFile } from "../services/file.service";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -69,6 +70,7 @@ export default function EventList({
   });
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
   const [deletedTicketTypeIds, setDeletedTicketTypeIds] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const [venueQuery, setVenueQuery] = useState("");
   const [venueResults, setVenueResults] = useState<any[]>([]);
@@ -112,6 +114,17 @@ export default function EventList({
     const newTicketTypes = validTicketTypes.filter((tt) => !tt.id);
 
     try {
+      // 0. Upload new image files if any
+      let thumbnailToSave = formData.thumbnailUrl || undefined;
+      if (selectedFiles.length > 0) {
+        const uploadedUrls = await Promise.all(
+          selectedFiles.map((file) => uploadFile(file)),
+        );
+        if (uploadedUrls.length > 0) {
+          thumbnailToSave = uploadedUrls[0];
+        }
+      }
+
       // 1. Update event details and existing ticket types
       await updateEvent(
         id,
@@ -120,7 +133,7 @@ export default function EventList({
         formData.startTime,
         formData.endTime,
         formData.venueId,
-        formData.thumbnailUrl || undefined,
+        thumbnailToSave,
         formData.artistId || null,
         formData.totalCapacity ? parseInt(formData.totalCapacity) : null,
         formData.ticketMaxScanCount
@@ -177,6 +190,7 @@ export default function EventList({
 
   async function startEdit(event: Event) {
     setEditingId(event.id);
+    setSelectedFiles([]);
     onEditStart();
 
     try {
@@ -423,14 +437,28 @@ export default function EventList({
             className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm resize-none"
             rows={3}
           />
-          <input
-            placeholder="Thumbnail URL"
-            value={formData.thumbnailUrl}
-            onChange={(ev) =>
-              setFormData({ ...formData, thumbnailUrl: ev.target.value })
-            }
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
-          />
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
+              Event Image
+            </label>
+            {formData.thumbnailUrl && (
+              <div className="mb-2">
+                <img
+                  src={formData.thumbnailUrl}
+                  alt="Current thumbnail"
+                  className="h-24 rounded-xl object-cover border border-white/10"
+                />
+                <p className="text-xs text-gray-500 mt-1 ml-1">Current image — upload a new one to replace it</p>
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
+              className="w-full text-sm text-gray-400 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-purple-500/10 file:text-purple-400 hover:file:bg-purple-500/20 cursor-pointer border border-white/10 rounded-2xl bg-white/5 p-2"
+            />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
