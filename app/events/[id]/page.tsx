@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import axios from "axios";
 import Modal from "@/components/Modal";
 
@@ -319,7 +320,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
               <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight">{event.name}</h1>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-white/5">
               <div className="space-y-1">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Date & Time</p>
                 <p className="text-lg text-white font-semibold">{formatDate(event.startTime)}</p>
@@ -327,8 +328,43 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Location</p>
-                <p className="text-lg text-white font-semibold">{event.venueName || "Venue TBD"}</p>
+                {event.venueId ? (
+                  <Link
+                    href={`/venues/${event.venueId}`}
+                    className="flex items-center gap-1.5 text-lg text-white font-semibold hover:text-purple-400 transition-colors group w-fit"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-purple-400 shrink-0">
+                      <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                    </svg>
+                    <span className="underline-offset-2 group-hover:underline">{event.venueName || "Venue TBD"}</span>
+                  </Link>
+                ) : (
+                  <p className="text-lg text-white font-semibold">{event.venueName || "Venue TBD"}</p>
+                )}
                 {event.venueAddress && <p className="text-sm text-gray-500">{event.venueAddress}</p>}
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Artist</p>
+                {event.artistId ? (
+                  <Link
+                    href={`/artists/${event.artistId}`}
+                    className="flex items-center gap-1.5 text-lg text-white font-semibold hover:text-purple-400 transition-colors group w-fit"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-purple-400 shrink-0">
+                      <path d="M19.952 1.651a.75.75 0 01.298.599V16.303a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.403-4.909l2.311-.66a1.5 1.5 0 001.088-1.442V6.994l-9 2.572v9.737a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.402-4.909l2.31-.66a1.5 1.5 0 001.088-1.442V5.25a.75.75 0 01.544-.721l10.5-3a.75.75 0 01.658.122z" />
+                    </svg>
+                    <span className="underline-offset-2 group-hover:underline">{event.artistName}</span>
+                  </Link>
+                ) : event.artistName ? (
+                  <p className="flex items-center gap-1.5 text-lg text-white font-semibold">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-purple-400 shrink-0">
+                      <path d="M19.952 1.651a.75.75 0 01.298.599V16.303a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.403-4.909l2.311-.66a1.5 1.5 0 001.088-1.442V6.994l-9 2.572v9.737a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.402-4.909l2.31-.66a1.5 1.5 0 001.088-1.442V5.25a.75.75 0 01.544-.721l10.5-3a.75.75 0 01.658.122z" />
+                    </svg>
+                    {event.artistName}
+                  </p>
+                ) : (
+                  <p className="text-lg text-gray-500 font-semibold">TBA</p>
+                )}
               </div>
             </div>
 
