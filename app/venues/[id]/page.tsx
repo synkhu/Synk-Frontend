@@ -104,10 +104,34 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
               <img src={imageUrls[currentImageIndex]} alt={venueDetails.name} className="w-full h-full object-cover transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               {imageUrls.length > 1 && (
-                <div className="absolute bottom-6 inset-x-0 flex justify-center gap-2">
-                  {imageUrls.map((_, idx) => (
-                    <button key={idx} onClick={() => setCurrentImageIndex(idx)} className={`h-1 rounded-full transition-all ${idx === currentImageIndex ? "w-8 bg-white" : "w-2 bg-white/30"}`} />
-                  ))}
+                <div className="absolute bottom-6 inset-x-0 flex justify-center gap-4 items-center z-10">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentImageIndex(prev => prev === 0 ? imageUrls.length - 1 : prev - 1);
+                    }}
+                    className="p-2 rounded-full bg-black/50 hover:bg-black/70 text-white transition-all backdrop-blur-sm border border-white/10"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <div className="flex gap-2">
+                    {imageUrls.map((_, idx) => (
+                      <button 
+                        key={idx} 
+                        onClick={() => setCurrentImageIndex(idx)} 
+                        className={`h-1.5 rounded-full transition-all ${idx === currentImageIndex ? "w-8 bg-white" : "w-1.5 bg-white/30 hover:bg-white/50"}`} 
+                      />
+                    ))}
+                  </div>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentImageIndex(prev => prev === imageUrls.length - 1 ? 0 : prev + 1);
+                    }}
+                    className="p-2 rounded-full bg-black/50 hover:bg-black/70 text-white transition-all backdrop-blur-sm border border-white/10"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                  </button>
                 </div>
               )}
             </>

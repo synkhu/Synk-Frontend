@@ -56,6 +56,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   const [loadingAddresses, setLoadingAddresses] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
+  const [saveAddress, setSaveAddress] = useState(false);
   
   const [billingInfo, setBillingInfo] = useState({ 
     fullName: "", 
@@ -187,26 +188,30 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         return alert("Please fill in all payment information");
       }
 
-      try {
-        // Save the new address first
-        const { data: newAddress } = await axios.post(`${API_URL}/billing-addresses`, {
-          ...billingInfo,
-          addressLine2: billingInfo.addressLine2 || null,
-          stateOrProvince: billingInfo.stateOrProvince || null,
-          phoneNumber: billingInfo.phoneNumber || null,
-          isDefault: savedAddresses.length === 0 // Make default if it's the first one
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        finalBillingAddressId = newAddress.id;
-        // Update local state with new address
-        setSavedAddresses(prev => [...prev, newAddress]);
-        setSelectedAddressId(newAddress.id);
-        setIsAddingNewAddress(false);
-      } catch (err: any) {
-        console.error("Failed to save billing address", err);
-        return alert("Failed to save billing address: " + (err.response?.data?.message || err.message));
+      if (saveAddress) {
+        try {
+          // Save the new address first
+          const { data: newAddress } = await axios.post(`${API_URL}/billing-addresses`, {
+            ...billingInfo,
+            addressLine2: billingInfo.addressLine2 || null,
+            stateOrProvince: billingInfo.stateOrProvince || null,
+            phoneNumber: billingInfo.phoneNumber || null,
+            isDefault: savedAddresses.length === 0 // Make default if it's the first one
+          }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          finalBillingAddressId = newAddress.id;
+          // Update local state with new address
+          setSavedAddresses(prev => [...prev, newAddress]);
+          setSelectedAddressId(newAddress.id);
+          setIsAddingNewAddress(false);
+        } catch (err: any) {
+          console.error("Failed to save billing address", err);
+          return alert("Failed to save billing address: " + (err.response?.data?.message || err.message));
+        }
+      } else {
+        finalBillingAddressId = null;
       }
     } else {
       if (!finalBillingAddressId) return alert("Please select a billing address");
@@ -216,7 +221,18 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     }
 
     let billingInfoPayload = {};
-    if (finalBillingAddressId) {
+    if (isAddingNewAddress) {
+       billingInfoPayload = {
+          fullName: billingInfo.fullName,
+          addressLine1: billingInfo.addressLine1,
+          addressLine2: billingInfo.addressLine2 || null,
+          city: billingInfo.city,
+          stateOrProvince: billingInfo.stateOrProvince || null,
+          postalCode: billingInfo.postalCode,
+          country: billingInfo.country,
+          phoneNumber: billingInfo.phoneNumber || null
+       };
+    } else if (finalBillingAddressId) {
       const selectedAddr = savedAddresses.find(a => a.id === finalBillingAddressId);
       if (selectedAddr) {
         billingInfoPayload = {
@@ -236,8 +252,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       eventId, 
       items: selectedItems,
       billingAddressId: finalBillingAddressId,
-      billingInfo: billingInfoPayload 
-    };
+      billingInfo: billingInfoPayload,
+      saveBillingAddress: saveAddress
+    }; 
     
     console.log("Executing purchase with payload:", JSON.stringify(payload, null, 2));
 
@@ -593,6 +610,18 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500"
                     placeholder="+1 234 567 890"
                   />
+                </div>
+                <div className="md:col-span-2 flex items-center gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="saveAddress"
+                    checked={saveAddress}
+                    onChange={(e) => setSaveAddress(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-600 bg-white/5 text-purple-600 focus:ring-purple-500"
+                  />
+                  <label htmlFor="saveAddress" className="text-sm font-medium text-gray-400 select-none cursor-pointer">
+                    Save address for future purchases?
+                  </label>
                 </div>
               </div>
             )}

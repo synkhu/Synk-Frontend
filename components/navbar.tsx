@@ -10,6 +10,7 @@ import {
   getCachedUser,
   type CurrentUser,
 } from "../app/services/user.service";
+import { Source_Serif_4 } from "next/font/google";
 
 type NavbarProps = {
   loggedIn: boolean;
@@ -181,19 +182,25 @@ export default function Navbar({
         <div className="flex flex-col h-full p-4 space-y-8">
           {/* Header */}
           <div
-            className={`flex items-center px-2 h-10 transition-all duration-500 ${
-              isNavbarOpen ? "justify-between" : "justify-center"
+            className={`flex px-2 transition-all duration-500 ${
+              isNavbarOpen
+                ? "flex-row items-center justify-between h-10"
+                : "flex-col items-center justify-center gap-2"
             }`}
           >
-            <span
-              className={`text-2xl font-black italic tracking-tighter text-white transition-all duration-500 ${
-                isNavbarOpen
-                  ? "opacity-100 scale-100"
-                  : "opacity-0 scale-50 pointer-events-none w-0"
-              }`}
-            >
-              SYNK
-            </span>
+            {isNavbarOpen ? (
+              <img
+                src="/logo/horizontal-logo2.png"
+                alt="Synk Logo"
+                className="h-[40px] object-contain"
+              />
+            ) : (
+              <img
+                src="/logo/logo.png"
+                alt="Synk Logo"
+                style={{ width: "120px", height: "auto" }}
+              />
+            )}
             <button
               onClick={toggleNavbar}
               className={`p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all duration-300 hover:shadow-lg`}

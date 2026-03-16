@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Synk",
   description: "Connect with events, artists, and venues",
+  icons: {
+    icon: "/logo/favicon.ico",
+  },
 };
 
 export default function RootLayout({
