@@ -36,25 +36,22 @@ const NavItem = ({
 }) => (
   <button
     onClick={onClick}
-    className={`group relative flex items-center w-full h-12 rounded-2xl transition-all duration-300 ${
-      isNavbarOpen ? "px-3" : "justify-center px-0"
-    } ${
-      danger
+    className={`group relative flex items-center w-full h-12 rounded-2xl transition-all duration-300 ${isNavbarOpen ? "px-3" : "justify-center px-0"
+      } ${danger
         ? "hover:bg-red-500/10 text-red-400 hover:text-red-300"
         : active
           ? "bg-purple-600/20 text-purple-300 border border-purple-500/30 shadow-[0_0_20px_rgba(124,58,237,0.1)]"
           : "hover:bg-white/5 text-gray-400 hover:text-white border border-transparent"
-    }`}
+      }`}
   >
     <div className="flex items-center justify-center w-6 h-6 shrink-0 transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
       {icon}
     </div>
     <div
-      className={`font-semibold whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
-        isNavbarOpen
+      className={`font-semibold whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${isNavbarOpen
           ? "opacity-100 translate-x-0 w-32 ml-3"
           : "opacity-0 -translate-x-4 w-0 pointer-events-none ml-0"
-      }`}
+        }`}
     >
       {label}
     </div>
@@ -83,12 +80,46 @@ export default function Navbar({
   const pathname = usePathname();
   const router = useRouter();
 
-  const isNavbarOpen = navbarOpen ?? true;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const isNavbarOpen = navbarOpen ?? false;
+
   const toggleNavbar = () => {
     if (setNavbarOpen) {
       setNavbarOpen((prev) => !prev);
     }
   };
+
+  useEffect(() => {
+    if (isNavbarOpen) {
+      const scrollY = window.scrollY;
+
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+    } else {
+      const scrollY = document.body.style.top;
+
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || "0") * -1);
+      }
+    }
+  }, [isNavbarOpen]);
 
   useEffect(() => {
     let isMounted = true;
@@ -99,8 +130,6 @@ export default function Navbar({
     const fetchUser = async () => {
       if (loggedIn) {
         try {
-          // If we already have cached user data, populate it after mount.
-          // Scheduled to avoid sync setState directly inside the effect body.
           queueMicrotask(() => applyUser(getCachedUser()));
           const user = await getCurrentUser();
           applyUser(user);
@@ -129,14 +158,19 @@ export default function Navbar({
 
   const displayName = currentUser
     ? [currentUser.firstName, currentUser.lastName]
-        .filter(Boolean)
-        .join(" ")
-        .trim() || currentUser.email
+      .filter(Boolean)
+      .join(" ")
+      .trim() || currentUser.email
     : "";
+
+  const navigateTo = (path: string) => {
+    router.push(path);
+    if (setNavbarOpen) setNavbarOpen(false);
+  };
 
   const openLogin = () => {
     if (loggedIn) {
-      router.push("/my-tickets");
+      navigateTo("/my-tickets");
       return;
     }
     setShowLoginPopup(true);
@@ -177,16 +211,25 @@ export default function Navbar({
   return (
     <>
       <nav
-        className={`h-[calc(100vh-1.5rem)] m-3 flex flex-col items-stretch bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden`}
+        className={`
+          flex flex-col items-stretch bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden z-50
+          ${isMobile
+            ? isNavbarOpen
+              ? "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-[calc(100vw-1.5rem)] rounded-[2.5rem]"
+              : "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-20 rounded-[2.5rem]"
+            : isNavbarOpen
+              ? "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-64 rounded-[2.5rem]"
+              : "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-20 rounded-[2.5rem]"
+          }
+        `}
       >
         <div className="flex flex-col h-full p-4 space-y-8">
           {/* Header */}
           <div
-            className={`flex px-2 transition-all duration-500 ${
-              isNavbarOpen
+            className={`flex px-2 transition-all duration-500 ${isNavbarOpen
                 ? "flex-row items-center justify-between h-10"
                 : "flex-col items-center justify-center gap-2"
-            }`}
+              }`}
           >
             {isNavbarOpen ? (
               <img
@@ -228,13 +271,12 @@ export default function Navbar({
           {/* User Profile */}
           <div className="flex flex-col">
             <div
-              className={`flex items-center w-full p-2 rounded-[2rem] bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10 transition-all duration-300 group ${
-                isNavbarOpen
+              className={`flex items-center w-full p-2 rounded-[2rem] bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10 transition-all duration-300 group ${isNavbarOpen
                   ? "px-2"
                   : "px-0 justify-center border-transparent bg-transparent"
-              }`}
+                }`}
               onClick={() =>
-                loggedIn ? router.push("/my-profile") : openLogin()
+                loggedIn ? navigateTo("/my-profile") : openLogin()
               }
             >
               <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 via-indigo-500 to-pink-500 flex items-center justify-center text-white font-black shrink-0 shadow-xl border-2 border-white/20 overflow-hidden transition-transform duration-300 group-hover:scale-105 group-active:scale-95">
@@ -251,11 +293,10 @@ export default function Navbar({
                 )}
               </div>
               <div
-                className={`transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden ${
-                  isNavbarOpen
+                className={`transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden ${isNavbarOpen
                     ? "ml-3 opacity-100 translate-x-0 w-32"
                     : "ml-0 opacity-0 -translate-x-4 w-0"
-                }`}
+                  }`}
               >
                 <p className="text-sm font-bold text-white truncate">
                   {displayName || "Guest"}
@@ -282,7 +323,7 @@ export default function Navbar({
                   <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
               }
-              onClick={() => router.push("/")}
+              onClick={() => navigateTo("/")}
               active={pathname === "/"}
               isNavbarOpen={isNavbarOpen}
             />
@@ -296,15 +337,15 @@ export default function Navbar({
                   stroke="currentColor"
                   strokeWidth="2.5"
                 >
-                  <line x1="8" y1="6" x2="21" y2="6" />
-                  <line x1="8" y1="12" x2="21" y2="12" />
-                  <line x1="8" y1="18" x2="21" y2="18" />
+                  <line x1="2" y1="6" x2="21" y2="6" />
+                  <line x1="2" y1="12" x2="21" y2="12" />
+                  <line x1="2" y1="18" x2="21" y2="18" />
                   <line x1="3" y1="6" x2="3.01" y2="6" />
                   <line x1="3" y1="12" x2="3.01" y2="12" />
                   <line x1="3" y1="18" x2="3.01" y2="18" />
                 </svg>
               }
-              onClick={() => router.push("/all-events")}
+              onClick={() => navigateTo("/all-events")}
               active={pathname === "/all-events"}
               isNavbarOpen={isNavbarOpen}
             />
@@ -341,7 +382,7 @@ export default function Navbar({
                     <circle cx="12" cy="7" r="4" />
                   </svg>
                 }
-                onClick={() => router.push("/my-profile")}
+                onClick={() => navigateTo("/my-profile")}
                 active={pathname === "/my-profile"}
                 isNavbarOpen={isNavbarOpen}
               />
@@ -352,11 +393,10 @@ export default function Navbar({
                 currentUser?.role === "Organizer") && (
                 <div className="pt-6 mt-4 space-y-2 border-t border-white/5">
                   <p
-                    className={`px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] transition-all duration-500 ${
-                      isNavbarOpen
+                    className={`px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] transition-all duration-500 ${isNavbarOpen
                         ? "opacity-100 translate-x-0"
                         : "opacity-0 -translate-x-4 h-0 overflow-hidden"
-                    }`}
+                      }`}
                   >
                     Admin
                   </p>
@@ -374,7 +414,7 @@ export default function Navbar({
                         <circle cx="18" cy="16" r="3" />
                       </svg>
                     }
-                    onClick={() => router.push("/artists")}
+                    onClick={() => navigateTo("/artists")}
                     active={pathname?.startsWith("/artists")}
                     isNavbarOpen={isNavbarOpen}
                   />
@@ -398,7 +438,7 @@ export default function Navbar({
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                       </svg>
                     }
-                    onClick={() => router.push("/venues")}
+                    onClick={() => navigateTo("/venues")}
                     active={pathname?.startsWith("/venues")}
                     isNavbarOpen={isNavbarOpen}
                   />
@@ -424,7 +464,7 @@ export default function Navbar({
                         <line x1="3" y1="10" x2="21" y2="10" />
                       </svg>
                     }
-                    onClick={() => router.push("/events")}
+                    onClick={() => navigateTo("/events")}
                     active={pathname === "/events"}
                     isNavbarOpen={isNavbarOpen}
                   />
