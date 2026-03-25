@@ -58,8 +58,8 @@ useEffect(() => {
             ? ""
             : isMobile
             ? navbarOpen
-              ? "pl-23"
-              : "pl-23"
+              ? "pl-15"
+              : "pl-15"
             : navbarOpen
             ? "pl-64"
             : "pl-20"
