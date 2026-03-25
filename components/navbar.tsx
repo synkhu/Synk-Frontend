@@ -396,7 +396,8 @@ export default function Navbar({
             {loggedIn &&
               (currentUser?.role === "Administrator" ||
                 currentUser?.role === "Organizer") && (
-                <div className="pt-6 mt-4 space-y-2 border-t border-white/5">
+                <>
+                  {/* Admin Section Label */}
                   <p
                     className={`px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] transition-all duration-500 ${isNavbarOpen
                       ? "opacity-100 translate-x-0"
@@ -405,6 +406,7 @@ export default function Navbar({
                   >
                     Admin
                   </p>
+                  <div className="w-full border-t border-white/5 mb-2" />
                   <NavItem
                     label="Artists"
                     icon={
@@ -432,14 +434,7 @@ export default function Navbar({
                         stroke="currentColor"
                         strokeWidth="2.5"
                       >
-                        <rect
-                          x="3"
-                          y="11"
-                          width="18"
-                          height="11"
-                          rx="2"
-                          ry="2"
-                        />
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                       </svg>
                     }
@@ -456,14 +451,7 @@ export default function Navbar({
                         stroke="currentColor"
                         strokeWidth="2.5"
                       >
-                        <rect
-                          x="3"
-                          y="4"
-                          width="18"
-                          height="18"
-                          rx="2"
-                          ry="2"
-                        />
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                         <line x1="16" y1="2" x2="16" y2="6" />
                         <line x1="8" y1="2" x2="8" y2="6" />
                         <line x1="3" y1="10" x2="21" y2="10" />
@@ -473,7 +461,7 @@ export default function Navbar({
                     active={pathname === "/events"}
                     isNavbarOpen={isNavbarOpen}
                   />
-                </div>
+                </>
               )}
           </div>
 
