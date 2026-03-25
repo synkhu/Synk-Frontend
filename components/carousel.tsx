@@ -133,12 +133,12 @@ export default function Carousel() {
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                 
-                <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 text-left">
-                  <h3 className="text-xl md:text-3xl font-bold text-white mb-2 line-clamp-1">{event.name}</h3>
+                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 text-left">
+                  <h3 className="text-lg sm:text-xl md:text-3xl font-bold text-white mb-2 line-clamp-1">{event.name}</h3>
                   {event.venueName && (
-                    <p className="text-sm md:text-base text-gray-300 font-medium mb-4">{event.venueName}</p>
+                    <p className="text-xs sm:text-sm md:text-base text-gray-300 font-medium mb-4">{event.venueName}</p>
                   )}
-                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-purple-600 text-white text-xs font-bold uppercase tracking-widest shadow-lg hover:bg-purple-500 transition-colors">
+                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-purple-600 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-lg hover:bg-purple-500 transition-colors">
                     View Event
                   </div>
                 </div>

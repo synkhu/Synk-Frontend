@@ -98,9 +98,9 @@ export default function RegisterPopup({
         className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-white tracking-tight text-center flex-1">Create Account</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight text-center flex-1">Create Account</h2>
             <button 
               onClick={onClose}
               className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
@@ -110,7 +110,7 @@ export default function RegisterPopup({
           </div>
 
           {registerError && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm flex items-center">
+            <div className="mb-6 p-3 sm:p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm flex items-center">
               <svg className="w-5 h-5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               {registerError}
             </div>
@@ -124,7 +124,7 @@ export default function RegisterPopup({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-400 ml-1">First name</label>
                 <input

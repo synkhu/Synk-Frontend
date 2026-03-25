@@ -196,7 +196,7 @@ export default function AllEventsPage() {
                     value={filters.place}
                     onChange={(e) => setFilters(p => ({ ...p, place: e.target.value }))}
                     placeholder="Search city or venue..."
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                    className="w-full px-4 py-2 md:py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                   />
                 </div>
 
@@ -209,7 +209,7 @@ export default function AllEventsPage() {
                     value={filters.artist}
                     onChange={(e) => setFilters(p => ({ ...p, artist: e.target.value }))}
                     placeholder="Search performer..."
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                    className="w-full px-4 py-2 md:py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                   />
                 </div>
 
@@ -284,7 +284,7 @@ export default function AllEventsPage() {
                   <select
                     value={filters.maxCapacity}
                     onChange={(e) => setFilters(p => ({ ...p, maxCapacity: e.target.value }))}
-                    className="w-full mb-4 px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all appearance-none cursor-pointer"
+                    className="w-full mb-4 px-4 py-2 md:py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all appearance-none cursor-pointer"
                   >
                     <option value="" className="bg-zinc-900">Any size</option>
                     {[200, 500, 1000, 2000, 5000, 10000].map(c => (
@@ -297,7 +297,7 @@ export default function AllEventsPage() {
           </section>
         ) : (
           <section className="bg-white/5 border border-white/10 rounded-[2.5rem] p-4 md:p-8 md:p-10 shadow-xl backdrop-blur-md">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Location</label>
                 <input
@@ -305,7 +305,7 @@ export default function AllEventsPage() {
                   value={filters.place}
                   onChange={(e) => setFilters(p => ({ ...p, place: e.target.value }))}
                   placeholder="Search city or venue..."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                  className="w-full px-4 py-2 md:py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 />
               </div>
 
@@ -316,7 +316,7 @@ export default function AllEventsPage() {
                   value={filters.artist}
                   onChange={(e) => setFilters(p => ({ ...p, artist: e.target.value }))}
                   placeholder="Search performer..."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                  className="w-full px-4 py-2 md:py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 />
               </div>
 
@@ -387,7 +387,7 @@ export default function AllEventsPage() {
                 <select
                   value={filters.maxCapacity}
                   onChange={(e) => setFilters(p => ({ ...p, maxCapacity: e.target.value }))}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all appearance-none cursor-pointer"
+                  className="w-full px-4 py-2 md:py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all appearance-none cursor-pointer"
                 >
                   <option value="" className="bg-zinc-900">Any size</option>
                   {[200, 500, 1000, 2000, 5000, 10000].map(c => (
@@ -423,7 +423,7 @@ export default function AllEventsPage() {
         </div>
       ) : (
         <div className="max-h-[70vh] overflow-y-auto md:overflow-visible">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {filteredEvents.map((event) => {
               const minPrice = event.ticketTypes?.length
                 ? Math.min(...event.ticketTypes.map((t) => t.price))
@@ -457,7 +457,7 @@ export default function AllEventsPage() {
                   </div>
                   <div className="p-4 md:p-8 space-y-4">
                     <div className="space-y-2">
-                      <h2 className="text-2xl font-bold text-white line-clamp-1 group-hover:text-purple-400 transition-colors">
+                      <h2 className="text-xl md:text-2xl font-bold text-white line-clamp-1 group-hover:text-purple-400 transition-colors">
                         {event.name}
                       </h2>
                       <div className="flex flex-col space-y-1">
@@ -510,7 +510,7 @@ export default function AllEventsPage() {
                         </p>
                       </div>
                     </div>
-                    <button className="w-full py-3 bg-white/5 group-hover:bg-white text-white group-hover:text-black font-bold rounded-2xl transition-all duration-300">
+                    <button className="w-full py-2 md:py-3 bg-white/5 group-hover:bg-white text-white group-hover:text-black font-bold rounded-2xl transition-all duration-300">
                       View Details
                     </button>
                   </div>

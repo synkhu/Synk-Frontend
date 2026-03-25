@@ -299,7 +299,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="py-12 px-4 md:px-8 max-w-7xl mx-auto space-y-12">
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 md:gap-12 items-start">
         {/* Left: Event Main Content */}
         <div className="lg:col-span-3 space-y-10">
           <div className="relative rounded-[3rem] overflow-hidden shadow-2xl border border-white/10 aspect-video group">
@@ -334,13 +334,13 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                 <span className="px-4 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-widest rounded-full">Music Event</span>
                 {event.totalCapacity && <span className="px-4 py-1 bg-white/5 border border-white/10 text-gray-400 text-xs font-bold uppercase tracking-widest rounded-full">{event.totalCapacity} Capacity</span>}
               </div>
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight">{event.name}</h1>
+              <h1 className="text-2xl md:text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight">{event.name}</h1>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-white/5">
               <div className="space-y-1">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Date & Time</p>
-                <p className="text-lg text-white font-semibold">{formatDate(event.startTime)}</p>
+                <p className="text-sm md:text-lg text-white font-semibold">{formatDate(event.startTime)}</p>
                 <p className="text-sm text-gray-500">Ends {formatDate(event.endTime)}</p>
               </div>
               <div className="space-y-1">
@@ -348,7 +348,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                 {event.venueId ? (
                   <Link
                     href={`/venues/${event.venueId}`}
-                    className="flex items-center gap-1.5 text-lg text-white font-semibold hover:text-purple-400 transition-colors group w-fit"
+                    className="flex items-center gap-1.5 text-sm md:text-lg text-white font-semibold hover:text-purple-400 transition-colors group w-fit"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-purple-400 shrink-0">
                       <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
@@ -356,7 +356,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     <span className="underline-offset-2 group-hover:underline">{event.venueName || "Venue TBD"}</span>
                   </Link>
                 ) : (
-                  <p className="text-lg text-white font-semibold">{event.venueName || "Venue TBD"}</p>
+                  <p className="text-sm md:text-lg text-white font-semibold">{event.venueName || "Venue TBD"}</p>
                 )}
                 {event.venueAddress && <p className="text-sm text-gray-500">{event.venueAddress}</p>}
               </div>
@@ -365,7 +365,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                 {event.artistId ? (
                   <Link
                     href={`/artists/${event.artistId}`}
-                    className="flex items-center gap-1.5 text-lg text-white font-semibold hover:text-purple-400 transition-colors group w-fit"
+                    className="flex items-center gap-1.5 text-sm md:text-lg text-white font-semibold hover:text-purple-400 transition-colors group w-fit"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-purple-400 shrink-0">
                       <path d="M19.952 1.651a.75.75 0 01.298.599V16.303a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.403-4.909l2.311-.66a1.5 1.5 0 001.088-1.442V6.994l-9 2.572v9.737a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.402-4.909l2.31-.66a1.5 1.5 0 001.088-1.442V5.25a.75.75 0 01.544-.721l10.5-3a.75.75 0 01.658.122z" />
@@ -373,30 +373,30 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     <span className="underline-offset-2 group-hover:underline">{event.artistName}</span>
                   </Link>
                 ) : event.artistName ? (
-                  <p className="flex items-center gap-1.5 text-lg text-white font-semibold">
+                  <p className="flex items-center gap-1.5 text-sm md:text-lg text-white font-semibold">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-purple-400 shrink-0">
                       <path d="M19.952 1.651a.75.75 0 01.298.599V16.303a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.403-4.909l2.311-.66a1.5 1.5 0 001.088-1.442V6.994l-9 2.572v9.737a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.402-4.909l2.31-.66a1.5 1.5 0 001.088-1.442V5.25a.75.75 0 01.544-.721l10.5-3a.75.75 0 01.658.122z" />
                     </svg>
                     {event.artistName}
                   </p>
                 ) : (
-                  <p className="text-lg text-gray-500 font-semibold">TBA</p>
+                  <p className="text-sm md:text-lg text-gray-500 font-semibold">TBA</p>
                 )}
               </div>
             </div>
 
-            <div className="space-y-4 pt-10">
+            <div className="space-y-4 pt-4 md:pt-10">
               <h2 className="text-2xl font-bold text-white tracking-tight">About Event</h2>
-              <p className="text-gray-400 leading-relaxed text-lg whitespace-pre-wrap">{event.description}</p>
+              <p className="text-gray-400 leading-relaxed text-sm md:text-lg whitespace-pre-wrap">{event.description}</p>
             </div>
           </div>
         </div>
 
         {/* Right: Ticket Sidebar */}
         <div className="lg:col-span-2 space-y-8 lg:sticky lg:top-8">
-          <div className="bg-white/5 border border-white/10 rounded-[3rem] p-4 md:p-10 space-y-8 backdrop-blur-xl">
+          <div className="bg-white/5 border border-white/10 rounded-[3rem] p-4 md:p-10 space-y-4 md:space-y-8 backdrop-blur-xl">
             <header className="text-center space-y-2">
-              <h2 className="text-3xl font-bold text-white tracking-tight">Get Your Tickets</h2>
+              <h2 className="text-xl md:text-3xl font-bold text-white tracking-tight">Get Your Tickets</h2>
               <p className="text-gray-500 text-sm">Secure your spot at this event</p>
             </header>
 
@@ -410,10 +410,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                       : "bg-white/5 border-white/5 hover:border-white/20"
                   }`}
                 >
-                  <div className="p-6 space-y-4">
+                  <div className="p-3 md:p-6 space-y-4">
                     <div className="flex flex-col gap-2 items-center md:flex-row md:items-start md:justify-between">
                       <div className="space-y-1">
-                        <h3 className="font-bold text-white text-lg text-center md:text-left">{ticket.name}</h3>
+                        <h3 className="font-bold text-white text-sm md:text-lg text-center md:text-left">{ticket.name}</h3>
                         <p className="text-purple-400 font-bold">{ticket.price.toLocaleString()} HUF</p>
                       </div>
                       <div className="flex items-center gap-3 bg-black/40 rounded-2xl p-1 border border-white/5">
@@ -457,7 +457,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                 </button>
               </div>
             ) : (
-              <div className="text-center py-4">
+              <div className="text-center py-2 md:py-4">
                 <p className="text-gray-600 text-sm italic">Select ticket quantity to proceed</p>
               </div>
             )}

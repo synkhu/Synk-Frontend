@@ -40,18 +40,18 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
         className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#1a0b2e]/90 backdrop-blur-xl border border-white/10 rounded-[2rem] shadow-2xl animate-in zoom-in-95 duration-300 ring-1 ring-white/10 shadow-purple-500/20"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-[#1a0b2e]/95 backdrop-blur-md border-b border-white/5">
-          <h2 className="text-2xl font-bold text-white tracking-tight">{title || "Modal"}</h2>
+        <div className="sticky top-0 z-10 flex items-center justify-between p-4 sm:p-6 bg-[#1a0b2e]/95 backdrop-blur-md border-b border-white/5">
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{title || "Modal"}</h2>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div className="p-8">
+        <div className="p-5 sm:p-6 md:p-8">
           {children}
         </div>
       </div>

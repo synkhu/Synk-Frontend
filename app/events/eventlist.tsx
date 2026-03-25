@@ -269,9 +269,9 @@ export default function EventList({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {!events || events.length === 0 ? (
-          <div className="col-span-full text-center py-24">
+          <div className="col-span-full text-center py-16 md:py-24">
             <div className="w-24 h-24 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-500/20">
               <span className="text-4xl">📅</span>
             </div>
@@ -282,7 +282,7 @@ export default function EventList({
           events.map((e) => (
             <div key={e.id}>
               <div
-                className="group relative h-full rounded-[2rem] border border-white/10 bg-[#1a0b2e]/60 backdrop-blur-sm overflow-hidden hover:bg-[#2d1b4e]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1 flex flex-col cursor-pointer"
+                className="group relative h-full rounded-[2rem] border border-white/10 bg-[#1a0b2e]/60 backdrop-blur-sm overflow-hidden hover:bg-[#2d1b4e]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1 flex flex-col cursor-pointer p-4 md:p-6"
                 onClick={() => router.push(`/events/${e.id}`)}
               >
                 <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 z-10">
@@ -372,7 +372,7 @@ export default function EventList({
 
                 <div className="p-6 pt-2 flex flex-col space-y-4 flex-grow">
                   <div className="space-y-1">
-                    <h3 className="text-2xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">
+                    <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">
                       {e.name}
                     </h3>
                     {e.venueName && (
@@ -384,7 +384,7 @@ export default function EventList({
 
                   <div className="space-y-2">
                     {e.startTime && (
-                      <div className="flex items-center text-sm text-gray-400 bg-white/5 p-3 rounded-xl border border-white/5">
+                      <div className="flex items-center text-sm text-gray-400 bg-white/5 p-2 md:p-3 rounded-xl border border-white/5">
                         <span className="mr-3 text-lg">📅</span>
                         <span className="truncate">
                           {formatDate(e.startTime)}
@@ -392,7 +392,7 @@ export default function EventList({
                       </div>
                     )}
                     {e.artistName && (
-                      <div className="flex items-center text-sm text-gray-400 bg-white/5 p-3 rounded-xl border border-white/5">
+                      <div className="flex items-center text-sm text-gray-400 bg-white/5 p-2 md:p-3 rounded-xl border border-white/5">
                         <span className="mr-3 text-lg">🎤</span>
                         <span className="truncate">{e.artistName}</span>
                       </div>
@@ -400,7 +400,7 @@ export default function EventList({
                   </div>
 
                   {e.description && (
-                    <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed mt-2">
+                    <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed mt-1 sm:mt-2">
                       {e.description}
                     </p>
                   )}
@@ -613,7 +613,7 @@ export default function EventList({
                     </button>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                   <input
                     value={ticket.name}
                     onChange={(ev) => {

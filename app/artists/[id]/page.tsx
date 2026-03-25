@@ -101,15 +101,15 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
-        <div className="p-10 flex-1 flex flex-col justify-center space-y-6">
+        <div className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">
           <div className="space-y-2">
             <span className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">Performer</span>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-none">{artistDetails.name}</h1>
+            <h1 className="text-3xl md:text-6xl font-extrabold text-white tracking-tight leading-none">{artistDetails.name}</h1>
           </div>
-          {artistDetails.description && <p className="text-gray-400 text-lg leading-relaxed line-clamp-3">{artistDetails.description}</p>}
+          {artistDetails.description && <p className="text-gray-400 text-sm md:text-lg leading-relaxed line-clamp-3">{artistDetails.description}</p>}
           <div className="flex flex-wrap gap-4 pt-4">
             {artistDetails.spotifyUrl && (
-              <a href={artistDetails.spotifyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center px-6 py-3 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-full transition-all active:scale-95 space-x-2">
+              <a href={artistDetails.spotifyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 md:px-6 md:py-3 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-full transition-all active:scale-95 space-x-2">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.508 17.302c-.223.367-.694.482-1.061.259-2.858-1.742-6.455-2.136-10.692-1.17-.421.097-.84-.167-.937-.588-.097-.421.167-.84.588-.937 4.631-1.06 8.604-.613 11.843 1.339.367.222.482.694.259 1.057zm1.472-3.258c-.281.457-.879.605-1.336.324-3.272-2.012-8.259-2.592-12.128-1.417-.515.157-1.066-.134-1.223-.649-.157-.515.134-1.066.649-1.223 4.419-1.341 9.914-.698 13.684 1.623.457.281.605.879.324 1.336l.03.006zm.126-3.41c-3.924-2.33-10.392-2.546-14.172-1.398-.602.183-1.238-.162-1.421-.764-.183-.602.162-1.238.764-1.421 4.331-1.315 11.472-1.058 16.007 1.634.541.321.718 1.02.397 1.56-.321.541-1.02.718-1.56.397l-.015-.008z"/></svg>
                 <span>Listen on Spotify</span>
               </a>
@@ -119,7 +119,7 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
       </section>
 
       <section className="space-y-8">
-        <h2 className="text-3xl font-bold text-white tracking-tight px-4">Upcoming Events</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight px-4">Upcoming Events</h2>
         {artistEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {artistEvents.map((event) => (
@@ -132,7 +132,7 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
                   )}
                 </div>
                 <div className="p-6 flex-1 flex flex-col justify-center space-y-2">
-                  <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">{event.name}</h3>
+                  <h3 className="text-base md:text-xl font-bold text-white group-hover:text-purple-400 transition-colors">{event.name}</h3>
                   <div className="space-y-1">
                     <p className="text-gray-400 text-sm flex items-center">
                       <svg className="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>

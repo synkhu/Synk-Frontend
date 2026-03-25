@@ -50,16 +50,16 @@ export default function EventsPage() {
   return (
     <ProtectedRoute>
       <div className="py-12 px-4 md:px-8 max-w-6xl mx-auto">
-        <div className="bg-white/5 border border-white/10 rounded-[3rem] p-8 md:p-12 shadow-2xl backdrop-blur-xl">
-          <header className="mb-10 flex justify-between items-center">
+        <div className="bg-white/5 border border-white/10 rounded-[3rem] p-4 md:p-12 shadow-2xl backdrop-blur-xl">
+          <header className="mb-6 md:mb-10 flex justify-between items-center">
             <div className="space-y-2">
-              <h1 className="text-4xl font-extrabold text-white tracking-tight leading-tight">Events</h1>
-              <p className="text-gray-500 font-medium">Manage events and schedules</p>
+              <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">Events</h1>
+              <p className="text-gray-500 text-sm md:text-base font-medium">Manage events and schedules</p>
             </div>
             {!isEditing && (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-6 py-3 bg-[#2d1b4e] hover:bg-[#4c3073] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#4c3073]/50 flex items-center space-x-2"
+                className="px-4 py-2 md:px-6 md:py-3 bg-[#2d1b4e] hover:bg-[#4c3073] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#4c3073]/50 flex items-center space-x-1 md:space-x-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -69,7 +69,7 @@ export default function EventsPage() {
             )}
           </header>
 
-          <div className="space-y-12">
+          <div className="space-y-6 md:space-y-12">
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Event">
               <EventForm onSuccess={(data) => {
                 setEvents(data);

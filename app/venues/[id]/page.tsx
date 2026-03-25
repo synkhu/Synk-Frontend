@@ -96,9 +96,9 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
   const imageUrls = venueDetails.images?.map(img => img.imageUrl).filter(Boolean) as string[] || [];
 
   return (
-    <div className="py-12 px-4 md:px-8 max-w-6xl mx-auto space-y-12">
-      <section className="relative overflow-hidden rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl flex flex-col lg:flex-row">
-        <div className="lg:w-1/2 h-[400px] lg:h-auto relative overflow-hidden">
+    <div className="py-8 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto space-y-8">
+      <section className="relative overflow-hidden rounded-2xl sm:rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl flex flex-col lg:flex-row">
+        <div className="lg:w-1/2 h-64 sm:h-80 lg:h-auto relative overflow-hidden">
           {imageUrls.length > 0 ? (
             <>
               <img src={imageUrls[currentImageIndex]} alt={venueDetails.name} className="w-full h-full object-cover transition-transform duration-700" />
@@ -141,13 +141,13 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
             </div>
           )}
         </div>
-        <div className="p-10 lg:w-1/2 flex flex-col justify-center space-y-8">
+        <div className="p-6 sm:p-10 lg:w-1/2 flex flex-col justify-center space-y-6">
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">Venue</span>
+              <span className="px-2 py-1 sm:px-3 sm:py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] rounded-full">Venue</span>
               {venueDetails.isAdultOnly && <span className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">18+ Only</span>}
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">{venueDetails.name}</h1>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">{venueDetails.name}</h1>
             <div className="space-y-2">
               <p className="text-gray-300 flex items-center">
                 <svg className="w-5 h-5 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -168,7 +168,7 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
       <section className="space-y-8 px-4">
         <h2 className="text-3xl font-bold text-white tracking-tight">Events at this Venue</h2>
         {venueEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-4">
             {venueEvents.map((event) => (
               <div key={event.id} onClick={() => router.push(`/events/${event.id}`)} className="group bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden hover:bg-white/[0.08] transition-all cursor-pointer shadow-lg hover:shadow-purple-500/5">
                 <div className="relative aspect-video overflow-hidden">

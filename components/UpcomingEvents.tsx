@@ -91,7 +91,7 @@ export default function UpcomingEvents() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between px-2">
-        <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Upcoming Events</h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">Upcoming Events</h2>
         <div className="flex space-x-2">
           <button 
             onClick={() => scroll('left')}
@@ -115,7 +115,7 @@ export default function UpcomingEvents() {
         {events.map(event => (
           <div 
             key={event.id}
-            className="flex-none w-[360px] group snap-start bg-white/5 hover:bg-white/[0.08] border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10"
+            className="flex-none w-[300px] sm:w-[340px] md:w-[360px] group snap-start bg-white/5 hover:bg-white/[0.08] border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10"
           >
             <div className="relative aspect-video overflow-hidden">
               {event.thumbnailUrl ? (
@@ -133,24 +133,24 @@ export default function UpcomingEvents() {
               
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-full inline-block mb-2">
-                  <p className="text-[10px] font-bold text-purple-300 uppercase tracking-widest">
+                  <p className="text-[9px] sm:text-[10px] font-bold text-purple-300 uppercase tracking-widest">
                     {event.startTime ? new Date(event.startTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Upcoming'}
                   </p>
                 </div>
-                <h3 className="text-xl font-bold text-white line-clamp-2 leading-tight">{event.name}</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-white line-clamp-2 leading-tight">{event.name}</h3>
               </div>
             </div>
 
             <div className="p-5 space-y-4">
               <div className="space-y-1.5">
                 {event.venue && (
-                  <div className="flex items-center text-gray-400 text-sm">
+                  <div className="flex items-center text-gray-400 text-xs sm:text-sm">
                     <svg className="w-4 h-4 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     <span className="truncate">{event.venue.name}</span>
                   </div>
                 )}
                 {event.artist && (
-                  <div className="flex items-center text-gray-400 text-sm">
+                  <div className="flex items-center text-gray-400 text-xs sm:text-sm">
                     <svg className="w-4 h-4 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
                     <span className="truncate">{event.artist.name}</span>
                   </div>
@@ -159,7 +159,7 @@ export default function UpcomingEvents() {
 
               <button
                 onClick={() => router.push(`/events/${event.id}`)}
-                className="w-full py-3 rounded-2xl bg-white text-black font-bold text-sm transition-all hover:bg-gray-200 active:scale-95"
+                className="w-full py-3 rounded-2xl bg-white text-black font-bold text-xs sm:text-sm transition-all hover:bg-gray-200 active:scale-95"
               >
                 View Details
               </button>
