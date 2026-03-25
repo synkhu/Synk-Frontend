@@ -64,8 +64,8 @@ export default function Carousel() {
   }
 
   return (
-    <div className="relative w-full py-6 group/carousel">
-      <div className="relative h-[280px] md:h-[360px] perspective-[1600px] overflow-hidden">
+    <div className="relative w-full md:py-6 group/carousel">
+      <div className="relative h-[180px] md:h-[360px] perspective-[1600px] overflow-hidden">
         {/* Navigation Arrows */}
         <button
           type="button"
@@ -121,7 +121,7 @@ export default function Carousel() {
               <button
                 key={event.id}
                 type="button"
-                className="absolute top-1/2 left-1/2 w-[85%] md:w-[60%] max-w-[640px] aspect-video rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                className={`absolute top-1/2 left-1/2 w-[100%] md:w-[60%] max-w-[640px] aspect-video rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] ${offset === 0 ? "block" : "hidden md:block"}`}
                 style={{ ...style, zIndex, opacity, pointerEvents }}
                 onClick={() => router.push(`/events/${event.id}`)}
               >
@@ -130,9 +130,9 @@ export default function Carousel() {
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-purple-900 to-indigo-950" />
                 )}
-                
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                
+
                 <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8 text-left">
                   <h3 className="text-lg sm:text-xl md:text-3xl font-bold text-white mb-2 line-clamp-1">{event.name}</h3>
                   {event.venueName && (
@@ -149,14 +149,13 @@ export default function Carousel() {
       </div>
 
       {/* Pagination Dots */}
-      <div className="flex justify-center items-center gap-2 mt-6">
+      <div className="flex justify-center items-center gap-2 mt-3 md:mt-6">
         {events.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`transition-all duration-300 rounded-full h-1.5 ${
-              index === currentSlide ? "w-8 bg-purple-500" : "w-1.5 bg-white/20 hover:bg-white/40"
-            }`}
+            className={`transition-all duration-300 rounded-full h-1.5 ${index === currentSlide ? "w-8 bg-purple-500" : "w-1.5 bg-white/20 hover:bg-white/40"
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}

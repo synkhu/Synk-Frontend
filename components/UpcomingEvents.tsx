@@ -88,7 +88,7 @@ export default function UpcomingEvents() {
   if (error) return <p className="text-red-400 font-medium">{error}</p>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 md:space-y-6">
       <div className="flex flex-col sm:flex-row items-center justify-between px-2">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight text-center sm:text-left mb-2 sm:mb-0">
           Upcoming Events
