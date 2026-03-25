@@ -394,7 +394,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
         {/* Right: Ticket Sidebar */}
         <div className="lg:col-span-2 space-y-8 lg:sticky lg:top-8">
-          <div className="bg-white/5 border border-white/10 rounded-[3rem] p-8 md:p-10 space-y-8 backdrop-blur-xl">
+          <div className="bg-white/5 border border-white/10 rounded-[3rem] p-4 md:p-10 space-y-8 backdrop-blur-xl">
             <header className="text-center space-y-2">
               <h2 className="text-3xl font-bold text-white tracking-tight">Get Your Tickets</h2>
               <p className="text-gray-500 text-sm">Secure your spot at this event</p>
@@ -411,9 +411,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                   }`}
                 >
                   <div className="p-6 space-y-4">
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col gap-2 items-center md:flex-row md:items-start md:justify-between">
                       <div className="space-y-1">
-                        <h3 className="font-bold text-white text-lg">{ticket.name}</h3>
+                        <h3 className="font-bold text-white text-lg text-center md:text-left">{ticket.name}</h3>
                         <p className="text-purple-400 font-bold">{ticket.price.toLocaleString()} HUF</p>
                       </div>
                       <div className="flex items-center gap-3 bg-black/40 rounded-2xl p-1 border border-white/5">
