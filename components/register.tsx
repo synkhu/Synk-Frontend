@@ -124,29 +124,29 @@ export default function RegisterPopup({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-400 ml-1">First name</label>
+                <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">First name</label>
                 <input
                   type="text"
                   name="firstName"
                   value={registerData.firstName}
                   onChange={handleInputChange}
                   placeholder="First"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                   required
                   disabled={registerLoading || registerSuccess}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-400 ml-1">Last name</label>
+                <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Last name</label>
                 <input
                   type="text"
                   name="lastName"
                   value={registerData.lastName}
                   onChange={handleInputChange}
                   placeholder="Last"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                   required
                   disabled={registerLoading || registerSuccess}
                 />
@@ -154,28 +154,28 @@ export default function RegisterPopup({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Email address</label>
+              <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Email address</label>
               <input
                 type="email"
                 name="email"
                 value={registerData.email}
                 onChange={handleInputChange}
                 placeholder="name@example.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 required
                 disabled={registerLoading || registerSuccess}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Password</label>
+              <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Password</label>
               <input
                 type="password"
                 name="password"
                 value={registerData.password}
                 onChange={handleInputChange}
                 placeholder="Minimum 8 characters"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 required
                 disabled={registerLoading || registerSuccess}
               />
@@ -184,7 +184,7 @@ export default function RegisterPopup({
             <button
               type="submit"
               disabled={registerLoading || registerSuccess}
-              className="w-full py-4 bg-white hover:bg-gray-200 disabled:bg-gray-600 disabled:opacity-50 text-black font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-black/20 mt-2"
+              className="w-full py-3 sm:py-4 bg-white hover:bg-gray-200 disabled:bg-gray-600 disabled:opacity-50 text-black font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-black/20 mt-2"
             >
               {registerLoading ? "Creating account..." : "Join SYNK"}
             </button>
