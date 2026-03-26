@@ -216,8 +216,8 @@ export default function Navbar({
           flex flex-col items-stretch bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden z-50
           ${isMobile
             ? isNavbarOpen
-              ? "fixed top-0 left-0 h-[calc(100vh)] w-[calc(100vw)]"
-              : "fixed top-0 left-0 h-[calc(100vh)] w-15"
+              ? "fixed top-0 left-0 bottom-0 w-[100vw]"
+              : "fixed top-0 left-0 h-[100vh] w-15"
             : isNavbarOpen
               ? "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-64 rounded-[2.5rem]"
               : "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-20 rounded-[2.5rem]"
