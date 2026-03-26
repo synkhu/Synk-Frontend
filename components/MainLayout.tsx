@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Navbar from "./navbar";
+import { isMobile as checkIsMobile } from "../utils/isMobile";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -11,30 +12,38 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [navbarOpen, setNavbarOpen] = useState(true);
+  const [navbarOpen, setNavbarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const hideNavbar = pathname === "/reset-password";
 
-const [isMobile, setIsMobile] = useState(false);
-
-useEffect(() => {
-  const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-  checkMobile();
-  window.addEventListener("resize", checkMobile);
-  return () => window.removeEventListener("resize", checkMobile);
-}, []);
+  // Track mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(checkIsMobile());
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const initialize = () => {
       const isTokenSet = !!localStorage.getItem("authToken");
       setLoggedIn(isTokenSet);
-      
-      const savedNavbarState = localStorage.getItem("navbarOpen");
-      if (savedNavbarState !== null) {
-        setNavbarOpen(savedNavbarState === "true");
+
+      const isMobileNow = checkIsMobile();
+
+      if (isMobileNow) {
+        setNavbarOpen(false);
+      } else {
+        const savedNavbarState = localStorage.getItem("navbarOpen");
+        if (savedNavbarState !== null) {
+          setNavbarOpen(savedNavbarState === "true");
+        } else {
+          setNavbarOpen(true);
+        }
       }
     };
-    
+
     initialize();
   }, []);
 
@@ -57,9 +66,7 @@ useEffect(() => {
           hideNavbar
             ? ""
             : isMobile
-            ? navbarOpen
-              ? "pl-15"
-              : "pl-15"
+            ? "pl-15"
             : navbarOpen
             ? "pl-64"
             : "pl-20"

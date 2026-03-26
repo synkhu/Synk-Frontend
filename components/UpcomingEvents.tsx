@@ -146,7 +146,7 @@ export default function UpcomingEvents() {
         {events.map(event => (
           <div
             key={event.id}
-            className="flex-none mt-1 w-[60vw] sm:w-[60vw] md:w-[360px] h-[70vw] sm:h-[340px] md:h-[370px] group snap-center bg-white/5 hover:bg-white/[0.08] border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10"
+            className="flex-none mt-1 w-[60vw] sm:w-[60vw] md:w-[370px] h-[70vw] sm:h-[340px] md:h-[370px] group snap-center bg-white/5 hover:bg-white/[0.08] border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10"
           >
             <div className="relative aspect-video overflow-hidden">
               {event.thumbnailUrl ? (
