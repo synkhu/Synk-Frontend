@@ -135,18 +135,18 @@ export default function UpcomingEvents() {
 
       <div
         ref={containerRef}
-        className="flex flex-nowrap space-x-6 overflow-x-auto max-w-full pb-4 snap-x snap-mandatory
+        className="flex flex-nowrap space-x-4 overflow-x-auto max-w-full pb-4 snap-x snap-mandatory
              px-[10vw] sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{
           contain: 'layout paint size',
-          minHeight: 'calc(300px + 7vw)',
+          minHeight: '75vw',
           height: 'auto',
         }}
       >
         {events.map(event => (
           <div
             key={event.id}
-            className="flex-none mt-1 w-[75vw] sm:w-[60vw] md:w-[360px] h-[310px] sm:h-[340px] md:h-[370px] group snap-center bg-white/5 hover:bg-white/[0.08] border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10"
+            className="flex-none mt-1 w-[60vw] sm:w-[60vw] md:w-[360px] h-[70vw] sm:h-[340px] md:h-[370px] group snap-center bg-white/5 hover:bg-white/[0.08] border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10"
           >
             <div className="relative aspect-video overflow-hidden">
               {event.thumbnailUrl ? (
@@ -168,7 +168,7 @@ export default function UpcomingEvents() {
                     {event.startTime ? new Date(event.startTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Upcoming'}
                   </p>
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white line-clamp-2 leading-tight">{event.name}</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-white line-clamp-1 leading-tight">{event.name}</h3>
               </div>
             </div>
 
@@ -202,6 +202,14 @@ export default function UpcomingEvents() {
             </div>
           </div>
         ))}
+      </div>
+      <div className="flex justify-center pt-2 sm:pt-4">
+        <button
+          onClick={() => router.push('/all-events')}
+          className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold text-sm transition-all active:scale-95 backdrop-blur-md"
+        >
+          View All Events
+        </button>
       </div>
     </div>
   );
