@@ -17,9 +17,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   const hideNavbar = pathname === "/reset-password";
 
-  // Track mobile
   useEffect(() => {
-    const checkMobile = () => setIsMobile(checkIsMobile());
+    const checkMobile = () => setIsMobile(checkIsMobile(navigator.userAgent));
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
@@ -30,7 +29,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       const isTokenSet = !!localStorage.getItem("authToken");
       setLoggedIn(isTokenSet);
 
-      const isMobileNow = checkIsMobile();
+      const isMobileNow = checkIsMobile(navigator.userAgent);
 
       if (isMobileNow) {
         setNavbarOpen(false);

@@ -1,1 +1,3 @@
-export const isMobile = (): boolean => window.innerWidth <= 768;
+export const isMobile = (userAgent: string): boolean => {
+return /android.+mobile|ip(hone|[oa]d)/i.test(userAgent);
+};

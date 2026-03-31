@@ -147,7 +147,7 @@ export default function MyTicketsPage() {
                   <span className="flex justify-between items-center text-xs font-bold text-gray-500 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full mt-1 md:mt-0 min-w-[60px] md:min-w-[100px]">
                     {tickets.length} {tickets.length === 1 ? 'Ticket' : 'Tickets'}
                     <svg
-                      className={`w-4 h-4 ml-2 text-gray-500 md:hidden transition-transform duration-300 ${collapsedCategories[eventName] ? '-rotate-90' : ''
+                      className={`w-4 h-4 ml-2 text-gray-500 md:hidden transition-transform duration-300 ${collapsedCategories[eventName] ? '-rotate-90' : null
                         }`}
                       fill="none"
                       stroke="currentColor"
@@ -157,7 +157,7 @@ export default function MyTicketsPage() {
                     </svg>
                   </span>
                   <svg
-                    className={`hidden md:block w-6 h-6 text-gray-500 transition-transform duration-300 ${collapsedCategories[eventName] ? '-rotate-90' : ''
+                    className={`hidden md:block w-6 h-6 text-gray-500 transition-transform duration-300 ${collapsedCategories[eventName] ? '-rotate-90' : null
                       }`}
                     fill="none"
                     stroke="currentColor"
