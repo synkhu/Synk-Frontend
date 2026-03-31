@@ -53,9 +53,9 @@ export default function ArtistList({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {!artists || artists.length === 0 ? (
-          <div className="col-span-full text-center py-24">
+          <div className="col-span-full text-center py-16 sm:py-24">
             <div className="w-24 h-24 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-500/20">
               <span className="text-4xl">🎤</span>
             </div>
@@ -67,7 +67,7 @@ export default function ArtistList({
         ) : (
           artists.map((a) => (
             <div key={a.id}>
-              <div className="group relative h-full rounded-[2rem] border border-white/10 bg-[#1a0b2e]/60 backdrop-blur-sm overflow-hidden hover:bg-[#2d1b4e]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1 flex flex-col">
+              <div className="group relative h-full rounded-2xl border border-white/10 bg-[#1a0b2e]/60 backdrop-blur-sm overflow-hidden hover:bg-[#2d1b4e]/60 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-0.5 flex flex-col">
                 <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 z-10">
                   <button
                     onClick={() => {
@@ -116,7 +116,7 @@ export default function ArtistList({
                   </button>
                 </div>
 
-                <div className="p-8 flex flex-col items-center text-center space-y-4 flex-grow">
+                <div className="p-6 sm:p-8 flex flex-col items-center text-center space-y-3 sm:space-y-4 flex-grow">
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/20 group-hover:border-purple-500/50 shadow-2xl shadow-purple-500/10 transition-all duration-500 group-hover:scale-105">
                       {a.profilePictureUrl ? (
@@ -147,11 +147,11 @@ export default function ArtistList({
                   </div>
 
                   <div className="space-y-2 w-full">
-                    <h3 className="text-2xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">
                       {a.name}
                     </h3>
                     {a.description && (
-                      <p className="text-gray-400 text-sm line-clamp-3 leading-relaxed">
+                      <p className="text-gray-400 text-xs sm:text-sm line-clamp-3 leading-relaxed">
                         {a.description}
                       </p>
                     )}
@@ -162,7 +162,7 @@ export default function ArtistList({
                       href={a.spotifyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto pt-4 inline-flex items-center text-xs font-bold text-gray-500 hover:text-[#1DB954] uppercase tracking-widest transition-colors"
+                      className="mt-auto pt-3 inline-flex items-center text-[10px] sm:text-xs font-bold text-gray-500 hover:text-[#1DB954] uppercase tracking-widest transition-colors"
                     >
                       Listen on Spotify <span className="ml-1">↗</span>
                     </a>
@@ -217,21 +217,21 @@ export default function ArtistList({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Artist name"
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-xs sm:text-sm"
             />
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description"
               rows={3}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm resize-none"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-xs sm:text-sm resize-none"
             />
             <input
               value={spotifyUrl}
               onChange={(e) => setSpotifyUrl(e.target.value)}
               placeholder="Spotify URL"
               type="url"
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-xs sm:text-sm"
             />
           </div>
 

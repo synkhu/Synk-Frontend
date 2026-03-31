@@ -11,6 +11,7 @@ import {
   type CurrentUser,
 } from "../app/services/user.service";
 import { Source_Serif_4 } from "next/font/google";
+import { isMobile as checkIsMobile } from "../utils/isMobile";
 
 type NavbarProps = {
   loggedIn: boolean;
@@ -36,24 +37,24 @@ const NavItem = ({
 }) => (
   <button
     onClick={onClick}
-    className={`group relative flex items-center w-full h-12 rounded-2xl transition-all duration-300 ${isNavbarOpen ? "px-3" : "justify-center px-0"
-      } ${danger
-        ? "hover:bg-red-500/10 text-red-400 hover:text-red-300"
-        : active
-          ? "bg-purple-600/20 text-purple-300 border border-purple-500/30 shadow-[0_0_20px_rgba(124,58,237,0.1)]"
-          : "hover:bg-white/5 text-gray-400 hover:text-white border border-transparent"
+    className={`group flex items-center w-full h-12 px-2 rounded-2xl transition-all duration-300 ${danger
+      ? "hover:bg-red-500/10 text-red-400 hover:text-red-300"
+      : active
+        ? "bg-purple-600/20 text-purple-300 border border-purple-500/30 shadow-[0_0_20px_rgba(124,58,237,0.1)]"
+        : "hover:bg-white/5 text-gray-400 hover:text-white border border-transparent"
       }`}
   >
-    <div className="flex items-center justify-center w-6 h-6 shrink-0 transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
-      {icon}
-    </div>
-    <div
-      className={`font-semibold whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${isNavbarOpen
-          ? "opacity-100 translate-x-0 w-32 ml-3"
-          : "opacity-0 -translate-x-4 w-0 pointer-events-none ml-0"
-        }`}
-    >
-      {label}
+    <div className="flex items-center w-full transition-all duration-500">
+      <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
+        {icon}
+      </div>
+      <div
+        className={`ml-3 font-semibold whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
+      ${isNavbarOpen ? "opacity-100 w-auto" : "opacity-0 w-0 pointer-events-none overflow-hidden"}`
+        }
+      >
+        {label}
+      </div>
     </div>
     {!isNavbarOpen && (
       <div className="absolute left-full ml-4 px-3 py-2 bg-zinc-900 text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap z-[100] border border-white/10 shadow-2xl translate-x-2 group-hover:translate-x-0">
@@ -83,10 +84,10 @@ export default function Navbar({
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const updateIsMobile = () => setIsMobile(checkIsMobile());
+    updateIsMobile();
+    window.addEventListener("resize", updateIsMobile);
+    return () => window.removeEventListener("resize", updateIsMobile);
   }, []);
 
   const isNavbarOpen = navbarOpen ?? false;
@@ -165,7 +166,7 @@ export default function Navbar({
 
   const navigateTo = (path: string) => {
     router.push(path);
-    if (setNavbarOpen) setNavbarOpen(false);
+    if (isMobile && setNavbarOpen) setNavbarOpen(false);
   };
 
   const openLogin = () => {
@@ -215,20 +216,20 @@ export default function Navbar({
           flex flex-col items-stretch bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden z-50
           ${isMobile
             ? isNavbarOpen
-              ? "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-[calc(100vw-1.5rem)] rounded-[2.5rem]"
-              : "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-20 rounded-[2.5rem]"
+              ? "fixed top-0 left-0 bottom-0 w-[100vw]"
+              : "fixed top-0 left-0 bottom-0 w-15"
             : isNavbarOpen
               ? "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-64 rounded-[2.5rem]"
               : "fixed top-3 left-3 h-[calc(100vh-1.5rem)] w-20 rounded-[2.5rem]"
           }
         `}
       >
-        <div className="flex flex-col h-full p-4 space-y-8">
+        <div className="flex flex-col h-full p-2 md:p-4 space-y-8">
           {/* Header */}
           <div
             className={`flex px-2 transition-all duration-500 ${isNavbarOpen
-                ? "flex-row items-center justify-between h-10"
-                : "flex-col items-center justify-center gap-2"
+              ? "flex-row items-center justify-between h-10"
+              : "flex-col items-center justify-center gap-2"
               }`}
           >
             {isNavbarOpen ? (
@@ -241,7 +242,7 @@ export default function Navbar({
               <img
                 src="/logo/logo.png"
                 alt="Synk Logo"
-                style={{ width: "120px", height: "auto" }}
+                style={{ width: "120px", height: "auto", marginTop: "20px" }}
               />
             )}
             <button
@@ -272,8 +273,8 @@ export default function Navbar({
           <div className="flex flex-col">
             <div
               className={`flex items-center w-full p-2 rounded-[2rem] bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10 transition-all duration-300 group ${isNavbarOpen
-                  ? "px-2"
-                  : "px-0 justify-center border-transparent bg-transparent"
+                ? "px-2"
+                : "px-0 justify-center border-transparent bg-transparent"
                 }`}
               onClick={() =>
                 loggedIn ? navigateTo("/my-profile") : openLogin()
@@ -294,8 +295,8 @@ export default function Navbar({
               </div>
               <div
                 className={`transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden ${isNavbarOpen
-                    ? "ml-3 opacity-100 translate-x-0 w-32"
-                    : "ml-0 opacity-0 -translate-x-4 w-0"
+                  ? "ml-3 opacity-100 translate-x-0 w-32"
+                  : "ml-0 opacity-0 -translate-x-4 w-0"
                   }`}
               >
                 <p className="text-sm font-bold text-white truncate">
@@ -309,7 +310,11 @@ export default function Navbar({
           </div>
 
           {/* Main Navigation */}
-          <div className="flex-1 space-y-2 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className={`
+    flex-1 flex flex-col space-y-2 overflow-y-auto
+    [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]
+    ${!isNavbarOpen ? "items-center" : "items-start"}
+  `}>
             <NavItem
               label="Home"
               icon={
@@ -391,15 +396,17 @@ export default function Navbar({
             {loggedIn &&
               (currentUser?.role === "Administrator" ||
                 currentUser?.role === "Organizer") && (
-                <div className="pt-6 mt-4 space-y-2 border-t border-white/5">
+                <>
+                  {/* Admin Section Label */}
                   <p
                     className={`px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] transition-all duration-500 ${isNavbarOpen
-                        ? "opacity-100 translate-x-0"
-                        : "opacity-0 -translate-x-4 h-0 overflow-hidden"
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 -translate-x-4 h-0 overflow-hidden"
                       }`}
                   >
                     Admin
                   </p>
+                  <div className="w-full border-t border-white/5 mb-2" />
                   <NavItem
                     label="Artists"
                     icon={
@@ -427,14 +434,7 @@ export default function Navbar({
                         stroke="currentColor"
                         strokeWidth="2.5"
                       >
-                        <rect
-                          x="3"
-                          y="11"
-                          width="18"
-                          height="11"
-                          rx="2"
-                          ry="2"
-                        />
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                       </svg>
                     }
@@ -451,14 +451,7 @@ export default function Navbar({
                         stroke="currentColor"
                         strokeWidth="2.5"
                       >
-                        <rect
-                          x="3"
-                          y="4"
-                          width="18"
-                          height="18"
-                          rx="2"
-                          ry="2"
-                        />
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                         <line x1="16" y1="2" x2="16" y2="6" />
                         <line x1="8" y1="2" x2="8" y2="6" />
                         <line x1="3" y1="10" x2="21" y2="10" />
@@ -468,7 +461,7 @@ export default function Navbar({
                     active={pathname === "/events"}
                     isNavbarOpen={isNavbarOpen}
                   />
-                </div>
+                </>
               )}
           </div>
 

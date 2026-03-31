@@ -173,15 +173,15 @@ export default function MyProfilePage() {
         <p className="text-gray-500">Manage your account settings and profile preferences</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
         {/* Left Column: Avatar & Overview */}
         <div className="md:col-span-1 space-y-6">
-          <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 text-center space-y-6">
+          <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
             <div 
               className="relative group cursor-pointer inline-block mx-auto"
               onClick={() => document.getElementById("profile-picture-input")?.click()}
             >
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/20 group-hover:border-purple-500/50 transition-all duration-300">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-purple-500/20 sm:group-hover:border-purple-500/50 transition-all duration-300">
                 {profilePreview || user.profilePictureUrl ? (
                   <img
                     src={profilePreview || (user.profilePictureUrl as string)}
@@ -221,8 +221,8 @@ export default function MyProfilePage() {
             />
 
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-white truncate">{fullName()}</h2>
-              <p className="text-sm text-gray-500 truncate">{user.email}</p>
+              <h2 className="text-lg sm:text-xl font-bold text-white truncate">{fullName()}</h2>
+              <p className="text-xs sm:text-sm text-gray-500 truncate">{user.email}</p>
             </div>
 
             {!user.emailVerified && (
@@ -266,7 +266,7 @@ export default function MyProfilePage() {
               </p>
               <button
                 onClick={handleVerifyEmail}
-                className="w-full py-2 bg-orange-500 text-white text-sm font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20"
+                className="w-full py-1.5 sm:py-2 bg-orange-500 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20"
               >
                 Send Verification Email
               </button>

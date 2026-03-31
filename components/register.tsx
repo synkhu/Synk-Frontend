@@ -98,9 +98,9 @@ export default function RegisterPopup({
         className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-white tracking-tight text-center flex-1">Create Account</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight text-center flex-1">Create Account</h2>
             <button 
               onClick={onClose}
               className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
@@ -110,7 +110,7 @@ export default function RegisterPopup({
           </div>
 
           {registerError && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm flex items-center">
+            <div className="mb-6 p-3 sm:p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm flex items-center">
               <svg className="w-5 h-5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               {registerError}
             </div>
@@ -124,29 +124,29 @@ export default function RegisterPopup({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-400 ml-1">First name</label>
+                <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">First name</label>
                 <input
                   type="text"
                   name="firstName"
                   value={registerData.firstName}
                   onChange={handleInputChange}
                   placeholder="First"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                   required
                   disabled={registerLoading || registerSuccess}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-400 ml-1">Last name</label>
+                <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Last name</label>
                 <input
                   type="text"
                   name="lastName"
                   value={registerData.lastName}
                   onChange={handleInputChange}
                   placeholder="Last"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                   required
                   disabled={registerLoading || registerSuccess}
                 />
@@ -154,28 +154,28 @@ export default function RegisterPopup({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Email address</label>
+              <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Email address</label>
               <input
                 type="email"
                 name="email"
                 value={registerData.email}
                 onChange={handleInputChange}
                 placeholder="name@example.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 required
                 disabled={registerLoading || registerSuccess}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Password</label>
+              <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Password</label>
               <input
                 type="password"
                 name="password"
                 value={registerData.password}
                 onChange={handleInputChange}
                 placeholder="Minimum 8 characters"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 required
                 disabled={registerLoading || registerSuccess}
               />
@@ -184,7 +184,7 @@ export default function RegisterPopup({
             <button
               type="submit"
               disabled={registerLoading || registerSuccess}
-              className="w-full py-4 bg-white hover:bg-gray-200 disabled:bg-gray-600 disabled:opacity-50 text-black font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-black/20 mt-2"
+              className="w-full py-3 sm:py-4 bg-white hover:bg-gray-200 disabled:bg-gray-600 disabled:opacity-50 text-black font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-black/20 mt-2"
             >
               {registerLoading ? "Creating account..." : "Join SYNK"}
             </button>

@@ -63,9 +63,9 @@ function ResetPasswordForm() {
     <div className="flex items-center justify-center min-h-[80vh] px-4 w-full h-full">
       <div className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden p-8 animate-in zoom-in-95 duration-200">
         <h2 className="text-2xl font-bold text-white tracking-tight mb-2">Reset Password</h2>
-        <p className="text-gray-500 text-sm mb-8">Must be 8+ characters with uppercase, lowercase, number &amp; special character.</p>
+        <p className="text-gray-500 text-sm mb-4 sm:mb-8">Must be 8+ characters with uppercase, lowercase, number &amp; special character.</p>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-400 ml-1">New password</label>
             <input
@@ -74,7 +74,7 @@ function ResetPasswordForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               disabled={isLoading}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
             />
           </div>
 
@@ -86,7 +86,7 @@ function ResetPasswordForm() {
               onChange={(e) => setPasswordAgain(e.target.value)}
               placeholder="••••••••"
               disabled={isLoading}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
               onKeyDown={(e) => e.key === "Enter" && !isLoading && handleResetPassword()}
             />
           </div>
@@ -94,7 +94,7 @@ function ResetPasswordForm() {
           <button
             onClick={handleResetPassword}
             disabled={isLoading}
-            className="w-full py-4 bg-white hover:bg-gray-200 disabled:bg-gray-600 disabled:opacity-50 text-black font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-black/20 mt-4 cursor-pointer"
+            className="w-full py-3 sm:py-4 bg-white hover:bg-gray-200 disabled:bg-gray-600 disabled:opacity-50 text-black font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-black/20 mt-4 cursor-pointer"
           >
             {isLoading ? "Resetting..." : "Reset password"}
           </button>
@@ -103,7 +103,7 @@ function ResetPasswordForm() {
 
       {popup && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-sm bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-6 animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-full sm:max-w-sm bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl p-4 sm:p-8 flex flex-col items-center gap-6 animate-in zoom-in-95 duration-200">
             {popup.type === "success" ? (
               <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
                 <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

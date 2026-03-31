@@ -238,7 +238,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
   return (
     <form
       onSubmit={submit}
-      className="max-w-4xl mx-auto space-y-8"
+      className="max-w-4xl mx-auto space-y-6 md:space-y-8"
     >
       {/* Basic Information Section */}
       <div className="space-y-4">
@@ -253,11 +253,11 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
             onChange={(e) => setName(e.target.value)}
             placeholder="Event Name"
             required
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10"
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10"
           />
 
           <div>
-            <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider ml-1">
+            <label className="block text-[10px] sm:text-sm font-bold text-gray-400 mb-1 sm:mb-2 uppercase tracking-wider ml-1">
               Event Images
             </label>
             <input
@@ -268,7 +268,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
                 const files = Array.from(e.target.files || []);
                 setSelectedFiles(files);
               }}
-              className="w-full text-sm text-gray-400 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-purple-500/10 file:text-purple-400 hover:file:bg-purple-500/20 cursor-pointer border border-white/10 rounded-2xl bg-white/5 p-2"
+              className="w-full text-xs sm:text-sm text-gray-400 file:mr-2 sm:file:mr-4 file:py-2 sm:file:py-3 file:px-4 sm:file:px-6 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-bold file:bg-purple-500/10 file:text-purple-400 hover:file:bg-purple-500/20 cursor-pointer border border-white/10 rounded-2xl bg-white/5 p-1 sm:p-2"
             />
           </div>
 
@@ -278,7 +278,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
             placeholder="Describe your event..."
             rows={4}
             required
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10 resize-none"
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all hover:bg-white/10 resize-none"
           />
         </div>
       </div>
@@ -290,7 +290,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
           Date & Time
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">
               Start Time
@@ -326,7 +326,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
           Capacity & Tickets
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
           <input
             type="number"
             value={totalCapacity}
@@ -354,7 +354,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
           Location & Artist
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
           {/* Venue Autocomplete */}
           <div className="relative">
             <input
@@ -459,7 +459,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
               <input
                 value={ticket.name}
                 onChange={(e) => {
@@ -468,7 +468,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
                   setTicketTypes(updated);
                 }}
                 placeholder="Ticket Name (e.g. VIP)"
-                className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
+                className="w-full px-3 sm:px-4 py-2 sm:py-2 md:py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
               />
 
               <input
@@ -482,7 +482,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
                 placeholder="Price"
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
+                className="w-full px-3 sm:px-4 py-2 sm:py-2 md:py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
               />
 
               <div className="space-y-1">
@@ -523,7 +523,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
                 }}
                 placeholder="Quantity Available"
                 min="0"
-                className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
+                className="w-full px-3 sm:px-4 py-2 sm:py-2 md:py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
               />
             </div>
           </div>
@@ -552,7 +552,7 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
       {/* Submit Button */}
       <button
         type="submit"
-        className="w-full bg-white text-black hover:bg-gray-200 px-6 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-white/20"
+        className="w-full bg-white text-black hover:bg-gray-200 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-lg transition-all shadow-lg hover:shadow-white/20"
       >
         {initialData ? "Save Changes" : "Create Event"}
       </button>

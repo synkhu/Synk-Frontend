@@ -121,9 +121,9 @@ export default function LoginPopup({
         className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-white tracking-tight">Welcome Back</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Welcome Back</h2>
             <button 
               onClick={onClose}
               className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
@@ -148,20 +148,20 @@ export default function LoginPopup({
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Email address</label>
+              <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Email address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => onEmailChange(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 disabled={isLoading || loginSuccess}
               />
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
-                <label className="text-sm font-medium text-gray-400">Password</label>
+                <label className="text-[10px] sm:text-sm font-medium text-gray-400">Password</label>
                 <button className="text-xs text-purple-400 hover:text-purple-300 font-medium" onClick={handleForgotPassword} disabled={forgotLoading || isLoading || loginSuccess}>{forgotLoading ? "Sending..." : "Forgot password?"}</button>
               </div>
               <input
@@ -169,7 +169,7 @@ export default function LoginPopup({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 disabled={isLoading || loginSuccess}
                 onKeyDown={(e) => e.key === "Enter" && handleLoginWithAPI()}
               />
@@ -178,7 +178,7 @@ export default function LoginPopup({
             <button
               onClick={handleLoginWithAPI}
               disabled={!email || !password || isLoading || loginSuccess}
-              className="w-full py-4 bg-white hover:bg-gray-200 disabled:bg-gray-600 disabled:opacity-50 text-black font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-black/20"
+              className="w-full py-3 sm:py-4 bg-white hover:bg-gray-200 disabled:bg-gray-600 disabled:opacity-50 text-black text-sm sm:text-base font-bold rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-black/20"
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </button>
@@ -209,7 +209,7 @@ export default function LoginPopup({
       {portal}
       {forgotSuccess && mounted && createPortal(
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-sm bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-6 animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-sm bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col items-center gap-6 animate-in zoom-in-95 duration-200">
             <svg className="w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
             <p className="text-white text-center font-semibold text-lg">Password reset email sent.</p>
             <button
