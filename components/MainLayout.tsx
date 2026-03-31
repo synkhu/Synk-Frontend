@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import Navbar from "./navbar";
+import Navbar from "./Navbar";
 import { isMobile as checkIsMobile } from "../utils/isMobile";
 
 interface MainLayoutProps {

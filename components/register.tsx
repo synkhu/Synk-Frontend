@@ -103,6 +103,7 @@ export default function RegisterPopup({
             <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight text-center flex-1">Create Account</h2>
             <button 
               onClick={onClose}
+              aria-label="Close"
               className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -126,9 +127,10 @@ export default function RegisterPopup({
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">First name</label>
+                <label htmlFor="firstName" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">First name</label>
                 <input
                   type="text"
+                  id="firstName"
                   name="firstName"
                   value={registerData.firstName}
                   onChange={handleInputChange}
@@ -139,9 +141,10 @@ export default function RegisterPopup({
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Last name</label>
+                <label htmlFor="lastName" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Last name</label>
                 <input
                   type="text"
+                  id="lastName"
                   name="lastName"
                   value={registerData.lastName}
                   onChange={handleInputChange}
@@ -154,9 +157,10 @@ export default function RegisterPopup({
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Email address</label>
+              <label htmlFor="email" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Email address</label>
               <input
                 type="email"
+                id="email"
                 name="email"
                 value={registerData.email}
                 onChange={handleInputChange}
@@ -168,9 +172,10 @@ export default function RegisterPopup({
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Password</label>
+              <label htmlFor="password" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Password</label>
               <input
                 type="password"
+                id="password"
                 name="password"
                 value={registerData.password}
                 onChange={handleInputChange}
