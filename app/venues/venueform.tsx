@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createVenue } from "../services/venue.Service";
+import { createVenue } from "../services/venue.service";
 import { uploadFile } from "../services/file.service";
 
 interface Venue {
@@ -105,12 +105,13 @@ export default function VenueForm({ onSuccess }: VenueFormProps) {
         />
       </div>
       <div>
-        <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider ml-1">
+        <label htmlFor="venue-images" className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider ml-1">
           Venue Images
         </label>
         <div className="relative group">
           <input
             type="file"
+            id="venue-images"
             accept="image/*"
             multiple
             onChange={(e) => {

@@ -67,9 +67,10 @@ function ResetPasswordForm() {
 
         <div className="space-y-4 sm:space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-400 ml-1">New password</label>
+            <label htmlFor="new-password" className="text-sm font-medium text-gray-400 ml-1">New password</label>
             <input
               type="password"
+              id="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -79,9 +80,10 @@ function ResetPasswordForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-400 ml-1">Confirm new password</label>
+            <label htmlFor="confirm-password" className="text-sm font-medium text-gray-400 ml-1">Confirm new password</label>
             <input
               type="password"
+              id="confirm-password"
               value={passwordAgain}
               onChange={(e) => setPasswordAgain(e.target.value)}
               placeholder="••••••••"

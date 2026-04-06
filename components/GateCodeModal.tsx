@@ -39,14 +39,12 @@ export default function GateCodeModal({ isOpen, onClose, eventId, eventName }: G
       }
 
       const { data } = await axios.request(options);
-      console.log(data);
       if (typeof data === 'object' && data !== null && 'gateStaffCode' in data) {
         setCode(data.gateStaffCode);
       } else {
         setCode(String(data));
       }
     } catch (error) {
-      console.error(error);
       setError("Failed to load gate code");
     } finally {
       setLoading(false);

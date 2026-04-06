@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteArtist, updateArtist } from "../services/artist.Service";
+import { deleteArtist, updateArtist } from "../services/artist.service";
 import { uploadFile } from "../services/file.service";
 import { useState } from "react";
 

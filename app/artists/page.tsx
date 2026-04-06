@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getArtists } from "../services/artist.Service";
+import { getArtists } from "../services/artist.service";
 import ArtistForm from "./artistform";
 import ArtistList from "./artistlist";
 import ProtectedRoute from "../../components/ProtectedRoute";

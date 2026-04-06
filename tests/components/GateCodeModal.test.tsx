@@ -18,7 +18,7 @@ describe('GateCodeModal', () => {
   });
 
   it('renders loading state initially', async () => {
-    (axios.request as jest.Mock).mockReturnValue(new Promise(() => {})); // never resolves
+    (axios.request as jest.Mock).mockReturnValue(new Promise(() => {}));
 
     await act(async () =>
       render(<GateCodeModal isOpen={true} onClose={onClose} eventId={eventId} eventName={eventName} />)
@@ -41,12 +41,15 @@ describe('GateCodeModal', () => {
   it('renders error message when API fails', async () => {
     const error = new Error('API failure');
     (axios.request as jest.Mock).mockRejectedValue(error);
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     await act(async () =>
       render(<GateCodeModal isOpen={true} onClose={onClose} eventId={eventId} eventName={eventName} />)
     );
 
     await waitFor(() => expect(screen.getByText(/Failed to load gate code/i)).toBeInTheDocument());
+
+    consoleSpy.mockRestore();
   });
 
   it('calls onClose when close button clicked', async () => {

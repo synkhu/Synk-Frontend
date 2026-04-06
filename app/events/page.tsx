@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getEvents } from "../services/event.Service";
+import { getEvents } from "../services/event.service";
 import EventForm from "./eventsform";
 import EventList from "./eventlist";
 import ProtectedRoute from "../../components/ProtectedRoute";
