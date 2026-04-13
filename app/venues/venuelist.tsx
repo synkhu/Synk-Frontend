@@ -3,7 +3,7 @@ import {
   deleteVenue,
   updateVenue,
   addVenueImages,
-} from "../services/venue.Service";
+} from "../services/venue.service";
 import { uploadFile } from "../services/file.service";
 import { useState } from "react";
 

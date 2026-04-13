@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createArtist } from "../services/artist.Service";
+import { createArtist } from "../services/artist.service";
 import { uploadFile } from "../services/file.service";
 
 type ArtistFormProps = {

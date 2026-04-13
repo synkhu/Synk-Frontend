@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getVenues } from "../services/venue.Service";
+import { getVenues } from "../services/venue.service";
 import VenueForm from "./venueform";
 import VenueList from "./venuelist";
 import ProtectedRoute from "../../components/ProtectedRoute";

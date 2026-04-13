@@ -148,8 +148,9 @@ export default function LoginPopup({
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Email address</label>
+              <label htmlFor="email" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Email address</label>
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => onEmailChange(e.target.value)}
@@ -161,10 +162,11 @@ export default function LoginPopup({
 
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
-                <label className="text-[10px] sm:text-sm font-medium text-gray-400">Password</label>
+                <label htmlFor="password" className="text-[10px] sm:text-sm font-medium text-gray-400">Password</label>
                 <button className="text-xs text-purple-400 hover:text-purple-300 font-medium" onClick={handleForgotPassword} disabled={forgotLoading || isLoading || loginSuccess}>{forgotLoading ? "Sending..." : "Forgot password?"}</button>
               </div>
               <input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

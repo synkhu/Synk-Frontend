@@ -6,7 +6,7 @@ import {
   updateEvent,
   searchArtists,
   searchVenues,
-} from "../services/event.Service";
+} from "../services/event.service";
 import { uploadFile } from "../services/file.service";
 
 type Artist = { id: string; name: string };

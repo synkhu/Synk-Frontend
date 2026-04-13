@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import RegisterPopup from "./register";
-import LoginPopup from "./login";
+import RegisterPopup from "./Register";
+import LoginPopup from "./Login";
 import {
   getCurrentUser,
   getCachedUser,
@@ -84,7 +84,7 @@ export default function Navbar({
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const updateIsMobile = () => setIsMobile(checkIsMobile());
+    const updateIsMobile = () => setIsMobile(checkIsMobile(navigator.userAgent));
     updateIsMobile();
     window.addEventListener("resize", updateIsMobile);
     return () => window.removeEventListener("resize", updateIsMobile);
@@ -246,6 +246,7 @@ export default function Navbar({
               />
             )}
             <button
+              aria-label="Toggle menu"
               onClick={toggleNavbar}
               className={`p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-all duration-300 hover:shadow-lg`}
             >

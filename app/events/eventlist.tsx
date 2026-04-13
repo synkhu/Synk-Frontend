@@ -8,7 +8,7 @@ import {
   getEvents,
   searchArtists,
   searchVenues,
-} from "../services/event.Service";
+} from "../services/event.service";
 import { uploadFile } from "../services/file.service";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
