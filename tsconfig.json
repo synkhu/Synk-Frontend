@@ -15,7 +15,7 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": ["./*"]
     },
     "types": ["jest", "node", "react", "react-dom"]
   },

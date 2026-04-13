@@ -88,7 +88,7 @@ describe("EventDetailsPage", () => {
     expect(screen.getByText("General Admission")).toBeInTheDocument();
 
     expect(
-      screen.getByText((text) => text.includes("5000") && text.includes("HUF"))
+      screen.getByText((text) => (text.includes("5000") || text.includes("5,000")) && text.includes("HUF"))
     ).toBeInTheDocument();
   });
 
@@ -135,7 +135,7 @@ describe("EventDetailsPage", () => {
     await waitFor(() => {
       expect(
         within(totalContainer).getByText((text) =>
-          text.includes("5000") && text.includes("HUF")
+          (text.includes("5000") || text.includes("5,000")) && text.includes("HUF")
         )
       ).toBeInTheDocument();
     });

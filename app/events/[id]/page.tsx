@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import Modal from "../../../components/Modal";
+import Modal from "@/components/Modal";
 
 const API_URL = "https://api.synk.hu";
 

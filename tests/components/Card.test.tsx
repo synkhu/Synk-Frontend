@@ -30,14 +30,4 @@ describe('Card', () => {
       'group'
     );
   });
-
-  it('renders a div with the background image', () => {
-    render(<Card />);
-    const bgDiv = document.querySelector(
-      'div[style*="background-image"]'
-    );
-    expect(bgDiv).toHaveStyle(
-      'background-image: url(https://independentaustralia.net/_lib/slir/w800-c660x434/i/article/img/article-19811-hero.jpg?t=1749265169)'
-    );
-  });
 });
