@@ -69,18 +69,36 @@ export default function RegisterPopup({
         onClose();
         setRegisterSuccess(false);
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Registration error:", error);
+
       let msg = "Registration failed. Please try again.";
-      if (error.response?.data?.errors) {
-        const errors = error.response.data.errors;
-        for (const field in errors) {
-          if (Array.isArray(errors[field]) && errors[field].length > 0) {
-            msg = errors[field][0];
-            break;
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error
+      ) {
+        const err = error as {
+          response?: {
+            data?: {
+              errors?: Record<string, string[]>;
+            };
+          };
+        };
+
+        if (err.response?.data?.errors) {
+          const errors = err.response.data.errors;
+
+          for (const field in errors) {
+            if (Array.isArray(errors[field]) && errors[field].length > 0) {
+              msg = errors[field][0];
+              break;
+            }
           }
         }
       }
+
       setRegisterError(msg);
     } finally {
       setRegisterLoading(false);
@@ -90,36 +108,74 @@ export default function RegisterPopup({
   if (!visible || !mounted) return null;
 
   return createPortal(
-    <div 
+    <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={onClose}
     >
-      <div 
+      <div
         className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 sm:p-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight text-center flex-1">Create Account</h2>
-            <button 
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight text-center flex-1">
+              Create Account
+            </h2>
+            <button
               onClick={onClose}
               aria-label="Close"
               className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
 
           {registerError && (
             <div className="mb-6 p-3 sm:p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm flex items-center">
-              <svg className="w-5 h-5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <svg
+                className="w-5 h-5 mr-3 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
               {registerError}
             </div>
           )}
 
           {registerSuccess && (
             <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-400 text-sm flex items-center">
-              <svg className="w-5 h-5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+              <svg
+                className="w-5 h-5 mr-3 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
               Welcome to the family!
             </div>
           )}
@@ -127,7 +183,12 @@ export default function RegisterPopup({
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               <div className="space-y-2">
-                <label htmlFor="firstName" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">First name</label>
+                <label
+                  htmlFor="firstName"
+                  className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1"
+                >
+                  First name
+                </label>
                 <input
                   type="text"
                   id="firstName"
@@ -140,8 +201,14 @@ export default function RegisterPopup({
                   disabled={registerLoading || registerSuccess}
                 />
               </div>
+
               <div className="space-y-2">
-                <label htmlFor="lastName" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Last name</label>
+                <label
+                  htmlFor="lastName"
+                  className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1"
+                >
+                  Last name
+                </label>
                 <input
                   type="text"
                   id="lastName"
@@ -157,7 +224,12 @@ export default function RegisterPopup({
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="email" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Email address</label>
+              <label
+                htmlFor="email"
+                className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1"
+              >
+                Email address
+              </label>
               <input
                 type="email"
                 id="email"
@@ -172,7 +244,12 @@ export default function RegisterPopup({
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1">Password</label>
+              <label
+                htmlFor="password"
+                className="text-[10px] sm:text-sm font-medium text-gray-400 ml-1"
+              >
+                Password
+              </label>
               <input
                 type="password"
                 id="password"
@@ -198,8 +275,11 @@ export default function RegisterPopup({
           <div className="mt-8 text-center">
             <p className="text-gray-500 text-sm">
               Already have an account?{" "}
-              <button 
-                onClick={(e) => { e.preventDefault(); onBackToLogin(); }}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  onBackToLogin();
+                }}
                 className="text-white font-semibold hover:underline decoration-purple-500 underline-offset-4"
               >
                 Sign in

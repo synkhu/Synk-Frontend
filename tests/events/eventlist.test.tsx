@@ -3,12 +3,36 @@ import EventList from "../../app/events/eventlist";
 import { useRouter } from "next/navigation";
 
 jest.mock("next/navigation");
-jest.mock("../../components/Modal", () => ({ isOpen, children, onClose }: any) => 
-  isOpen ? <div data-testid="edit-modal">{children}</div> : null
-);
-jest.mock("../../components/GateCodeModal", () => ({ isOpen }: any) => 
-  isOpen ? <div data-testid="gatecode-modal" /> : null
-);
+jest.mock("../../components/Modal", () => {
+  type Props = {
+    isOpen: boolean;
+    children: React.ReactNode;
+    onClose?: () => void;
+  };
+
+  const MockModal = ({ isOpen, children }: Props) => {
+    if (!isOpen) return null;
+    return <div data-testid="edit-modal">{children}</div>;
+  };
+
+  MockModal.displayName = "MockModal";
+  return MockModal;
+});
+
+jest.mock("../../components/GateCodeModal", () => {
+  type Props = {
+    isOpen: boolean;
+  };
+
+  const MockGateCodeModal = ({ isOpen }: Props) => {
+    if (!isOpen) return null;
+    return <div data-testid="gatecode-modal" />;
+  };
+
+  MockGateCodeModal.displayName = "MockGateCodeModal";
+  return MockGateCodeModal;
+});
+
 jest.mock("../../app/services/event.service");
 jest.mock("../../app/services/file.service");
 

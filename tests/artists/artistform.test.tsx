@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ArtistForm from "../../app/artists/artistform";
-import { createArtist } from "@/services/artist.service";
+import { createArtist } from "../../app/services/artist.service";
 
-jest.mock("@/services/artist.service");
+jest.mock("../../app/services/artist.service");
 
 describe("ArtistForm", () => {
   const mockOnSuccess = jest.fn();

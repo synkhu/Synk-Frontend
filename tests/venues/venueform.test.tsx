@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import VenueForm from '@/venues/venueform';
+import VenueForm from '../../app/venues/venueform';
 import * as venueService from '../../app/services/venue.service';
 import * as fileService from '../../app/services/file.service';
 

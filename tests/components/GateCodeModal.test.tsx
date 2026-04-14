@@ -3,9 +3,19 @@ import GateCodeModal from '../../components/GateCodeModal';
 import axios from 'axios';
 
 jest.mock('axios');
-jest.mock('../../components/Modal', () => ({ isOpen, onClose, title, children }: any) => (
-  <div data-testid="modal">{children}</div>
-));
+jest.mock('../../components/Modal', () => ({
+  __esModule: true,
+  default: ({ isOpen, onClose, children }: any) => {
+    if (!isOpen) return null;
+
+    return (
+      <div data-testid="modal">
+        <button onClick={onClose}>Close</button>
+        {children}
+      </div>
+    );
+  },
+}));
 
 describe('GateCodeModal', () => {
   const eventId = '123';
@@ -21,45 +31,83 @@ describe('GateCodeModal', () => {
     (axios.request as jest.Mock).mockReturnValue(new Promise(() => {}));
 
     await act(async () =>
-      render(<GateCodeModal isOpen={true} onClose={onClose} eventId={eventId} eventName={eventName} />)
+      render(
+        <GateCodeModal
+          isOpen={true}
+          onClose={onClose}
+          eventId={eventId}
+          eventName={eventName}
+        />
+      )
     );
 
     expect(screen.getByText(/Loading code/i)).toBeInTheDocument();
   });
 
   it('renders gate code when API succeeds', async () => {
-    (axios.request as jest.Mock).mockResolvedValue({ data: { gateStaffCode: 'GATE1234' } });
+    (axios.request as jest.Mock).mockResolvedValue({
+      data: { gateStaffCode: 'GATE1234' },
+    });
 
     await act(async () =>
-      render(<GateCodeModal isOpen={true} onClose={onClose} eventId={eventId} eventName={eventName} />)
+      render(
+        <GateCodeModal
+          isOpen={true}
+          onClose={onClose}
+          eventId={eventId}
+          eventName={eventName}
+        />
+      )
     );
 
-    await waitFor(() => expect(screen.getByText(/GATE1234/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/GATE1234/i)).toBeInTheDocument()
+    );
+
     expect(screen.getByText(eventName)).toBeInTheDocument();
   });
 
   it('renders error message when API fails', async () => {
     const error = new Error('API failure');
     (axios.request as jest.Mock).mockRejectedValue(error);
+
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     await act(async () =>
-      render(<GateCodeModal isOpen={true} onClose={onClose} eventId={eventId} eventName={eventName} />)
+      render(
+        <GateCodeModal
+          isOpen={true}
+          onClose={onClose}
+          eventId={eventId}
+          eventName={eventName}
+        />
+      )
     );
 
-    await waitFor(() => expect(screen.getByText(/Failed to load gate code/i)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/Failed to load gate code/i)).toBeInTheDocument()
+    );
 
     consoleSpy.mockRestore();
   });
 
   it('calls onClose when close button clicked', async () => {
-    (axios.request as jest.Mock).mockResolvedValue({ data: { gateStaffCode: 'GATE1234' } });
+    (axios.request as jest.Mock).mockResolvedValue({
+      data: { gateStaffCode: 'GATE1234' },
+    });
 
     await act(async () =>
-      render(<GateCodeModal isOpen={true} onClose={onClose} eventId={eventId} eventName={eventName} />)
+      render(
+        <GateCodeModal
+          isOpen={true}
+          onClose={onClose}
+          eventId={eventId}
+          eventName={eventName}
+        />
+      )
     );
 
-    const closeButton = screen.getByText(/Close/i);
+    const closeButton = screen.getAllByRole('button', { name: /close/i })[0];
     fireEvent.click(closeButton);
 
     expect(onClose).toHaveBeenCalled();
@@ -67,7 +115,14 @@ describe('GateCodeModal', () => {
 
   it('does not fetch if isOpen is false', async () => {
     await act(async () =>
-      render(<GateCodeModal isOpen={false} onClose={onClose} eventId={eventId} eventName={eventName} />)
+      render(
+        <GateCodeModal
+          isOpen={false}
+          onClose={onClose}
+          eventId={eventId}
+          eventName={eventName}
+        />
+      )
     );
 
     expect(axios.request).not.toHaveBeenCalled();
@@ -76,10 +131,19 @@ describe('GateCodeModal', () => {
   it('includes auth token if present in localStorage', async () => {
     localStorage.setItem('authToken', 'TEST_TOKEN');
 
-    (axios.request as jest.Mock).mockResolvedValue({ data: { gateStaffCode: 'GATE1234' } });
+    (axios.request as jest.Mock).mockResolvedValue({
+      data: { gateStaffCode: 'GATE1234' },
+    });
 
     await act(async () =>
-      render(<GateCodeModal isOpen={true} onClose={onClose} eventId={eventId} eventName={eventName} />)
+      render(
+        <GateCodeModal
+          isOpen={true}
+          onClose={onClose}
+          eventId={eventId}
+          eventName={eventName}
+        />
+      )
     );
 
     await waitFor(() =>

@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { act } from "react";
-import EventDetailsPage from "@/events/[id]/page";
+import EventDetailsPage from "../../../app/events/[id]/page";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -10,11 +10,18 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
 
-jest.mock("../../../components/Modal", () => ({
-  __esModule: true,
-  default: ({ isOpen, children }: any) =>
-    isOpen ? <div data-testid="modal">{children}</div> : null,
-}));
+jest.mock("../../../components/Modal", () => {
+  type ModalProps = {
+    isOpen: boolean;
+    children: React.ReactNode;
+  };
+
+  return {
+    __esModule: true,
+    default: ({ isOpen, children }: ModalProps) =>
+      isOpen ? <div data-testid="modal">{children}</div> : null,
+  };
+});
 
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
@@ -60,20 +67,21 @@ describe("EventDetailsPage", () => {
     });
   });
 
-  const renderPage = async () => {
-    let view: any;
+  const renderPage = async (): Promise<void> => {
     await act(async () => {
-      view = render(
-        <EventDetailsPage params={Promise.resolve({ id: "1" }) as any} />
+      render(
+        <EventDetailsPage
+          params={Promise.resolve({ id: "1" })}
+        />
       );
     });
-    return view;
   };
 
   it("renders loading spinner initially", async () => {
     const { container } = render(
-      <EventDetailsPage params={Promise.resolve({ id: "1" }) as any} />
+      <EventDetailsPage params={Promise.resolve({ id: "1" })} />
     );
+
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
     await screen.findByText("Test Event");
   });
@@ -88,7 +96,9 @@ describe("EventDetailsPage", () => {
     expect(screen.getByText("General Admission")).toBeInTheDocument();
 
     expect(
-      screen.getByText((text) => (text.includes("5000") || text.includes("5,000")) && text.includes("HUF"))
+      screen.getByText((text) =>
+        (text.includes("5000") || text.includes("5,000")) && text.includes("HUF")
+      )
     ).toBeInTheDocument();
   });
 
@@ -97,13 +107,15 @@ describe("EventDetailsPage", () => {
 
     await act(async () => {
       render(
-        <EventDetailsPage params={Promise.resolve({ id: "999" }) as any} />
+        <EventDetailsPage params={Promise.resolve({ id: "999" })} />
       );
     });
 
     await waitFor(() => {
       expect(screen.getByText("Error")).toBeInTheDocument();
-      expect(screen.getByText("Failed to load event details")).toBeInTheDocument();
+      expect(
+        screen.getByText("Failed to load event details")
+      ).toBeInTheDocument();
     });
   });
 
@@ -111,9 +123,13 @@ describe("EventDetailsPage", () => {
     await renderPage();
     await screen.findByText("Test Event");
 
-    const buttons = screen.getAllByRole("button");
-    const plusButton = buttons.find((btn) => btn.innerHTML.includes("M12 4v16"))!;
-    const minusButton = buttons.find((btn) => btn.innerHTML.includes("M20 12H4"))!;
+    const plusButton = screen
+      .getAllByRole("button")
+      .find((btn) => btn.innerHTML.includes("M12 4v16"))!;
+
+    const minusButton = screen
+      .getAllByRole("button")
+      .find((btn) => btn.innerHTML.includes("M20 12H4"))!;
 
     await userEvent.click(plusButton);
     expect(screen.getByText("1")).toBeInTheDocument();
@@ -126,12 +142,14 @@ describe("EventDetailsPage", () => {
     await renderPage();
     await screen.findByText("Test Event");
 
-    const plusButton = screen.getAllByRole("button").find((btn) =>
-      btn.innerHTML.includes("M12 4v16")
-    )!;
+    const plusButton = screen
+      .getAllByRole("button")
+      .find((btn) => btn.innerHTML.includes("M12 4v16"))!;
+
     await userEvent.click(plusButton);
 
     const totalContainer = screen.getByText("Total Price").closest("div")!;
+
     await waitFor(() => {
       expect(
         within(totalContainer).getByText((text) =>
@@ -147,9 +165,10 @@ describe("EventDetailsPage", () => {
     await renderPage();
     await screen.findByText("Test Event");
 
-    const plusButton = screen.getAllByRole("button").find((btn) =>
-      btn.innerHTML.includes("M12 4v16")
-    )!;
+    const plusButton = screen
+      .getAllByRole("button")
+      .find((btn) => btn.innerHTML.includes("M12 4v16"))!;
+
     await userEvent.click(plusButton);
 
     const checkoutButton = await screen.findByText("Confirm Purchase");

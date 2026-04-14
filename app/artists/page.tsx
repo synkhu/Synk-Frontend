@@ -9,8 +9,16 @@ import ProtectedRoute from "../../components/ProtectedRoute";
 import { authService } from "../services/auth.service";
 import Modal from "../../components/Modal";
 
+type Artist = {
+  id: number;
+  name: string;
+  description?: string | null;
+  spotifyUrl?: string | null;
+  profilePictureUrl?: string | null;
+};
+
 export default function ArtistsPage() {
-  const [artists, setArtists] = useState<any[]>([]);
+  const [artists, setArtists] = useState<Artist[]>([]);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

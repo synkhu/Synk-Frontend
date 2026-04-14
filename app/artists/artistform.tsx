@@ -3,9 +3,18 @@
 import { useState } from "react";
 import { createArtist } from "../services/artist.service";
 import { uploadFile } from "../services/file.service";
+import Image from "next/image";
+
+type Artist = {
+  id: number;
+  name: string;
+  description?: string | null;
+  spotifyUrl?: string | null;
+  profilePictureUrl?: string | null;
+};
 
 type ArtistFormProps = {
-  onSuccess: (artists: any[]) => void;
+  onSuccess: (artists: Artist[]) => void;
 };
 
 export default function ArtistForm({ onSuccess }: ArtistFormProps) {
@@ -92,11 +101,12 @@ export default function ArtistForm({ onSuccess }: ArtistFormProps) {
           </div>
           {profilePreview && (
             <div className="flex-shrink-0">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-purple-500/50 shadow-lg shadow-purple-500/20">
-                <img
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-purple-500/50 shadow-lg shadow-purple-500/20">
+                <Image
                   src={profilePreview}
                   alt="Profile preview"
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
             </div>

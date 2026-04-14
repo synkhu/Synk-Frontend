@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import ArtistDetailsPage from "@/artists/[id]/page";
+import ArtistDetailsPage from "../../../app/artists/[id]/page";
 import axios from "axios";
 
 jest.mock("axios");
@@ -30,13 +30,15 @@ describe("ArtistDetailsPage", () => {
 
   it("renders loading spinner", async () => {
     await waitFor(() => {
-      const { container } = render(<ArtistDetailsPage params={{ id: "1" } as any} />);
+      const { container } = render(
+        <ArtistDetailsPage params={Promise.resolve({ id: "1" })} />
+      );
       expect(container.querySelector(".animate-spin")).toBeInTheDocument();
     });
   });
 
   it("renders artist details successfully", async () => {
-    render(<ArtistDetailsPage params={{ id: "1" } as any} />);
+    render(<ArtistDetailsPage params={Promise.resolve({ id: "1" })} />);
     await waitFor(() => {
       expect(screen.getByText("Test Artist")).toBeInTheDocument();
       expect(screen.getByText("Test description")).toBeInTheDocument();
@@ -45,7 +47,7 @@ describe("ArtistDetailsPage", () => {
 
   it("renders error state", async () => {
     mockedAxios.get.mockRejectedValueOnce(new Error("API Error"));
-    render(<ArtistDetailsPage params={{ id: "999" } as any} />);
+    render(<ArtistDetailsPage params={Promise.resolve({ id: "999" })} />);
     await waitFor(() => {
       expect(screen.getByText("Error")).toBeInTheDocument();
       expect(screen.getByText("Failed to load artist details")).toBeInTheDocument();
@@ -53,7 +55,7 @@ describe("ArtistDetailsPage", () => {
   });
 
   it("renders no events state", async () => {
-    render(<ArtistDetailsPage params={{ id: "1" } as any} />);
+    render(<ArtistDetailsPage params={Promise.resolve({ id: "1" })} />);
     await waitFor(() => {
       expect(screen.queryByText("Test Event")).not.toBeInTheDocument();
     });

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const API_URL = "https://api.synk.hu";
 
@@ -13,6 +14,9 @@ interface ArtistEvent {
   venueName?: string | null;
   startTime?: string;
   thumbnailUrl?: string | null;
+  venue?: {
+    id: string;
+  };
 }
 
 interface ArtistDetails {
@@ -48,8 +52,7 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           axios.get(`${API_URL}/artists/${artistId}/events`),
         ]);
         const artist = artistRes.data;
-        const events = eventsRes.data;
-        
+
         setArtistDetails({
           id: artist.id,
           name: artist.name,
@@ -58,13 +61,23 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           spotifyUrl: artist.spotifyUrl || artist.spotify_url || artist.spotify,
         });
 
-        const items = Array.isArray(events) ? events : events.items || [];
-        setArtistEvents(items.map((e: any) => ({
+        const data = eventsRes.data;
+
+        const items = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.items)
+            ? data.items
+            : [];
+        setArtistEvents(items.map((e: ArtistEvent) => ({
           ...e,
           venueId: e.venueId ?? e.venue?.id,
         })));
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to load artist details");
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+          setError(err.response?.data?.message || "Failed to load artist details");
+        } else {
+          setError("Failed to load artist details");
+        }
       } finally {
         setLoading(false);
       }
@@ -93,7 +106,7 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
       <section className="relative overflow-hidden rounded-[3rem] border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl flex flex-col md:flex-row">
         <div className="md:w-80 md:h-80 w-full h-72 flex-shrink-0 relative overflow-hidden">
           {artistDetails.profilePictureUrl ? (
-            <img src={artistDetails.profilePictureUrl} alt={artistDetails.name} className="w-full h-full object-cover" />
+            <Image src={artistDetails.profilePictureUrl} alt={artistDetails.name} fill className="object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-900 flex items-center justify-center text-6xl font-bold text-white italic">
               {artistDetails.name.charAt(0)}
@@ -110,7 +123,7 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           <div className="flex flex-wrap gap-4 pt-4">
             {artistDetails.spotifyUrl && (
               <a href={artistDetails.spotifyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 md:px-6 md:py-3 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-full transition-all active:scale-95 space-x-2">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.508 17.302c-.223.367-.694.482-1.061.259-2.858-1.742-6.455-2.136-10.692-1.17-.421.097-.84-.167-.937-.588-.097-.421.167-.84.588-.937 4.631-1.06 8.604-.613 11.843 1.339.367.222.482.694.259 1.057zm1.472-3.258c-.281.457-.879.605-1.336.324-3.272-2.012-8.259-2.592-12.128-1.417-.515.157-1.066-.134-1.223-.649-.157-.515.134-1.066.649-1.223 4.419-1.341 9.914-.698 13.684 1.623.457.281.605.879.324 1.336l.03.006zm.126-3.41c-3.924-2.33-10.392-2.546-14.172-1.398-.602.183-1.238-.162-1.421-.764-.183-.602.162-1.238.764-1.421 4.331-1.315 11.472-1.058 16.007 1.634.541.321.718 1.02.397 1.56-.321.541-1.02.718-1.56.397l-.015-.008z"/></svg>
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.508 17.302c-.223.367-.694.482-1.061.259-2.858-1.742-6.455-2.136-10.692-1.17-.421.097-.84-.167-.937-.588-.097-.421.167-.84.588-.937 4.631-1.06 8.604-.613 11.843 1.339.367.222.482.694.259 1.057zm1.472-3.258c-.281.457-.879.605-1.336.324-3.272-2.012-8.259-2.592-12.128-1.417-.515.157-1.066-.134-1.223-.649-.157-.515.134-1.066.649-1.223 4.419-1.341 9.914-.698 13.684 1.623.457.281.605.879.324 1.336l.03.006zm.126-3.41c-3.924-2.33-10.392-2.546-14.172-1.398-.602.183-1.238-.162-1.421-.764-.183-.602.162-1.238.764-1.421 4.331-1.315 11.472-1.058 16.007 1.634.541.321.718 1.02.397 1.56-.321.541-1.02.718-1.56.397l-.015-.008z" /></svg>
                 <span>Listen on Spotify</span>
               </a>
             )}
@@ -124,9 +137,9 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {artistEvents.map((event) => (
               <div key={event.id} onClick={() => router.push(`/events/${event.id}`)} className="group flex bg-white/5 border border-white/10 rounded-[2rem] overflow-hidden hover:bg-white/[0.08] transition-all cursor-pointer">
-                <div className="w-32 h-auto flex-shrink-0 overflow-hidden">
+                <div className="w-32 h-32 flex-shrink-0 overflow-hidden">
                   {event.thumbnailUrl ? (
-                    <img src={event.thumbnailUrl} alt={event.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <Image src={event.thumbnailUrl} alt={event.name} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
                   ) : (
                     <div className="w-full h-full bg-zinc-800" />
                   )}

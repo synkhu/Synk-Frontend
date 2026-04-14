@@ -12,8 +12,6 @@ jest.mock('../../app/services/auth.service', () => ({
   },
 }));
 
-const { authService: mockAuthService } = require('../../app/services/auth.service');
-
 jest.mock('../../app/services/user.service', () => ({
   getCurrentUser: jest.fn(),
   updateUserProfile: jest.fn(),
@@ -23,6 +21,10 @@ jest.mock('../../app/services/user.service', () => ({
 }));
 
 jest.mock('axios');
+import * as authServiceModule from '../../app/services/auth.service';
+const mockAuthService = authServiceModule.authService as jest.Mocked<
+  typeof authServiceModule.authService
+>;
 
 const mockUser = {
   firstName: 'John',
@@ -45,17 +47,25 @@ beforeEach(() => {
 describe('MyProfilePage', () => {
   it('renders loading state initially', async () => {
     let resolvePromise: (value: typeof mockUser) => void;
-    const promise = new Promise<typeof mockUser>((res) => { resolvePromise = res; });
+    const promise = new Promise<typeof mockUser>((res) => {
+      resolvePromise = res;
+    });
+
     (userService.getCurrentUser as jest.Mock).mockReturnValue(promise);
 
     render(<MyProfilePage />);
     expect(screen.getByText('Loading profile...')).toBeInTheDocument();
 
-    await act(async () => { resolvePromise!(mockUser); });
+    await act(async () => {
+      resolvePromise!(mockUser);
+    });
   });
 
   it('renders error state when getCurrentUser fails', async () => {
-    (userService.getCurrentUser as jest.Mock).mockRejectedValue({ response: { data: { message: 'Auth error' } } });
+    (userService.getCurrentUser as jest.Mock).mockRejectedValue({
+      response: { data: { message: 'Auth error' } },
+    });
+
     render(<MyProfilePage />);
     await waitFor(() => {
       expect(screen.getByText('Auth error')).toBeInTheDocument();
@@ -137,7 +147,10 @@ describe('MyProfilePage', () => {
     fireEvent.click(screen.getByText('Update Password'));
 
     await waitFor(() => {
-      expect(userService.changePassword).toHaveBeenCalledWith('oldpass', 'newpass123');
+      expect(userService.changePassword).toHaveBeenCalledWith(
+        'oldpass',
+        'newpass123'
+      );
       expect(screen.getByText('Password updated successfully.')).toBeInTheDocument();
     });
   });
@@ -180,13 +193,15 @@ describe('MyProfilePage', () => {
     });
   });
 
-  it('handles email verification from URL token', async () => {
-    const originalLocation = window.location;
+  it('handles email verification from URL token', async () => {  
     const replaceStateMock = jest.fn();
-    Object.defineProperty(window, 'history', { value: { replaceState: replaceStateMock } });
+    Object.defineProperty(window, 'history', {
+      value: { replaceState: replaceStateMock },
+    });
 
     const originalGet = URLSearchParams.prototype.get;
-    URLSearchParams.prototype.get = function(key) {
+
+    URLSearchParams.prototype.get = function (key: string): string | null {
       if (key === 'verification-token') {
         return 'testtoken';
       }
@@ -209,11 +224,10 @@ describe('MyProfilePage', () => {
           headers: expect.objectContaining({
             Authorization: 'Bearer mocktoken',
           }),
-        }),
+        })
       );
+
       expect(userService.clearUserCache).toHaveBeenCalled();
     });
-
-    (window.location as any) = originalLocation;
   });
 });

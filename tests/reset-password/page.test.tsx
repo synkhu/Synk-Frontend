@@ -17,7 +17,8 @@ const renderComponent = async (token: string = 'test-token') => {
   (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
   (useRouter as jest.Mock).mockReturnValue({ push: mockRouterPush });
 
-  const { default: Page } = require('../../app/reset-password/page');
+  const Page = (await import('../../app/reset-password/page')).default;
+
   render(<Page />);
 };
 
@@ -167,7 +168,9 @@ describe('ResetPasswordForm', () => {
     await user.click(button);
 
     await waitFor(() => {
-      expect(screen.getByText(/invalid or missing reset token/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/invalid or missing reset token/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -181,7 +184,9 @@ describe('ResetPasswordForm', () => {
     await user.click(button);
 
     await waitFor(() => {
-      expect(screen.getByText(/password reset successfully/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/password reset successfully/i)
+      ).toBeInTheDocument();
     });
 
     await user.click(screen.getByRole('button', { name: /ok/i }));

@@ -14,7 +14,17 @@ jest.mock('../../app/services/file.service', () => ({
 
 jest.mock('../../components/Modal', () => ({
   __esModule: true,
-  default: ({ isOpen, title, onClose, children }: any) =>
+  default: ({
+    isOpen,
+    title,
+    onClose,
+    children,
+  }: {
+    isOpen: boolean;
+    title: string;
+    onClose: () => void;
+    children: React.ReactNode;
+  }) =>
     isOpen ? (
       <>
         <h3>{title}</h3>
@@ -24,8 +34,13 @@ jest.mock('../../components/Modal', () => ({
     ) : null,
 }));
 
-const { updateVenue: mockUpdateVenue, deleteVenue: mockDeleteVenue, addVenueImages: mockAddVenueImages } = require('../../app/services/venue.service');
-const { uploadFile: mockUploadFile } = require('../../app/services/file.service');
+import * as venueService from '../../app/services/venue.service';
+import * as fileService from '../../app/services/file.service';
+
+const mockUpdateVenue = venueService.updateVenue as jest.Mock;
+const mockDeleteVenue = venueService.deleteVenue as jest.Mock;
+const mockAddVenueImages = venueService.addVenueImages as jest.Mock;
+const mockUploadFile = fileService.uploadFile as jest.Mock;
 
 interface Venue {
   id: number;
@@ -65,23 +80,41 @@ describe('VenueList', () => {
     render(<VenueList venues={mockVenues} onUpdate={mockOnUpdate} />);
 
     expect(screen.getByRole('heading', { name: 'Test Venue 1' })).toBeInTheDocument();
+
     expect(
-      screen.getByText((content, element) => {
-        return element?.textContent === '📍 Test City, Test Country';
-      })
+      screen.getByText((_, element) =>
+        element?.textContent === '📍 Test City, Test Country'
+      )
     ).toBeInTheDocument();
 
-    expect(screen.getByText((content, element) => element?.textContent === '🏠123 Test Street')).toBeInTheDocument();
-    expect(screen.getByText((content, element) => element?.textContent === '👥Capacity: 1000')).toBeInTheDocument();
+    expect(
+      screen.getByText((_, element) =>
+        element?.textContent === '🏠123 Test Street'
+      )
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText((_, element) =>
+        element?.textContent === '👥Capacity: 1000'
+      )
+    ).toBeInTheDocument();
+
     expect(screen.getByText('Test venue description')).toBeInTheDocument();
 
     expect(screen.getByRole('heading', { name: 'Test Venue 2' })).toBeInTheDocument();
+
     expect(
-      screen.getByText((content, element) => {
-        return element?.textContent === '📍 Another City, Another Country';
-      })
+      screen.getByText((_, element) =>
+        element?.textContent === '📍 Another City, Another Country'
+      )
     ).toBeInTheDocument();
-    expect(screen.getByText((content, element) => element?.textContent === '👥Capacity: 500')).toBeInTheDocument();
+
+    expect(
+      screen.getByText((_, element) =>
+        element?.textContent === '👥Capacity: 500'
+      )
+    ).toBeInTheDocument();
+
     expect(screen.getByText('Another venue description')).toBeInTheDocument();
   });
 
@@ -105,8 +138,13 @@ describe('VenueList', () => {
 
     await waitFor(() => screen.getByText('Edit Venue'));
 
-    fireEvent.change(screen.getByPlaceholderText('Name'), { target: { value: 'Updated Venue' } });
-    fireEvent.change(screen.getByPlaceholderText('Capacity'), { target: { value: '1500' } });
+    fireEvent.change(screen.getByPlaceholderText('Name'), {
+      target: { value: 'Updated Venue' },
+    });
+
+    fireEvent.change(screen.getByPlaceholderText('Capacity'), {
+      target: { value: '1500' },
+    });
 
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
@@ -136,11 +174,14 @@ describe('VenueList', () => {
   it('closes modal when close clicked', async () => {
     render(<VenueList venues={mockVenues} onUpdate={mockOnUpdate} />);
     fireEvent.click(screen.getAllByTitle('Edit')[0]);
-    await waitFor(() => screen.getByText('Edit Venue'));
+
+    await waitFor(() => expect(screen.getByText('Edit Venue')).toBeInTheDocument());
 
     fireEvent.click(screen.getByText('Close'));
 
-    await waitFor(() => expect(screen.queryByText('Edit Venue')).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByText('Edit Venue')).not.toBeInTheDocument()
+    );
   });
 
   it('alerts when name is empty on save', async () => {
@@ -148,12 +189,18 @@ describe('VenueList', () => {
 
     render(<VenueList venues={mockVenues} onUpdate={mockOnUpdate} />);
     fireEvent.click(screen.getAllByTitle('Edit')[0]);
-    await waitFor(() => screen.getByText('Edit Venue'));
 
-    fireEvent.change(screen.getByPlaceholderText('Name'), { target: { value: '' } });
+    await waitFor(() => expect(screen.getByText('Edit Venue')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText('Name'), {
+      target: { value: '' },
+    });
+
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
-    await waitFor(() => expect(alertSpy).toHaveBeenCalledWith('Venue name cannot be empty'));
+    await waitFor(() =>
+      expect(alertSpy).toHaveBeenCalledWith('Venue name cannot be empty')
+    );
 
     alertSpy.mockRestore();
   });

@@ -49,7 +49,7 @@ type Filters = {
 export default function AllEventsPage() {
   const [events, setEvents] = useState<EventDetail[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>({
     place: "",
     artist: "",
@@ -99,7 +99,7 @@ export default function AllEventsPage() {
             maxPrice: String(Math.ceil(max / 1000) * 1000),
           }));
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load events");
       } finally {
         setLoading(false);

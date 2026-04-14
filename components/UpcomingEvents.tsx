@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { isMobile as checkIsMobile } from "../utils/isMobile";
 
 interface EventItem {
   id: string;
@@ -137,11 +138,16 @@ export default function UpcomingEvents() {
         ref={containerRef}
         className="flex flex-nowrap space-x-4 overflow-x-auto max-w-full pb-4 snap-x snap-mandatory
              px-[10vw] sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        style={{
-          contain: 'layout paint size',
-          minHeight: '75vw',
-          height: 'auto',
-        }}
+        style={
+          checkIsMobile(navigator.userAgent)
+            ? {
+              contain: 'layout paint size',
+              minHeight: '75vw',
+            }
+            : {
+              contain: 'layout paint',
+            }
+        }
       >
         {events.map(event => (
           <div

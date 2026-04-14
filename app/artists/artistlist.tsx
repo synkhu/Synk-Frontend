@@ -3,16 +3,19 @@
 import { deleteArtist, updateArtist } from "../services/artist.service";
 import { uploadFile } from "../services/file.service";
 import { useState } from "react";
+import Image from "next/image";
+
+type Artist = {
+  id: number;
+  name: string;
+  description?: string | null;
+  spotifyUrl?: string | null;
+  profilePictureUrl?: string | null;
+};
 
 type ArtistListProps = {
-  artists?: {
-    id: number;
-    name: string;
-    description?: string;
-    spotifyUrl?: string;
-    profilePictureUrl?: string;
-  }[];
-  onUpdate: (artists: any[]) => void;
+  artists?: Artist[];
+  onUpdate: (artists: Artist[]) => void;
 };
 
 import Modal from "../../components/Modal";
@@ -120,10 +123,11 @@ export default function ArtistList({
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/20 group-hover:border-purple-500/50 shadow-2xl shadow-purple-500/10 transition-all duration-500 group-hover:scale-105">
                       {a.profilePictureUrl ? (
-                        <img
+                        <Image
                           src={a.profilePictureUrl}
                           alt={a.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-900 flex items-center justify-center">
@@ -188,20 +192,20 @@ export default function ArtistList({
                 onChange={(e) => {
                   const file = e.target.files?.[0] || null;
                   setProfileFile(file);
-                  // Keep existing URL if file is removed, or update logic if needed
-                  // But here we rely on profileFile being present for save()
                 }}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
               <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-lg shadow-purple-500/20 group-hover:border-purple-400 transition-all">
-                <img
+                <Image
                   src={
                     profileFile
                       ? URL.createObjectURL(profileFile)
                       : profilePictureUrl || "https://via.placeholder.com/150"
                   }
                   alt="Preview"
-                  className="w-full h-full object-cover"
+                  unoptimized
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="text-white text-xs font-bold uppercase">
