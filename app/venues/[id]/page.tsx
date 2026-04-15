@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const API_URL = "https://api.synk.hu";
 
@@ -25,6 +26,14 @@ interface VenueDetails {
   isAdultOnly?: boolean | null;
   images?: { id?: string; imageUrl?: string }[] | null;
 }
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
 
 export default function VenueDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -68,8 +77,9 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
 
         const items = Array.isArray(e) ? e : e.items || [];
         setVenueEvents(items);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to load venue details");
+      } catch (err: unknown) {
+        const apiErr = err as ApiError;
+        setError(apiErr.response?.data?.message || "Failed to load venue details");
       } finally {
         setLoading(false);
       }
@@ -101,7 +111,13 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
         <div className="lg:w-1/2 h-64 sm:h-80 lg:h-auto relative overflow-hidden">
           {imageUrls.length > 0 ? (
             <>
-              <img src={imageUrls[currentImageIndex]} alt={venueDetails.name} className="w-full h-full object-cover transition-transform duration-700" />
+              <Image
+                src={imageUrls[currentImageIndex]}
+                alt={venueDetails.name}
+                fill
+                unoptimized
+                className="w-full h-full object-cover transition-transform duration-700"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               {imageUrls.length > 1 && (
                 <div className="absolute bottom-6 inset-x-0 flex justify-center gap-4 items-center z-10">
@@ -173,7 +189,13 @@ export default function VenueDetailsPage({ params }: { params: Promise<{ id: str
               <div key={event.id} onClick={() => router.push(`/events/${event.id}`)} className="group bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden hover:bg-white/[0.08] transition-all cursor-pointer shadow-lg hover:shadow-purple-500/5">
                 <div className="relative aspect-video overflow-hidden">
                   {event.thumbnailUrl ? (
-                    <img src={event.thumbnailUrl} alt={event.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <Image
+                      src={event.thumbnailUrl}
+                      alt={event.name}
+                      fill
+                      unoptimized
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
                   ) : (
                     <div className="w-full h-full bg-zinc-800" />
                   )}

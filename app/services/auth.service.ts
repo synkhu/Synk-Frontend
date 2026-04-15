@@ -1,10 +1,11 @@
 "use client";
 import axios from "axios";
+import type { CurrentUser } from "./user.service";
 
 export interface UserSession {
   token: string;
   expiresAt: string;
-  user?: any;
+  user?: CurrentUser | null;
 }
 
 export interface LoginCredentials {
@@ -15,6 +16,17 @@ export interface LoginCredentials {
 class AuthService {
   private readonly SESSION_KEY = "user_session";
   private readonly TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000;
+
+  private static getErrorMessage(error: unknown): string {
+    if (axios.isAxiosError(error)) {
+      return (
+        (error.response?.data as { message?: string } | undefined)?.message ||
+        error.message
+      );
+    }
+    if (error instanceof Error) return error.message;
+    return "Unknown error";
+  }
 
   private isBrowser(): boolean {
     return typeof window !== "undefined";
@@ -73,7 +85,7 @@ class AuthService {
 
     try {
       return JSON.parse(sessionStr);
-    } catch (error) {
+    } catch {
       this.clearSession();
       return null;
     }
@@ -121,8 +133,8 @@ class AuthService {
         this.setSession(response.data);
         return response.data;
       }
-    } catch (error) {
-      console.error("Token refresh failed:", error);
+    } catch (error: unknown) {
+      console.error("Token refresh failed:", AuthService.getErrorMessage(error));
       this.clearSession();
     }
 
@@ -163,13 +175,16 @@ class AuthService {
           },
         },
       );
-    } catch (error) {
-      console.error("Failed to send verification email:", error);
+    } catch (error: unknown) {
+      console.error(
+        "Failed to send verification email:",
+        AuthService.getErrorMessage(error),
+      );
       throw error;
     }
   }
 
-  async getUserInfo(): Promise<any> {
+  async getUserInfo(): Promise<CurrentUser | null> {
     const token = this.getToken();
     if (!token) return null;
 
@@ -184,8 +199,8 @@ class AuthService {
 
       const { data } = await axios.request(options);
       return data;
-    } catch (error) {
-      console.error("Error fetching user info:", error);
+    } catch (error: unknown) {
+      console.error("Error fetching user info:", AuthService.getErrorMessage(error));
       return null;
     }
   }

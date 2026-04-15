@@ -11,6 +11,15 @@ import {
 } from "../services/user.service";
 import { authService } from "../services/auth.service";
 import axios from "axios";
+import Image from "next/image";
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
 
 export default function MyProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -45,12 +54,15 @@ export default function MyProfilePage() {
           setUser(null);
         } else {
           setUser(data);
-          setFirstName((data.firstName as string) || "");
-          setLastName((data.lastName as string) || "");
+          setFirstName(data.firstName || "");
+          setLastName(data.lastName || "");
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const apiErr = err as ApiError;
         console.error("Failed to load profile:", err);
-        setError(err.response?.data?.message || "Failed to load profile information.");
+        setError(
+          apiErr.response?.data?.message || "Failed to load profile information.",
+        );
       } finally {
         setLoading(false);
       }
@@ -84,10 +96,12 @@ export default function MyProfilePage() {
         const url = new URL(window.location.href);
         url.searchParams.delete("verification-token");
         window.history.replaceState({}, "", url.toString());
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const apiErr = err as ApiError;
         console.error("Failed to verify email:", err);
         setVerificationStatus(
-          err.response?.data?.message || "Failed to verify email. The link may be expired.",
+          apiErr.response?.data?.message ||
+            "Failed to verify email. The link may be expired.",
         );
       }
     };
@@ -116,9 +130,12 @@ export default function MyProfilePage() {
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const apiErr = err as ApiError;
       console.error("Failed to change password:", err);
-      setPasswordStatus(err.response?.data?.message || "Failed to change password.");
+      setPasswordStatus(
+        apiErr.response?.data?.message || "Failed to change password.",
+      );
     }
   };
 
@@ -127,10 +144,11 @@ export default function MyProfilePage() {
     try {
       await authService.sendVerificationEmail();
       setVerificationStatus("Success! Verification email sent.");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const apiErr = err as ApiError;
       console.error("Failed to send verification email:", err);
       setVerificationStatus(
-        err.response?.data?.message || "Failed to send verification email.",
+        apiErr.response?.data?.message || "Failed to send verification email.",
       );
     }
   };
@@ -183,9 +201,11 @@ export default function MyProfilePage() {
             >
               <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-purple-500/20 sm:group-hover:border-purple-500/50 transition-all duration-300">
                 {profilePreview || user.profilePictureUrl ? (
-                  <img
+                  <Image
                     src={profilePreview || (user.profilePictureUrl as string)}
                     alt={fullName()}
+                    fill
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -213,7 +233,7 @@ export default function MyProfilePage() {
                   const updated = await updateUserProfile({ profilePictureUrl: url });
                   setUser(updated);
                   setPictureStatus("Success! Your picture has been updated.");
-                } catch (err: any) {
+                } catch {
                   setPictureStatus("Failed to update picture.");
                   setProfilePreview(null);
                 }
@@ -355,7 +375,7 @@ export default function MyProfilePage() {
                       setLastName(editLastName);
                       setIsEditingName(false);
                       setProfileStatus("Success! Name updated.");
-                    } catch (err) {
+                    } catch {
                       setProfileStatus("Failed to update name.");
                     }
                   }}

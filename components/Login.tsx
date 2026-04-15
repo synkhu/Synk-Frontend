@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import axios from "axios";
-import { authService, LoginCredentials } from "../app/services/auth.service";
+import {
+  authService,
+  type LoginCredentials,
+  type UserSession,
+} from "../app/services/auth.service";
 import { getCurrentUser } from "../app/services/user.service";
 
 interface LoginPopupProps {
@@ -16,10 +20,22 @@ interface LoginPopupProps {
   onCodeChange: (value: string) => void;
   onGetCode: () => void;
   onLogin: () => void;
-  onLoginSuccess?: (sessionData: any) => void;
+  onLoginSuccess?: (sessionData: UserSession) => void;
   onOpenRegister: () => void;
   onBackToEmail: () => void;
 }
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+      errors?: {
+        Password?: string[];
+      };
+    };
+  };
+  message?: string;
+};
 
 export default function LoginPopup({
   visible,
@@ -56,8 +72,12 @@ export default function LoginPopup({
         headers: { "Content-Type": "application/json" },
       });
       setForgotSuccess(true);
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to send reset email. Please try again.");
+    } catch (err: unknown) {
+      const apiErr = err as ApiError;
+      setError(
+        apiErr.response?.data?.message ||
+          "Failed to send reset email. Please try again.",
+      );
     } finally {
       setForgotLoading(false);
     }
@@ -85,9 +105,13 @@ export default function LoginPopup({
         setPassword("");
         setLoginSuccess(false);
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const apiErr = error as ApiError;
       console.error("Login error:", error);
-      setError(error.response?.data?.errors?.Password?.[0] || "Invalid email or password");
+      setError(
+        apiErr.response?.data?.errors?.Password?.[0] ||
+          "Invalid email or password",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -187,8 +211,8 @@ export default function LoginPopup({
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-gray-500 text-sm">
-              Don't have an account?{" "}
+              <p className="text-gray-500 text-sm">
+                Don&apos;t have an account?{" "}
               <button 
                 onClick={(e) => {
                   e.preventDefault();

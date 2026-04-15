@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 const originalError = console.error;
 const originalWarn = console.warn;
 
-console.error = (...args: any[]) => {
+console.error = (...args: unknown[]) => {
   const msg = args[0] || '';
   if (
     typeof msg === 'string' &&
@@ -14,7 +14,7 @@ console.error = (...args: any[]) => {
   originalError(...args);
 };
 
-console.warn = (...args: any[]) => {
+console.warn = (...args: unknown[]) => {
   const msg = args[0] || '';
   if (
     typeof msg === 'string' &&

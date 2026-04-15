@@ -8,8 +8,13 @@ import ProtectedRoute from "../../components/ProtectedRoute";
 import { authService } from "../services/auth.service";
 import Modal from "../../components/Modal";
 
+type EventSummary = {
+  id: string;
+  name: string;
+};
+
 export default function EventsPage() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventSummary[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isChecking, setIsChecking] = useState(true);

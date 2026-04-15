@@ -1,10 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 
-const PASSWORD_RULES = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+      errors?: Record<string, string[]>;
+    };
+  };
+};
 
 function validatePassword(pw: string): string | null {
   if (!pw) return "Password is required";
@@ -40,10 +47,11 @@ function ResetPasswordForm() {
         { headers: { "Content-Type": "application/json" } }
       );
       setPopup({ type: "success", message: "Password reset successfully" });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const apiErr = err as ApiError;
       const msg =
-        err.response?.data?.message ||
-        err.response?.data?.errors?.[Object.keys(err.response?.data?.errors ?? {})[0]]?.[0] ||
+        apiErr.response?.data?.message ||
+        apiErr.response?.data?.errors?.[Object.keys(apiErr.response?.data?.errors ?? {})[0]]?.[0] ||
         "Failed to reset password. The link may have expired.";
       setPopup({ type: "error", message: msg });
     } finally {
@@ -137,7 +145,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <ResetPasswordForm />
     </Suspense>
   );

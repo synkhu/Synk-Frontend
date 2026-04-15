@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -11,13 +11,6 @@ interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, children, title }: ModalProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
-
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -32,7 +25,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
     };
   }, [isOpen, onClose]);
 
-  if (!mounted || !isOpen) return null;
+  if (typeof window === "undefined" || !isOpen) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0a0514]/80 backdrop-blur-md animate-in fade-in duration-300">

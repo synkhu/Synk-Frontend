@@ -20,35 +20,109 @@ type TicketType = {
   maxSaleCount: string;
 };
 
+type EventSummary = {
+  id: string;
+  name: string;
+};
+
+type InitialTicketType = {
+  name?: string;
+  price?: number;
+  saleStartTime?: string;
+  saleEndTime?: string;
+  maxSaleCount?: string | number;
+};
+
+type InitialEventData = {
+  id: string;
+  name?: string;
+  thumbnailUrl?: string;
+  description?: string;
+  startTime?: string;
+  endTime?: string;
+  totalCapacity?: string | number;
+  ticketMaxScanCount?: string | number;
+  venue?: Venue;
+  venueId?: string;
+  venueName?: string;
+  artist?: Artist;
+  artistId?: string;
+  artistName?: string;
+  ticketTypes?: InitialTicketType[];
+};
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+      errors?: unknown;
+    };
+  };
+  message?: string;
+};
+
+const defaultTicketType: TicketType = {
+  name: "",
+  price: 0,
+  saleStartTime: "",
+  saleEndTime: "",
+  maxSaleCount: "",
+};
+
+const buildInitialTicketTypes = (
+  initialData?: InitialEventData,
+): TicketType[] => {
+  if (initialData?.ticketTypes?.length) {
+    return initialData.ticketTypes.map((tt) => ({
+      name: tt.name || "",
+      price: tt.price || 0,
+      saleStartTime: tt.saleStartTime ? tt.saleStartTime.slice(0, 16) : "",
+      saleEndTime: tt.saleEndTime ? tt.saleEndTime.slice(0, 16) : "",
+      maxSaleCount: tt.maxSaleCount?.toString() || "",
+    }));
+  }
+  return [{ ...defaultTicketType }];
+};
+
 type EventFormProps = {
-  onSuccess: (events: any[]) => void;
-  initialData?: any;
+  onSuccess: (events: EventSummary[]) => void;
+  initialData?: InitialEventData;
 };
 
 export default function EventForm({ onSuccess, initialData }: EventFormProps) {
-  const [name, setName] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [name, setName] = useState(() => initialData?.name || "");
+  const [thumbnailUrl, setThumbnailUrl] = useState(
+    () => initialData?.thumbnailUrl || "",
+  );
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [description, setDescription] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [totalCapacity, setTotalCapacity] = useState("");
-  const [ticketMaxScanCount, setTicketMaxScanCount] = useState("");
+  const [description, setDescription] = useState(() => initialData?.description || "");
+  const [startTime, setStartTime] = useState(() =>
+    initialData?.startTime ? initialData.startTime.slice(0, 16) : "",
+  );
+  const [endTime, setEndTime] = useState(() =>
+    initialData?.endTime ? initialData.endTime.slice(0, 16) : "",
+  );
+  const [totalCapacity, setTotalCapacity] = useState(
+    () => initialData?.totalCapacity?.toString() || "",
+  );
+  const [ticketMaxScanCount, setTicketMaxScanCount] = useState(
+    () => initialData?.ticketMaxScanCount?.toString() || "",
+  );
 
-  const [ticketTypes, setTicketTypes] = useState<TicketType[]>([
-    {
-      name: "",
-      price: 0,
-      saleStartTime: "",
-      saleEndTime: "",
-      maxSaleCount: "",
-    },
-  ]);
+  const [ticketTypes, setTicketTypes] = useState<TicketType[]>(() =>
+    buildInitialTicketTypes(initialData),
+  );
 
-  const [artistQuery, setArtistQuery] = useState("");
+  const [artistQuery, setArtistQuery] = useState(
+    () => initialData?.artist?.name || initialData?.artistName || "",
+  );
   const [artistResults, setArtistResults] = useState<Artist[]>([]);
-  const [selectedArtistId, setSelectedArtistId] = useState<string | null>(null);
-  const [selectedArtistName, setSelectedArtistName] = useState<string>("");
+  const [selectedArtistId, setSelectedArtistId] = useState<string | null>(
+    () => initialData?.artist?.id || initialData?.artistId || null,
+  );
+  const [selectedArtistName, setSelectedArtistName] = useState<string>(
+    () => initialData?.artist?.name || initialData?.artistName || "",
+  );
 
   useEffect(() => {
     const timeout = setTimeout(async () => {
@@ -63,54 +137,20 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
     return () => clearTimeout(timeout);
   }, [artistQuery]);
 
-  const [venueQuery, setVenueQuery] = useState("");
+  const [venueQuery, setVenueQuery] = useState(
+    () => initialData?.venue?.name || initialData?.venueName || "",
+  );
   const [venueResults, setVenueResults] = useState<Venue[]>([]);
-  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name || "");
-      setDescription(initialData.description || "");
-      setStartTime(initialData.startTime ? initialData.startTime.slice(0, 16) : "");
-      setEndTime(initialData.endTime ? initialData.endTime.slice(0, 16) : "");
-      setTotalCapacity(initialData.totalCapacity || "");
-      setTicketMaxScanCount(initialData.ticketMaxScanCount || "");
-      setThumbnailUrl(initialData.thumbnailUrl || "");
-
-      if (initialData.venue) {
-        setSelectedVenue(initialData.venue);
-        setVenueQuery(initialData.venue.name);
-      } else if (initialData.venueId) {
-        setSelectedVenue({
-          id: initialData.venueId,
-          name: initialData.venueName || "Selected Venue",
-        });
-        setVenueQuery(initialData.venueName || "Selected Venue");
-      }
-
-      if (initialData.artist) {
-        setSelectedArtistId(initialData.artist.id);
-        setSelectedArtistName(initialData.artist.name);
-        setArtistQuery(initialData.artist.name);
-      } else if (initialData.artistId) {
-        setSelectedArtistId(initialData.artistId);
-        setSelectedArtistName(initialData.artistName || "Selected Artist");
-        setArtistQuery(initialData.artistName || "Selected Artist");
-      }
-
-      if (initialData.ticketTypes && initialData.ticketTypes.length > 0) {
-        setTicketTypes(
-          initialData.ticketTypes.map((tt: any) => ({
-            name: tt.name,
-            price: tt.price,
-            saleStartTime: tt.saleStartTime ? tt.saleStartTime.slice(0, 16) : "",
-            saleEndTime: tt.saleEndTime ? tt.saleEndTime.slice(0, 16) : "",
-            maxSaleCount: tt.maxSaleCount || "",
-          }))
-        );
-      }
+  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(() => {
+    if (initialData?.venue) return initialData.venue;
+    if (initialData?.venueId) {
+      return {
+        id: initialData.venueId,
+        name: initialData.venueName || "Selected Venue",
+      };
     }
-  }, [initialData]);
+    return null;
+  });
 
   useEffect(() => {
     const timeout = setTimeout(async () => {
@@ -212,25 +252,18 @@ export default function EventForm({ onSuccess, initialData }: EventFormProps) {
       setVenueQuery("");
       setSelectedVenue(null);
       setVenueResults([]);
-      setTicketTypes([
-        {
-          name: "",
-          price: 0,
-          saleStartTime: "",
-          saleEndTime: "",
-          maxSaleCount: "",
-        },
-      ]);
+      setTicketTypes([{ ...defaultTicketType }]);
 
       onSuccess(updatedEvents);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const apiErr = err as ApiError;
       console.error("❌ Full error:", err);
-      console.error("❌ Error response:", err.response?.data);
+      console.error("❌ Error response:", apiErr.response?.data);
       alert(
         "Failed to create event. Check console. " +
-          (err.response?.data?.errors
-            ? JSON.stringify(err.response.data.errors)
-            : err.response?.data?.message || err.message),
+          (apiErr.response?.data?.errors
+            ? JSON.stringify(apiErr.response.data.errors)
+            : apiErr.response?.data?.message || apiErr.message),
       );
     }
   }

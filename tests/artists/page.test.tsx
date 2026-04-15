@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
 import ArtistsPage from "../../app/artists/page";
 import { getArtists } from "../../app/services/artist.service";
 import { authService } from "../../app/services/auth.service";
@@ -13,18 +14,24 @@ jest.mock("next/navigation", () => ({
 
 jest.mock("../../components/ProtectedRoute", () => ({
   __esModule: true,
-  default: ({ children }: any) => <div>{children}</div>,
+  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
 jest.mock("../../components/Modal", () => ({
   __esModule: true,
-  default: ({ isOpen, children }: any) =>
+  default: ({
+    isOpen,
+    children,
+  }: {
+    isOpen: boolean;
+    children: ReactNode;
+  }) =>
     isOpen ? <div data-testid="modal">{children}</div> : null,
 }));
 
 jest.mock("../../app/artists/artistform", () => ({
   __esModule: true,
-  default: ({ onSuccess }: any) => (
+  default: ({ onSuccess }: { onSuccess: (artists: { id: number; name: string }[]) => void }) => (
     <button onClick={() => onSuccess([{ id: 1, name: "Dummy Artist" }])}>
       Submit Artist
     </button>
@@ -33,9 +40,9 @@ jest.mock("../../app/artists/artistform", () => ({
 
 jest.mock("../../app/artists/artistlist", () => ({
   __esModule: true,
-  default: ({ artists }: any) => (
+  default: ({ artists }: { artists: { id: number; name: string }[] }) => (
     <ul>
-      {artists.map((a: any) => (
+      {artists.map((a) => (
         <li key={a.id}>{a.name}</li>
       ))}
     </ul>

@@ -13,6 +13,7 @@ import { uploadFile } from "../services/file.service";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Image from "next/image";
 
 import Modal from "../../components/Modal";
 import GateCodeModal from "../../components/GateCodeModal";
@@ -41,9 +42,25 @@ type Event = {
   ticketMaxScanCount?: number;
 };
 
+type SearchResult = {
+  id: string;
+  name: string;
+};
+
+type EventWithTicketTypes = Event & {
+  ticketTypes?: Array<{
+    id?: string;
+    name?: string;
+    price?: number;
+    saleStartTime?: string;
+    saleEndTime?: string;
+    maxSaleCount?: number;
+  }>;
+};
+
 type EventListProps = {
   events?: Event[];
-  onUpdate: (events: any[]) => void;
+  onUpdate: (events: Event[]) => void;
   onEditStart: () => void;
   onEditEnd: () => void;
 };
@@ -73,9 +90,9 @@ export default function EventList({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const [venueQuery, setVenueQuery] = useState("");
-  const [venueResults, setVenueResults] = useState<any[]>([]);
+  const [venueResults, setVenueResults] = useState<SearchResult[]>([]);
   const [artistQuery, setArtistQuery] = useState("");
-  const [artistResults, setArtistResults] = useState<any[]>([]);
+  const [artistResults, setArtistResults] = useState<SearchResult[]>([]);
 
   useEffect(() => {
     const timeout = setTimeout(async () => {
@@ -197,7 +214,7 @@ export default function EventList({
       const response = await axios.get(
         `https://api.synk.hu/events/${event.id}`,
       );
-      const fullEvent = response.data;
+      const fullEvent = response.data as EventWithTicketTypes;
 
       setFormData({
         name: fullEvent.name || "",
@@ -213,7 +230,7 @@ export default function EventList({
 
       if (fullEvent.ticketTypes && fullEvent.ticketTypes.length > 0) {
         setTicketTypes(
-          fullEvent.ticketTypes.map((tt: any) => ({
+          fullEvent.ticketTypes.map((tt) => ({
             id: tt.id,
             name: tt.name || "",
             price: tt.price || 0,
@@ -356,9 +373,11 @@ export default function EventList({
 
                 {e.thumbnailUrl ? (
                   <div className="h-48 w-full overflow-hidden relative">
-                    <img
+                    <Image
                       src={e.thumbnailUrl}
                       alt={e.name}
+                      fill
+                      unoptimized
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1a0b2e] to-transparent opacity-60"></div>
@@ -443,10 +462,13 @@ export default function EventList({
             </label>
             {formData.thumbnailUrl && (
               <div className="mb-2">
-                <img
+                <Image
                   src={formData.thumbnailUrl}
                   alt="Current thumbnail"
-                  className="h-24 rounded-xl object-cover border border-white/10"
+                  width={160}
+                  height={96}
+                  unoptimized
+                  className="h-24 w-auto rounded-xl object-cover border border-white/10"
                 />
                 <p className="text-xs text-gray-500 mt-1 ml-1">Current image — upload a new one to replace it</p>
               </div>

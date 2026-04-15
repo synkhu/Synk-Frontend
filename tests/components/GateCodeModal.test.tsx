@@ -1,11 +1,20 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import type { ReactNode } from "react";
 import GateCodeModal from '../../components/GateCodeModal';
 import axios from 'axios';
 
 jest.mock('axios');
 jest.mock('../../components/Modal', () => ({
   __esModule: true,
-  default: ({ isOpen, onClose, children }: any) => {
+  default: ({
+    isOpen,
+    onClose,
+    children,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    children: ReactNode;
+  }) => {
     if (!isOpen) return null;
 
     return (

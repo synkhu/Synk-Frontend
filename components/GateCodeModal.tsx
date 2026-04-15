@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
+import axios, { type AxiosRequestConfig } from "axios";
 import Modal from "./Modal";
 
 interface GateCodeModalProps {
@@ -16,26 +16,20 @@ export default function GateCodeModal({ isOpen, onClose, eventId, eventName }: G
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isOpen && eventId) {
-      fetchCode();
-    }
-  }, [isOpen, eventId]);
-
-  const fetchCode = async () => {
+  const fetchCode = useCallback(async () => {
     setLoading(true);
     setError(null);
     setCode(null);
 
-    const options = {
-      method: 'GET',
-      url: `https://api.synk.hu/events/${eventId}/staff-code`
+    const options: AxiosRequestConfig = {
+      method: "GET",
+      url: `https://api.synk.hu/events/${eventId}/staff-code`,
     };
 
     try {
       const token = localStorage.getItem("authToken");
       if (token) {
-        (options as any).headers = { Authorization: `Bearer ${token}` };
+        options.headers = { Authorization: `Bearer ${token}` };
       }
 
       const { data } = await axios.request(options);
@@ -44,12 +38,18 @@ export default function GateCodeModal({ isOpen, onClose, eventId, eventName }: G
       } else {
         setCode(String(data));
       }
-    } catch (error) {
+    } catch {
       setError("Failed to load gate code");
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventId]);
+
+  useEffect(() => {
+    if (isOpen && eventId) {
+      fetchCode();
+    }
+  }, [fetchCode, isOpen, eventId]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Gate Code">

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
+import Image from "next/image";
 import Modal from "@/components/Modal";
 
 const API_URL = "https://api.synk.hu";
@@ -33,9 +34,57 @@ type EventDetails = {
   artistName?: string;
   artistId?: string;
   ticketTypes?: TicketType[];
+  imageUrls?: string[];
 };
 
-const mapEventDetails = (data: any): EventDetails => ({
+type ApiEventDetails = EventDetails & {
+  venue?: {
+    id?: string;
+    name?: string;
+    address?: string;
+  };
+  artist?: {
+    id?: string;
+    name?: string;
+  };
+  venueid?: string;
+  venuename?: string;
+  venue_address?: string;
+  artistid?: string;
+  artistname?: string;
+};
+
+type BillingAddress = {
+  id: string;
+  fullName: string;
+  addressLine1: string;
+  addressLine2?: string | null;
+  city: string;
+  stateOrProvince?: string | null;
+  postalCode: string;
+  country: string;
+  phoneNumber?: string | null;
+  isDefault?: boolean;
+};
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+};
+
+type PurchasePayload = {
+  eventId: string;
+  items: Array<{ ticketTypeId: string; quantity: number }>;
+  billingAddressId: string | null;
+  billingInfo: Record<string, unknown>;
+  saveBillingAddress: boolean;
+};
+
+const mapEventDetails = (data: ApiEventDetails): EventDetails => ({
   ...data,
   venueId: data.venueId ?? data.venueid ?? data.venue?.id ?? undefined,
   venueName: data.venueName ?? data.venuename ?? data.venue?.name ?? undefined,
@@ -52,7 +101,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   const [eventId, setEventId] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
-  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [savedAddresses, setSavedAddresses] = useState<BillingAddress[]>([]);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
@@ -79,18 +128,21 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       
       setLoadingAddresses(true);
       try {
-        const { data } = await axios.get(`${API_URL}/billing-addresses`, {
+        const { data } = await axios.get<BillingAddress[]>(
+          `${API_URL}/billing-addresses`,
+          {
           headers: { Authorization: `Bearer ${token}` }
-        });
+          },
+        );
         setSavedAddresses(data);
         if (data.length > 0) {
-          const defaultAddr = data.find((a: any) => a.isDefault) || data[0];
+          const defaultAddr = data.find((a) => a.isDefault) || data[0];
           setSelectedAddressId(defaultAddr.id);
           setIsAddingNewAddress(false);
         } else {
           setIsAddingNewAddress(true);
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Failed to fetch addresses", err);
         setIsAddingNewAddress(true);
       } finally {
@@ -116,7 +168,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       if (selectedAddressId === id) {
         setSelectedAddressId(null);
       }
-    } catch (err) {
+    } catch {
       alert("Failed to delete address");
     }
   };
@@ -133,11 +185,12 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     if (!eventId) return;
     async function fetchEventDetails() {
       try {
-        const res = await axios.get(`${API_URL}/events/${eventId}`);
+        const res = await axios.get<ApiEventDetails>(`${API_URL}/events/${eventId}`);
         setEvent(mapEventDetails(res.data));
         setLoading(false);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to load event details");
+      } catch (err: unknown) {
+        const apiErr = err as ApiError;
+        setError(apiErr.response?.data?.message || "Failed to load event details");
         setLoading(false);
       }
     }
@@ -155,7 +208,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
   const handleCheckout = () => {
     const selectedItems = Object.entries(ticketQuantities)
-      .filter(([_, qty]) => qty > 0);
+      .filter(([, qty]) => qty > 0);
 
     if (selectedItems.length === 0) return alert("Select at least one ticket");
     
@@ -169,8 +222,13 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   };
 
   const executePurchase = async () => {
+    if (!eventId) {
+      alert("Missing event information. Please refresh and try again.");
+      return;
+    }
+
     const selectedItems = Object.entries(ticketQuantities)
-      .filter(([_, qty]) => qty > 0)
+      .filter(([, qty]) => qty > 0)
       .map(([id, qty]) => ({ ticketTypeId: id, quantity: qty }));
 
     const token = localStorage.getItem("authToken");
@@ -191,24 +249,32 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       if (saveAddress) {
         try {
           // Save the new address first
-          const { data: newAddress } = await axios.post(`${API_URL}/billing-addresses`, {
+          const { data: newAddress } = await axios.post<BillingAddress>(
+            `${API_URL}/billing-addresses`,
+            {
             ...billingInfo,
             addressLine2: billingInfo.addressLine2 || null,
             stateOrProvince: billingInfo.stateOrProvince || null,
             phoneNumber: billingInfo.phoneNumber || null,
             isDefault: savedAddresses.length === 0 // Make default if it's the first one
-          }, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
           
           finalBillingAddressId = newAddress.id;
           // Update local state with new address
           setSavedAddresses(prev => [...prev, newAddress]);
           setSelectedAddressId(newAddress.id);
           setIsAddingNewAddress(false);
-        } catch (err: any) {
+        } catch (err: unknown) {
+          const apiErr = err as ApiError;
           console.error("Failed to save billing address", err);
-          return alert("Failed to save billing address: " + (err.response?.data?.message || err.message));
+          return alert(
+            "Failed to save billing address: " +
+              (apiErr.response?.data?.message || apiErr.message),
+          );
         }
       } else {
         finalBillingAddressId = null;
@@ -233,7 +299,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
           phoneNumber: billingInfo.phoneNumber || null
        };
     } else if (finalBillingAddressId) {
-      const selectedAddr = savedAddresses.find(a => a.id === finalBillingAddressId);
+      const selectedAddr = savedAddresses.find((a) => a.id === finalBillingAddressId);
       if (selectedAddr) {
         billingInfoPayload = {
           fullName: selectedAddr.fullName,
@@ -248,7 +314,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       }
     }
 
-    const payload: any = { 
+    const payload: PurchasePayload = {
       eventId, 
       items: selectedItems,
       billingAddressId: finalBillingAddressId,
@@ -269,13 +335,17 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
       // Refresh event data
       const res = await axios.get(`${API_URL}/events/${eventId}`);
       setEvent(mapEventDetails(res.data));
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const apiErr = err as ApiError;
       console.error(err);
-      if (err.message === "Network Error") {
+      if (apiErr.message === "Network Error") {
          alert("Network Error: Unable to reach the server. Please check your internet connection.");
-      } else {
-         alert("Purchase failed: " + (err.response?.data?.message || err.message || "Unknown error"));
-      }
+       } else {
+         alert(
+           "Purchase failed: " +
+             (apiErr.response?.data?.message || apiErr.message || "Unknown error"),
+         );
+       }
     }
   };
 
@@ -295,7 +365,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     </div>
   );
 
-  const imageUrls = (event as any).imageUrls || [event.thumbnailUrl].filter(Boolean);
+  const imageUrls = event.imageUrls || [event.thumbnailUrl].filter(Boolean);
 
   return (
     <div className="py-12 px-4 md:px-8 max-w-7xl mx-auto space-y-12">
@@ -305,15 +375,17 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
           <div className="relative rounded-[3rem] overflow-hidden shadow-2xl border border-white/10 aspect-video group">
             {imageUrls.length > 0 ? (
               <>
-                <img 
-                  src={imageUrls[currentImageIndex]} 
-                  alt={event.name} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                <Image
+                  src={(imageUrls[currentImageIndex] || imageUrls[0])!}
+                  alt={event.name}
+                  fill
+                  unoptimized
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                 {imageUrls.length > 1 && (
                   <div className="absolute inset-x-0 bottom-6 flex justify-center gap-2">
-                    {imageUrls.map((_: any, idx: number) => (
+                    {imageUrls.map((_, idx: number) => (
                       <button 
                         key={idx} 
                         onClick={() => setCurrentImageIndex(idx)}
@@ -499,7 +571,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
               <div className="text-center py-4 text-gray-500">Loading addresses...</div>
             ) : !isAddingNewAddress && savedAddresses.length > 0 ? (
               <div className="space-y-3">
-                {savedAddresses.map((addr: any) => (
+                {savedAddresses.map((addr) => (
                   <div 
                     key={addr.id}
                     onClick={() => setSelectedAddressId(addr.id)}

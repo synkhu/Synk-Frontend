@@ -10,7 +10,6 @@ import {
   getCachedUser,
   type CurrentUser,
 } from "../app/services/user.service";
-import { Source_Serif_4 } from "next/font/google";
 import { isMobile as checkIsMobile } from "../utils/isMobile";
 
 type NavbarProps = {
@@ -217,16 +216,20 @@ export default function Navbar({
               }`}
           >
             {isNavbarOpen ? (
-              <img
+              <Image
                 src="/logo/horizontal-logo2.png"
                 alt="Synk Logo"
+                width={160}
+                height={40}
                 className="h-[40px] object-contain"
               />
             ) : (
-              <img
+              <Image
                 src="/logo/logo.png"
                 alt="Synk Logo"
-                style={{ width: "120px", height: "auto", marginTop: "20px" }}
+                width={120}
+                height={120}
+                style={{ marginTop: "20px" }}
               />
             )}
             <button

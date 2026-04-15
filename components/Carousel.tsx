@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Image from "next/image";
 
 interface EventItem {
   id: string;
@@ -126,7 +127,13 @@ export default function Carousel() {
                 onClick={() => router.push(`/events/${event.id}`)}
               >
                 {event.thumbnailUrl ? (
-                  <img src={event.thumbnailUrl} alt={event.name} className="w-full h-full object-cover" />
+                  <Image
+                    src={event.thumbnailUrl}
+                    alt={event.name}
+                    fill
+                    unoptimized
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-purple-900 to-indigo-950" />
                 )}
