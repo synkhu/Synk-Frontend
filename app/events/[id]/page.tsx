@@ -101,6 +101,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
   const [eventId, setEventId] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState<BillingAddress[]>([]);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -206,15 +207,39 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     });
   };
 
+  const getTicketAvailability = (ticket: TicketType) => {
+    const now = Date.now();
+    const saleStartAt = ticket.saleStartTime ? new Date(ticket.saleStartTime).getTime() : null;
+    const saleEndAt = ticket.saleEndTime ? new Date(ticket.saleEndTime).getTime() : null;
+    const hasStarted = saleStartAt === null || Number.isNaN(saleStartAt) || now >= saleStartAt;
+    const hasNotEnded = saleEndAt === null || Number.isNaN(saleEndAt) || now <= saleEndAt;
+    const isInSale = hasStarted && hasNotEnded;
+    const isSoldOut = typeof ticket.remainingCount === "number" && ticket.remainingCount <= 0;
+
+    return {
+      isInSale,
+      isSoldOut,
+      isSelectable: isInSale && !isSoldOut,
+    };
+  };
+
   const handleCheckout = () => {
     const selectedItems = Object.entries(ticketQuantities)
       .filter(([, qty]) => qty > 0);
 
     if (selectedItems.length === 0) return alert("Select at least one ticket");
+
+    const hasUnavailableSelection = selectedItems.some(([ticketTypeId]) => {
+      const selectedTicket = event?.ticketTypes?.find((ticket) => ticket.id === ticketTypeId);
+      return !selectedTicket || !getTicketAvailability(selectedTicket).isSelectable;
+    });
+    if (hasUnavailableSelection) {
+      return alert("One or more selected tickets are no longer available for sale.");
+    }
     
     const token = localStorage.getItem("authToken");
     if (!token) {
-      alert("Please login to purchase tickets");
+      setIsLoginRequiredModalOpen(true);
       return;
     }
     
@@ -473,44 +498,63 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             </header>
 
             <div className="space-y-4">
-              {event.ticketTypes?.map((ticket) => (
-                <div 
-                  key={ticket.id}
-                  className={`group relative overflow-hidden rounded-[2rem] border transition-all duration-300 ${
-                    ticketQuantities[ticket.id] > 0 
-                      ? "bg-purple-500/10 border-purple-500/50" 
-                      : "bg-white/5 border-white/5 hover:border-white/20"
-                  }`}
-                >
-                  <div className="p-3 md:p-6 space-y-4">
-                    <div className="flex flex-col gap-2 items-center md:flex-row md:items-start md:justify-between">
-                      <div className="space-y-1">
-                        <h3 className="font-bold text-white text-sm md:text-lg text-center md:text-left">{ticket.name}</h3>
-                        <p className="text-purple-400 font-bold">{ticket.price.toLocaleString()} HUF</p>
-                      </div>
-                      <div className="flex items-center gap-3 bg-black/40 rounded-2xl p-1 border border-white/5">
-                        <button 
-                          onClick={() => setTicketQuantities(p => ({ ...p, [ticket.id]: Math.max(0, (p[ticket.id] || 0) - 1) }))}
-                          className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 text-white transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20 12H4" /></svg>
-                        </button>
-                        <span className="text-white font-bold w-6 text-center">{ticketQuantities[ticket.id] || 0}</span>
-                        <button 
-                          onClick={() => setTicketQuantities(p => {
-                            const currentTotal = Object.values(p).reduce((a, b) => a + b, 0);
-                            if (currentTotal >= 10) return p;
-                            return { ...p, [ticket.id]: (p[ticket.id] || 0) + 1 };
-                          })}
-                          className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 text-white transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
-                        </button>
+              {event.ticketTypes?.map((ticket) => {
+                const { isSelectable, isInSale, isSoldOut } = getTicketAvailability(ticket);
+                const currentQuantity = ticketQuantities[ticket.id] || 0;
+                const isDecreaseDisabled = currentQuantity === 0;
+
+                return (
+                  <div 
+                    key={ticket.id}
+                    className={`group relative overflow-hidden rounded-[2rem] border transition-all duration-300 ${
+                      currentQuantity > 0
+                        ? "bg-purple-500/10 border-purple-500/50"
+                        : isSelectable
+                          ? "bg-white/5 border-white/5 hover:border-white/20"
+                          : "bg-white/5 border-white/10 opacity-80"
+                    }`}
+                  >
+                    <div className="p-3 md:p-6 space-y-4">
+                      <div className="flex flex-col gap-2 items-center md:flex-row md:items-start md:justify-between">
+                        <div className="space-y-1">
+                          <h3 className="font-bold text-white text-sm md:text-lg text-center md:text-left">{ticket.name}</h3>
+                          <p className="text-purple-400 font-bold">{ticket.price.toLocaleString()} HUF</p>
+                          {!isInSale && <p className="text-xs font-semibold text-amber-400">Not in sale</p>}
+                          {isSoldOut && <p className="text-xs font-semibold text-red-400">Sold out</p>}
+                        </div>
+                        <div className="flex items-center gap-3 bg-black/40 rounded-2xl p-1 border border-white/5">
+                          <button
+                            aria-label={`Decrease ${ticket.name} quantity`}
+                            disabled={isDecreaseDisabled}
+                            onClick={() => setTicketQuantities(p => ({ ...p, [ticket.id]: Math.max(0, (p[ticket.id] || 0) - 1) }))}
+                            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors ${
+                              isDecreaseDisabled ? "text-gray-600 cursor-not-allowed" : "hover:bg-white/10 text-white"
+                            }`}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20 12H4" /></svg>
+                          </button>
+                          <span className="text-white font-bold w-6 text-center">{currentQuantity}</span>
+                          <button
+                            aria-label={`Increase ${ticket.name} quantity`}
+                            disabled={!isSelectable}
+                            onClick={() => setTicketQuantities(p => {
+                              if (!isSelectable) return p;
+                              const currentTotal = Object.values(p).reduce((a, b) => a + b, 0);
+                              if (currentTotal >= 10) return p;
+                              return { ...p, [ticket.id]: (p[ticket.id] || 0) + 1 };
+                            })}
+                            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors ${
+                              !isSelectable ? "text-gray-600 cursor-not-allowed" : "hover:bg-white/10 text-white"
+                            }`}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {Object.values(ticketQuantities).some(v => v > 0) ? (
@@ -750,6 +794,34 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
               {isAddingNewAddress ? "Save Address & Pay" : "Confirm & Pay"}
             </button>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isLoginRequiredModalOpen}
+        onClose={() => setIsLoginRequiredModalOpen(false)}
+        title="Login Required"
+      >
+        <div className="text-center space-y-6 py-2">
+          <div className="w-16 h-16 bg-purple-500/10 border border-purple-500/20 rounded-full flex items-center justify-center mx-auto">
+            <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 9V5.25A3.75 3.75 0 008.25 5.25V9m-1.5 0h10.5A2.25 2.25 0 0119.5 11.25v7.5A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 014.5 18.75v-7.5A2.25 2.25 0 016.75 9z" />
+            </svg>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-bold text-white">Please log in to continue</h3>
+            <p className="text-gray-400">
+              You need to be logged in to buy tickets.
+              <br />
+              Use the <span className="text-purple-300 font-semibold">Login</span> button in the navigation bar, then try again.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsLoginRequiredModalOpen(false)}
+            className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors"
+          >
+            OK
+          </button>
         </div>
       </Modal>
 

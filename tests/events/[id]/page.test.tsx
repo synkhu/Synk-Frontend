@@ -123,13 +123,8 @@ describe("EventDetailsPage", () => {
     await renderPage();
     await screen.findByText("Test Event");
 
-    const plusButton = screen
-      .getAllByRole("button")
-      .find((btn) => btn.innerHTML.includes("M12 4v16"))!;
-
-    const minusButton = screen
-      .getAllByRole("button")
-      .find((btn) => btn.innerHTML.includes("M20 12H4"))!;
+    const plusButton = screen.getByLabelText("Increase General Admission quantity");
+    const minusButton = screen.getByLabelText("Decrease General Admission quantity");
 
     await userEvent.click(plusButton);
     expect(screen.getByText("1")).toBeInTheDocument();
@@ -142,9 +137,7 @@ describe("EventDetailsPage", () => {
     await renderPage();
     await screen.findByText("Test Event");
 
-    const plusButton = screen
-      .getAllByRole("button")
-      .find((btn) => btn.innerHTML.includes("M12 4v16"))!;
+    const plusButton = screen.getByLabelText("Increase General Admission quantity");
 
     await userEvent.click(plusButton);
 
@@ -165,9 +158,7 @@ describe("EventDetailsPage", () => {
     await renderPage();
     await screen.findByText("Test Event");
 
-    const plusButton = screen
-      .getAllByRole("button")
-      .find((btn) => btn.innerHTML.includes("M12 4v16"))!;
+    const plusButton = screen.getByLabelText("Increase General Admission quantity");
 
     await userEvent.click(plusButton);
 
@@ -177,6 +168,57 @@ describe("EventDetailsPage", () => {
     await waitFor(() => {
       expect(screen.getByTestId("modal")).toBeInTheDocument();
     });
+  });
+
+  it("shows login required popup when trying to checkout while logged out", async () => {
+    await renderPage();
+    await screen.findByText("Test Event");
+
+    const plusButton = screen.getByLabelText("Increase General Admission quantity");
+
+    await userEvent.click(plusButton);
+
+    const checkoutButton = await screen.findByText("Confirm Purchase");
+    await userEvent.click(checkoutButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Please log in to continue")).toBeInTheDocument();
+      expect(screen.getByText(/You need to be logged in to buy tickets\./)).toBeInTheDocument();
+    });
+  });
+
+  it("disables sold out and not in sale tickets", async () => {
+    mockAxios.get.mockImplementation((url: string) => {
+      if (url.includes("/events/1")) {
+        return Promise.resolve({
+          data: {
+            ...mockEvent,
+            ticketTypes: [
+              { id: "t1", name: "General Admission", price: 5000, remainingCount: 100 },
+              { id: "t2", name: "Sold Out Ticket", price: 7000, remainingCount: 0 },
+              {
+                id: "t3",
+                name: "Not In Sale Ticket",
+                price: 9000,
+                remainingCount: 50,
+                saleEndTime: "2024-01-01T00:00:00Z",
+              },
+            ],
+          },
+        });
+      }
+      if (url.includes("/addresses")) return Promise.resolve({ data: [] });
+      return Promise.reject(new Error("Not found"));
+    });
+
+    await renderPage();
+    await screen.findByText("Test Event");
+
+    expect(screen.getByText("Sold out")).toBeInTheDocument();
+    expect(screen.getByText("Not in sale")).toBeInTheDocument();
+
+    expect(screen.getByLabelText("Increase Sold Out Ticket quantity")).toBeDisabled();
+    expect(screen.getByLabelText("Increase Not In Sale Ticket quantity")).toBeDisabled();
   });
 
   it("does not allow checkout without tickets", async () => {
