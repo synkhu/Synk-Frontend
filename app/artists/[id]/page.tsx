@@ -114,7 +114,7 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
-        <div className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">
+        <div className="flex-1 p-6 md:p-10 space-y-6">
           <div className="space-y-2">
             <span className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full">Performer</span>
             <h1 className="text-3xl md:text-6xl font-extrabold text-white tracking-tight leading-none">{artistDetails.name}</h1>
@@ -137,7 +137,7 @@ export default function ArtistDetailsPage({ params }: { params: Promise<{ id: st
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {artistEvents.map((event) => (
               <div key={event.id} onClick={() => router.push(`/events/${event.id}`)} className="group flex bg-white/5 border border-white/10 rounded-[2rem] overflow-hidden hover:bg-white/[0.08] transition-all cursor-pointer">
-                <div className="w-32 h-32 flex-shrink-0 overflow-hidden">
+                <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
                   {event.thumbnailUrl ? (
                     <Image src={event.thumbnailUrl} alt={event.name} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
                   ) : (
